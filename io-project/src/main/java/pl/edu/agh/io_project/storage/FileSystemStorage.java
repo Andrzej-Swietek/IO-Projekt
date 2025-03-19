@@ -1,6 +1,7 @@
 package pl.edu.agh.io_project.storage;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.Async;
@@ -19,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
+@Primary
 public class FileSystemStorage implements Storage {
 
     @Value("${storage.local.base-path}")

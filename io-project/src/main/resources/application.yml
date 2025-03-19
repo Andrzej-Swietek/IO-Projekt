@@ -3,9 +3,10 @@ spring:
     name: io-project
   profiles:
     active: local
-  storage:
-    local:
-      base-path: classpath:storage/
+  ai:
+    openai:
+      enabled: false
+      api-key: ${OPENAI_API_KEY}
 
   security:
     oauth2:
@@ -30,5 +31,13 @@ springdoc:
     path: /swagger-ui.html
     operationsSorter: method
 
+storage:
+  local:
+    base-path: classpath:storage/
+
 server:
   port: 8080
+
+logging:
+  level:
+    org.springframework.r2dbc: DEBUG
