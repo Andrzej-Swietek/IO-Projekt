@@ -1,0 +1,29 @@
+services:
+
+  # =================== Prometheus ===================
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+
+  # =================== Grafana ===================
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "9091:3000"
+    networks:
+      - microservices-net
+    restart: unless-stopped

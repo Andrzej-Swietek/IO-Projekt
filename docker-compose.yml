@@ -1,0 +1,65 @@
+services:
+  #  =================== Databases ===================
+
+  postgres:
+    container_name: io_pg_sql
+    image: postgres
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  keycloak:
+    container_name: keycloak-ms
+    image: quay.io/keycloak/keycloak:latest
+    ports:
+      - 9098:8080
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres/io-db
+      KC_DB_USERNAME: user
+      KC_DB_PASSWORD: password
+    networks:
+      - microservices-net
+    volumes:
+      - ./config/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ./keycloak/theme:/opt/keycloak/themes
+    command:
+      - "start-dev"
+      - "--import-realm"
+
+  #  ================ Mailer Service ================
+
+# TODO: Issue #xx Add email notification
+#  mail-dev:
+#    container_name: ms-mail-dev
+#    image: maildev/maildev
+#    ports:
+#      - 1080:1080 # UI
+#      - 1025:1025 # SMTP
+
+# TODO: Issue #xx Add monitoring
+#include:
+#  - docker/monitoring/monitoring.yml
+
+#  ================== Networks ===================
+
+networks:
+  microservices-net:
+    driver: bridge
+
+#  =================== Volumes ===================
+
+volumes:
+  postgres:
+  pgadmin:
