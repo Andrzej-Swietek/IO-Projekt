@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "spaces": 2,
+  "generator-cli": {
+    "version": "7.12.0"
+  },
+  "generatorName": "typescript-react-query",
+  "outputDir": "src/api",
+  "inputSpec": "http://localhost:8080/v3/api-docs",
+  "additionalProperties": {
+    "useQueryParams": "true",
+    "useSuspense": "true",
+    "queryParamObjectFormat": "deepObject",
+    "queryOptions": "{}",
+    "fetcher": "./custom-fetcher"
+  }
+}

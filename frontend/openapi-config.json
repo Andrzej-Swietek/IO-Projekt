@@ -1,0 +1,14 @@
+{
+  "generatorName": "typescript-axios",
+  "outputDir": "src/api",
+  "inputSpec": "http://localhost:8080/v3/api-docs",
+  "additionalProperties": {
+    "useQueryParams": "true",
+    "useSuspense": "true",
+    "queryParamObjectFormat": "deepObject",
+    "queryOptions": "{}",
+    "npmName": "api-client",
+    "npmVersion": "1.0.0"
+  }
+}
+
