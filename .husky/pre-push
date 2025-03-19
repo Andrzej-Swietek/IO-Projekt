@@ -1,0 +1,20 @@
+#!/bin/sh
+echo "🔎 Running ESLint on frontend..."
+cd frontend
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "❌ ESLint failed. Fix errors before pushing."
+  exit 1
+fi
+
+echo "✅ ESLint passed!"
+
+echo "🚀 Running backend tests..."
+cd ../io-project
+./gradlew test
+if [ $? -ne 0 ]; then
+  echo "❌ Backend tests failed. Fix errors before pushing."
+  exit 1
+fi
+
+echo "✅ All tests passed! Pushing..."
