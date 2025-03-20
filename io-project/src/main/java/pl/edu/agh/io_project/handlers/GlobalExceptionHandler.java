@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import pl.edu.agh.io_project.exceptions.ValidationException;
 import pl.edu.agh.io_project.reponses.ErrorResponse;
 
@@ -58,6 +59,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException exp) {
         Map<String, String> errors = Map.of("error", "Access denied: " + exp.getMessage());
         return ResponseEntity.status(FORBIDDEN).body(new ErrorResponse(errors));
+    }
+
+    @ExceptionHandler(AsyncRequestTimeoutException.class)
+    public ResponseEntity<ErrorResponse> handleAsyncTimeout(AsyncRequestTimeoutException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                Map.of(
+                        "message", "Asynchronous request timed out. Please try again later."
+                )
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(errorResponse);
     }
 
 //    @ExceptionHandler(Exception.class)

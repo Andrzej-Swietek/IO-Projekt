@@ -2,9 +2,11 @@ package pl.edu.agh.io_project.reports;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.Map;
+import java.util.concurrent.*;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,7 @@ import pl.edu.agh.io_project.reponses.PaginatedResponse;
 @RestController
 @RequestMapping("/api/v1/report")
 @AllArgsConstructor
+@Slf4j
 public class ReportController {
 
     private final ReportService reportService;
@@ -58,19 +61,38 @@ public class ReportController {
     }
 
     @GetMapping("/{reportId}/generate")
-    public SseEmitter generateReport(@PathVariable Long reportId) {
-        SseEmitter emitter = new SseEmitter();
+    public ResponseEntity<ReportResponses.ReportResultStatus> generateReport(@PathVariable Long reportId) {
+        ReportResult result = reportService.initializeReport(reportId);
+        return ResponseEntity.ok(
+                new ReportResponses.ReportResultStatus(
+                        reportId,
+                        result.getId(),
+                        result.getStatus()
+                ));
+    }
 
-        CompletableFuture<ReportResult> future = reportService.generate(reportId);
+    @GetMapping("/status/{resultId}")
+    public SseEmitter trackProgress(@PathVariable Long resultId) {
+        SseEmitter emitter = new SseEmitter(120_000L);
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-        future.thenAccept(reportResult -> {
+        scheduler.scheduleAtFixedRate(() -> {
             try {
-                emitter.send(reportResult);
-                emitter.complete();
-            } catch (IOException e) {
+                ReportStatus status = reportService.checkStatus(resultId);
+
+                emitter.send(SseEmitter.event()
+                        .data(Map.of("status", status))
+                        .id(String.valueOf(System.currentTimeMillis())));
+
+                if (status.isCompleted() || status.isFailed()) {
+                    emitter.complete();
+                    scheduler.shutdown();
+                }
+            } catch (Exception e) {
                 emitter.completeWithError(e);
+                scheduler.shutdown();
             }
-        });
+        }, 0, 1, TimeUnit.SECONDS);
 
         return emitter;
     }

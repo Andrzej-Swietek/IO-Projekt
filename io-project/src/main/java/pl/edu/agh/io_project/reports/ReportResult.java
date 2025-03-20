@@ -31,7 +31,11 @@ public class ReportResult {
 
     private Boolean success;
 
-    @CreatedDate
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdDate;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdDate = LocalDateTime.now();
+    }
 }
