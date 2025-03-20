@@ -7,6 +7,9 @@ spring:
     openai:
       enabled: false
       api-key: ${OPENAI_API_KEY}
+  threads:
+    virtual:
+      enabled: true
 
   security:
     oauth2:
@@ -14,15 +17,23 @@ spring:
         jwt:
           issuer-uri: "http://localhost:9098/realms/io-project"
 
-  r2dbc:
-    url: r2dbc:postgresql://localhost:5432/io-db
-    username: user
-    password: password
-    pool:
-      enabled: true
-      initial-size: 5
-      max-size: 20
-      validation-query: SELECT 1
+  datasource:
+    url: jdbc:postgresql://localhost:5432/io-db
+    username:  user #${DB_USERNAME}
+    password: password #${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-test-query: SELECT 1
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
 springdoc:
   api-docs:
@@ -40,4 +51,23 @@ server:
 
 logging:
   level:
-    org.springframework.r2dbc: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.boot.actuate: DEBUG
+    io.micrometer: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ["health", "info", "metrics", "prometheus"]
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: io-project
+  prometheus:
+    metrics:
+      export:
+        enabled: true

@@ -1,4 +1,4 @@
-package pl.edu.agh.io_project.handlers;
+package pl.edu.agh.io_project.reponses;
 
 import java.util.Map;
 

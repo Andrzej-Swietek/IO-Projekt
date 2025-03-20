@@ -1,4 +1,4 @@
-package pl.edu.agh.io_project.board;
+package pl.edu.agh.io_project.boards;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,7 +1,7 @@
 {
   "generatorName": "typescript-axios",
   "outputDir": "src/api",
-  "inputSpec": "http://localhost:8080/v3/api-docs",
+  "inputSpec": "http://localhost:8080/api-docs",
   "additionalProperties": {
     "useQueryParams": "true",
     "useSuspense": "true",
