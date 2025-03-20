@@ -25,6 +25,10 @@ public class ReportResult {
     @Column(columnDefinition = "TEXT")
     private String details;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReportStatus status;
+
     private Boolean success;
 
     @CreatedDate
