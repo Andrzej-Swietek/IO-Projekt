@@ -5,7 +5,7 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/io-project" />
-        <option name="gradleJvm" value="openjdk-22" />
+        <option name="gradleJvm" value="corretto-22" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/io-project" />
