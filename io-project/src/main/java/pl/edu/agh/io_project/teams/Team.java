@@ -21,6 +21,8 @@ public class Team {
 
     private String name;
 
+    private String description;
+
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamMember> members;
 

@@ -1,8 +1,12 @@
 package pl.edu.agh.io_project.teams;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.edu.agh.io_project.config.annotations.QueryBuilder;
+import pl.edu.agh.io_project.config.annotations.QueryBuilderParams;
+import pl.edu.agh.io_project.reponses.PaginatedResponse;
 
 import java.util.List;
 
@@ -12,9 +16,25 @@ import java.util.List;
 public class TeamController {
     private final TeamService teamService;
 
+    @GetMapping("/all")
+    public PaginatedResponse<Team> getAllTeams(@QueryBuilder QueryBuilderParams query) {
+        Page<Team> teamPage = this.teamService.getAllTeams(query.getPageRequest());
+        return PaginatedResponse.<Team>builder()
+                .data(teamPage.getContent())
+                .currentPage(teamPage.getNumber())
+                .size(teamPage.getSize())
+                .totalCount(teamPage.getTotalElements())
+                .build();
+    }
+
     @PostMapping
-    public ResponseEntity<Team> createTeam(@RequestBody Team team) {
+    public ResponseEntity<Team> createTeam(@RequestBody TeamRequest team) {
         return ResponseEntity.ok(teamService.createTeam(team));
+    }
+
+    @PostMapping("/add-team-member")
+    public ResponseEntity<TeamMember> addTeamMember(@RequestBody TeamMemberRequest teamMemberRequest) {
+        return ResponseEntity.ok(teamService.addTeamMember(teamMemberRequest));
     }
 
     @GetMapping("/{id}")

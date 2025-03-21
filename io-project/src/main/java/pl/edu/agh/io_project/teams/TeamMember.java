@@ -1,5 +1,6 @@
 package pl.edu.agh.io_project.teams;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +21,7 @@ public class TeamMember {
     private Role role;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "team_id")
     private Team team;
 
