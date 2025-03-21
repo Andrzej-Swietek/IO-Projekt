@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pl.edu.agh.io_project.boards.columns.BoardColumn;
 import pl.edu.agh.io_project.projects.Project;
 
 import java.util.List;

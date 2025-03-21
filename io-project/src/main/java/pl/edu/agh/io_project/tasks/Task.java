@@ -1,23 +1,21 @@
 package pl.edu.agh.io_project.tasks;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import pl.edu.agh.io_project.boards.columns.BoardColumn;
+import pl.edu.agh.io_project.tasks.comment.Comment;
+import pl.edu.agh.io_project.tasks.label.Label;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import pl.edu.agh.io_project.boards.BoardColumn;
-import pl.edu.agh.io_project.tasks.comment.Comment;
-import pl.edu.agh.io_project.tasks.label.Label;
 
 @AllArgsConstructor
 @NoArgsConstructor

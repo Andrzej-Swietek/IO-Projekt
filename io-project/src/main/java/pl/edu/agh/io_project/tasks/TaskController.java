@@ -1,11 +1,64 @@
 package pl.edu.agh.io_project.tasks;
 
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/task")
 @AllArgsConstructor
 public class TaskController {
+    private final TaskService taskService;
+
+    @GetMapping
+    public ResponseEntity<List<Task>> getAllTasks() {
+        return ResponseEntity.ok(taskService.getAllTasks());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
+        Task task = taskService.getTaskById(id);
+        return ResponseEntity.ok(task);
+    }
+
+    @PostMapping
+    public ResponseEntity<Task> createTask(@RequestBody TaskRequest taskRequest) {
+        Task task = taskService.createTask(taskRequest);
+        return ResponseEntity.ok(task);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody TaskRequest taskRequest) {
+        Task task = taskService.updateTask(id, taskRequest);
+        return ResponseEntity.ok(task);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> changeTaskStatus(@PathVariable Long id, @RequestBody TaskStatus status) {
+        taskService.changeTaskStatus(id, status);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/assign")
+    public ResponseEntity<Void> assignUserToTask(@PathVariable Long id, @RequestParam String userId) {
+        taskService.assignUserToTask(id, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/reorder")
+    public ResponseEntity<Void> reorderTasks(
+            @RequestParam Long columnId,
+            @RequestBody List<Long> taskIds
+    ) {
+        taskService.reorderTasks(columnId, taskIds);
+        return ResponseEntity.ok().build();
+    }
 }

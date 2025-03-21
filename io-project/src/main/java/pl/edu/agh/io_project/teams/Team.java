@@ -21,11 +21,10 @@ public class Team {
 
     private String name;
 
-    @ElementCollection
-    @CollectionTable(name = "team_members", joinColumns = @JoinColumn(name = "team_id"))
-    @Column(name = "user_id")
-    private List<String> members; // Keycloak User IDs
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamMember> members;
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Project> projects;
 }
+

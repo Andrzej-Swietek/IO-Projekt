@@ -1,15 +1,14 @@
-package pl.edu.agh.io_project.boards;
+package pl.edu.agh.io_project.boards.columns;
 
 import jakarta.persistence.*;
-
-import java.util.List;
-import java.util.UUID;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pl.edu.agh.io_project.boards.Board;
 import pl.edu.agh.io_project.tasks.Task;
+
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
