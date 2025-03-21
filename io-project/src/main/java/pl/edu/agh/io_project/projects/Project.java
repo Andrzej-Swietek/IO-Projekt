@@ -16,6 +16,8 @@ public class Project {
     private Long id;
 
     private String name;
+    
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "team_id", nullable = false)

@@ -14,8 +14,7 @@ public class Label {
     @Column(nullable = false)
     private String name;
 
-    @Column(columnDefinition = "VARCHAR(9) DEFAULT '##33a7ff'")
-    private String color;
+    private String color = "#33a7ff";
 
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = false)
