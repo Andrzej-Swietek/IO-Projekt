@@ -1,0 +1,108 @@
+@import 'tailwindcss';
+
+
+.kcLoginClass {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    align-items: stretch;
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    padding: 0;
+}
+
+.kcFormCardClass {
+    grid-column: span 6;
+    height: 100%;
+    width: 100% !important;
+    max-width: none !important;
+    background-color: rgba(255, 255, 255, 1);
+    /* padding:  0 2rem; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-flow: column wrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.kcInfoAreaWrapperClass {
+    background: rgba(255, 255, 255, 1) !important;
+}
+
+.kc-form-buttons {
+    margin-top: 4rem;
+}
+
+@media (max-width: 980px) {
+    .kcLoginClass {
+        grid-template-columns: 1fr;
+    }
+
+    .kcFormCardClass {
+        width: 90vw;
+        margin: auto;
+    }
+}
+
+.kcHeaderClass.login-pf-page-header {
+    grid-column: span 6;
+    order: 2;
+    font-weight: 900;
+    letter-spacing: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* Ekrany od 1440px w górę (większe ekrany) */
+@media (min-width: 1440px) {
+    .kcFormCardClass {
+        grid-column: span 3;
+        /* 25% */
+    }
+
+    .kcHeaderClass.login-pf-page-header {
+        grid-column: span 9;
+        /* 75% */
+    }
+}
+
+/* Ekrany od 980px do 1440px */
+@media (max-width: 1440px) {
+    .kcFormCardClass {
+        grid-column: span 5;
+        /* 41.7% */
+    }
+
+    .kcHeaderClass.login-pf-page-header {
+        grid-column: span 7;
+        /* 58.3% */
+    }
+}
+
+/* Ekrany od 768px do 980px (tablety) */
+@media (max-width: 980px) {
+    .kcFormCardClass {
+        grid-column: span 6;
+        /* 50% */
+    }
+
+    .kcHeaderClass.login-pf-page-header {
+        grid-column: span 6;
+        /* 50% */
+    }
+}
+
+/* Ekrany od 480px do 768px (małe tablety) */
+@media (max-width: 768px) {
+    .kcFormCardClass {
+        grid-column: span 12;
+        /* 100% */
+    }
+
+    .kcHeaderClass.login-pf-page-header {
+        display: none;
+        /* Ukryj sekcję informacyjną */
+    }
+}
