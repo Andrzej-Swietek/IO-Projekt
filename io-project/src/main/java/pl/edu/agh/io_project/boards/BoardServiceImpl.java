@@ -3,6 +3,9 @@ package pl.edu.agh.io_project.boards;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.edu.agh.io_project.boards.columns.BoardColumn;
+import pl.edu.agh.io_project.boards.columns.BoardColumnRepository;
+import pl.edu.agh.io_project.projects.ProjectRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -12,10 +15,30 @@ import java.util.NoSuchElementException;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
+    private final ProjectRepository projectRepository;
+    private final BoardColumnRepository boardColumnRepository;
 
     @Override
-    public Board createBoard(Board board) {
-        return boardRepository.save(board);
+    @Transactional
+    public Board createBoard(BoardRequest board) {
+        var project = projectRepository.findById(board.projectId())
+                .orElseThrow(NoSuchElementException::new);
+
+        var newBoard = Board.builder()
+                .name(board.name())
+                .description(board.description())
+                .ownerId(board.ownerId())
+                .columns(List.of())
+                .project(project)
+                .build();
+
+        var columns = List.of(
+                new BoardColumn(null, "To Do", 1, newBoard, List.of()),
+                new BoardColumn(null, "In Progress", 2, newBoard, List.of()),
+                new BoardColumn(null, "Done", 3, newBoard, List.of())
+        );
+        newBoard.setColumns(columns);
+        return boardRepository.save(newBoard);
     }
 
     @Override

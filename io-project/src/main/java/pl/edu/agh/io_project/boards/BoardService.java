@@ -3,7 +3,7 @@ package pl.edu.agh.io_project.boards;
 import java.util.List;
 
 public interface BoardService {
-    Board createBoard(Board board);
+    Board createBoard(BoardRequest board);
 
     Board getBoardById(Long id);
 

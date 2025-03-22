@@ -16,11 +16,15 @@ public class BoardColumnServiceImpl implements BoardColumnService {
     private final BoardRepository boardRepository;
 
     @Override
-    public BoardColumn createColumn(BoardColumn column) {
-        if (!boardRepository.existsById(column.getBoard().getId())) {
-            throw new NoSuchElementException("Board not found with id: " + column.getBoard().getId());
-        }
-        return columnRepository.save(column);
+    public BoardColumn createColumn(BoardColumnRequest column) {
+        var board = boardRepository.findById(column.boardId())
+                .orElseThrow(() -> new NoSuchElementException("Board not found with id: " + column.boardId()));
+
+        return columnRepository.save(BoardColumn.builder()
+                .name(column.name())
+                .tasks(List.of())
+                .board(board)
+                .build());
     }
 
     @Override

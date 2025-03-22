@@ -13,7 +13,7 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @PostMapping
-    public ResponseEntity<Project> createProject(@RequestBody Project project) {
+    public ResponseEntity<Project> createProject(@RequestBody ProjectRequest project) {
         return ResponseEntity.ok(projectService.createProject(project));
     }
 

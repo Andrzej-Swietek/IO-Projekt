@@ -3,7 +3,7 @@ package pl.edu.agh.io_project.projects;
 import java.util.List;
 
 public interface ProjectService {
-    Project createProject(Project project);
+    Project createProject(ProjectRequest project);
 
     Project getProjectById(Long id);
 

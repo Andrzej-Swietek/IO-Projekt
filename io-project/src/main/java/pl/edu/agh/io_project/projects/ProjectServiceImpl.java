@@ -14,9 +14,17 @@ public class ProjectServiceImpl implements ProjectService {
     private final TeamService teamService;
 
     @Override
-    public Project createProject(Project project) {
-        teamService.getTeamById(project.getTeam().getId());
-        return projectRepository.save(project);
+    public Project createProject(ProjectRequest project) {
+        var team = teamService.getTeamById(project.teamId());
+
+        var newProject = Project.builder()
+                .name(project.name())
+                .description(project.description())
+                .boards(List.of())
+                .team(team)
+                .build();
+
+        return projectRepository.save(newProject);
     }
 
     @Override

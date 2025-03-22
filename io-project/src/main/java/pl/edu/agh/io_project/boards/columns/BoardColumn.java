@@ -1,5 +1,6 @@
 package pl.edu.agh.io_project.boards.columns;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,7 @@ public class BoardColumn {
     private Integer position;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 

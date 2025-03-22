@@ -3,7 +3,7 @@ package pl.edu.agh.io_project.boards.columns;
 import java.util.List;
 
 public interface BoardColumnService {
-    BoardColumn createColumn(BoardColumn column);
+    BoardColumn createColumn(BoardColumnRequest column);
 
     List<BoardColumn> getColumnsByBoardId(Long boardId);
 

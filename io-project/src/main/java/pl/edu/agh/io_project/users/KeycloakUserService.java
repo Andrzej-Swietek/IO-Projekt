@@ -1,5 +1,7 @@
 package pl.edu.agh.io_project.users;
 
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -8,11 +10,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 @Service
 public class KeycloakUserService implements UserService {
 
     private final RestTemplate restTemplate;
     private final KeycloakAuthService authService;
+    private final KeycloakService keycloakService;
 
     @Value("${keycloak.server-url}")
     private String serverUrl;
@@ -20,9 +25,10 @@ public class KeycloakUserService implements UserService {
     @Value("${keycloak.realm}")
     private String realm;
 
-    public KeycloakUserService(KeycloakAuthService authService) {
+    public KeycloakUserService(KeycloakAuthService authService, KeycloakService keycloakService) {
         this.restTemplate = new RestTemplate();
         this.authService = authService;
+        this.keycloakService = keycloakService;
     }
 
     public String getUserDetails(String userId) {
@@ -53,5 +59,13 @@ public class KeycloakUserService implements UserService {
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
         return response.getBody();
+    }
+
+    public List<UserRepresentation> getAllUsers() {
+        return this.keycloakService.getAllUsers();
+    }
+
+    public List<RoleRepresentation> getAllRoles() {
+        return this.keycloakService.getAllRoles();
     }
 }

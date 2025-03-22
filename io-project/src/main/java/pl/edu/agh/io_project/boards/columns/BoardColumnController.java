@@ -14,7 +14,7 @@ public class BoardColumnController {
     private final BoardColumnService columnService;
 
     @PostMapping
-    public ResponseEntity<BoardColumn> createColumn(@RequestBody BoardColumn column) {
+    public ResponseEntity<BoardColumn> createColumn(@RequestBody BoardColumnRequest column) {
         return ResponseEntity.ok(columnService.createColumn(column));
     }
 

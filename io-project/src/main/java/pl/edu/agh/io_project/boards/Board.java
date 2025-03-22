@@ -1,5 +1,6 @@
 package pl.edu.agh.io_project.boards;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,8 @@ public class Board {
 
     private String name;
 
+    private String description;
+
     @Column(nullable = false)
     private String ownerId;
 
@@ -29,6 +32,7 @@ public class Board {
     private List<BoardColumn> columns;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 }

@@ -29,14 +29,22 @@ services:
       KC_DB_URL: jdbc:postgresql://postgres/io-db
       KC_DB_USERNAME: user
       KC_DB_PASSWORD: password
+      KC_HEALTH_ENABLED: true
+      KC_METRICS_ENABLED: true
+      KC_HTTP_ENABLED: true
     networks:
       - microservices-net
     volumes:
-      - ./config/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ./config/keycloak/realm.json:/opt/keycloak/data/import/realm-export.json
       - ./keycloak/theme:/opt/keycloak/themes
     command:
       - "start-dev"
       - "--import-realm"
+    healthcheck:
+      test: [ 'CMD-SHELL', '[ -f /tmp/HealthCheck.java ] || echo "public class HealthCheck { public static void main(String[] args) throws java.lang.Throwable { System.exit(java.net.HttpURLConnection.HTTP_OK == ((java.net.HttpURLConnection)new java.net.URL(args[0]).openConnection()).getResponseCode() ? 0 : 1); } }" > /tmp/HealthCheck.java && java /tmp/HealthCheck.java http://localhost:8080/auth/health/live' ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   #  ================ Mailer Service ================
 
