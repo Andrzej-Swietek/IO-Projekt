@@ -1,14 +1,19 @@
 package pl.edu.agh.io_project.boards;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.io_project.boards.columns.BoardColumn;
 import pl.edu.agh.io_project.boards.columns.BoardColumnRepository;
+import pl.edu.agh.io_project.boards.columns.ColumnOrderItem;
 import pl.edu.agh.io_project.projects.ProjectRepository;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -63,6 +68,27 @@ public class BoardServiceImpl implements BoardService {
         Board existingBoard = getBoardById(id);
         existingBoard.setName(board.getName());
         existingBoard.setOwnerId(board.getOwnerId());
+        return boardRepository.save(existingBoard);
+    }
+
+    @Override
+    @Transactional
+    public Board reorderBoardColumns(Long boardId, ReorderBoardRequest request) {
+        Board existingBoard = getBoardById(boardId);
+
+        Map<Long, BoardColumn> columnMap = existingBoard.getColumns().stream()
+                .collect(Collectors.toMap(BoardColumn::getId, column -> column));
+
+        for (ColumnOrderItem columnOrder : request.orderList()) {
+            BoardColumn column = columnMap.get(columnOrder.boardColumnId());
+            if (column != null) {
+                column.setPosition(columnOrder.columnOrder());
+            } else {
+                throw new EntityNotFoundException("Column with ID " + columnOrder.boardColumnId() + " not found in board with ID " + boardId);
+            }
+        }
+
+        existingBoard.getColumns().sort(Comparator.comparing(BoardColumn::getPosition));
         return boardRepository.save(existingBoard);
     }
 

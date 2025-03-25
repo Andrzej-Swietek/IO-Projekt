@@ -1,6 +1,5 @@
 package pl.edu.agh.io_project.reports;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import pl.edu.agh.io_project.config.annotations.QueryBuilder;
 import pl.edu.agh.io_project.config.annotations.QueryBuilderParams;
-import pl.edu.agh.io_project.reponses.PaginatedResponse;
+import pl.edu.agh.io_project.responses.PaginatedResponse;
 
 @RestController
 @RequestMapping("/api/v1/report")

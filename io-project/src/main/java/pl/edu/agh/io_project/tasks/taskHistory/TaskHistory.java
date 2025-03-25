@@ -1,11 +1,19 @@
 package pl.edu.agh.io_project.tasks.taskHistory;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import pl.edu.agh.io_project.tasks.Task;
 
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class TaskHistory {
@@ -21,7 +29,9 @@ public class TaskHistory {
     private String user;
 
     @Column(nullable = false)
-    private String action;
+    private TaskHistoryAction action;
+
+    private String actionDescription;
 
     @Column(nullable = false)
     private LocalDateTime timestamp = LocalDateTime.now();

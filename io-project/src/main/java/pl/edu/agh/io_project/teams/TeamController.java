@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.io_project.config.annotations.QueryBuilder;
 import pl.edu.agh.io_project.config.annotations.QueryBuilderParams;
-import pl.edu.agh.io_project.reponses.PaginatedResponse;
+import pl.edu.agh.io_project.responses.PaginatedResponse;
 
 import java.util.List;
 

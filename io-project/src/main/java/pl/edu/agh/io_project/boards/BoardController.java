@@ -32,6 +32,11 @@ public class BoardController {
         return ResponseEntity.ok(boardService.getBoardsByOwnerId(ownerId));
     }
 
+    @PatchMapping("/reorder-columns/{boardId}")
+    public ResponseEntity<Board> reorderColumns(@PathVariable Long boardId, @RequestBody ReorderBoardRequest request) {
+        return ResponseEntity.ok(boardService.reorderBoardColumns(boardId, request));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Board> updateBoard(@PathVariable Long id, @RequestBody Board board) {
         return ResponseEntity.ok(boardService.updateBoard(id, board));

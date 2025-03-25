@@ -10,7 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import pl.edu.agh.io_project.exceptions.ValidationException;
-import pl.edu.agh.io_project.reponses.ErrorResponse;
+import pl.edu.agh.io_project.responses.ErrorResponse;
 
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package pl.edu.agh.io_project.reponses;
+package pl.edu.agh.io_project.responses;
 
 import java.util.Map;
 

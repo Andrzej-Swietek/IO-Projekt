@@ -13,5 +13,7 @@ public interface BoardService {
 
     Board updateBoard(Long id, Board board);
 
+    Board reorderBoardColumns(Long boardId, ReorderBoardRequest request);
+
     void deleteBoard(Long id);
 }

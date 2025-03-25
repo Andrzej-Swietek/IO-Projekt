@@ -53,12 +53,12 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/reorder")
+    @PatchMapping("/reorder-tasks/{columnId}")
     public ResponseEntity<Void> reorderTasks(
-            @RequestParam Long columnId,
-            @RequestBody List<Long> taskIds
+            @PathVariable Long columnId,
+            @RequestBody List<Long> taskIdsInNewOrder
     ) {
-        taskService.reorderTasks(columnId, taskIds);
+        taskService.reorderTasks(columnId, taskIdsInNewOrder);
         return ResponseEntity.ok().build();
     }
 }
