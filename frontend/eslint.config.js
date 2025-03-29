@@ -7,7 +7,9 @@ import stylisticConfig from "./eslint-stylistic.config.js";
 import react from 'eslint-plugin-react';
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  {
+    ignores: ['dist', '**/api/**', '**/*.generated.*']
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
@@ -43,7 +45,12 @@ export default tseslint.config(
       "default-case-last": "error",
       "camelcase": "error",
       "capitalized-comments": "warn",
-      "consistent-return": "error",
+      "consistent-return": [
+        "error",
+        {
+          "treatUndefinedAsUnspecified": true,
+        }
+      ],
       "no-duplicate-imports": "error",
       "no-fallthrough": "error",
       "no-param-reassign": "error",

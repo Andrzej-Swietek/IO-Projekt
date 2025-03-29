@@ -13,13 +13,23 @@ spring:
 
   security:
     oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: io-project-backend
+            client-secret: HmNltqvNvZdfg8yrw256Hq4pVkuFYgB0
+            authorization-grant-type: client_credentials
+            scope: openid,profile,email
+      provider:
+        keycloak:
+          token-uri: "http://localhost:9098/realms/io-project"
       resourceserver:
         jwt:
           issuer-uri: "http://localhost:9098/realms/io-project"
 
   datasource:
     url: jdbc:postgresql://localhost:5432/io-db
-    username:  user #${DB_USERNAME}
+    username: user #${DB_USERNAME}
     password: password #${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
@@ -60,7 +70,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: ["health", "info", "metrics", "prometheus"]
+        include: [ "health", "info", "metrics", "prometheus" ]
   endpoint:
     health:
       show-details: always
@@ -71,3 +81,9 @@ management:
     metrics:
       export:
         enabled: true
+
+keycloak:
+  server-url: http://localhost:9098
+  realm: io-project
+  client-id: kanban-backend
+  client-secret: HmNltqvNvZdfg8yrw256Hq4pVkuFYgB0

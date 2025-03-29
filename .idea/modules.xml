@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/AGH-IO-Projekt.iml" filepath="$PROJECT_DIR$/.idea/AGH-IO-Projekt.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/io-project.main.iml" filepath="$PROJECT_DIR$/.idea/modules/io-project.main.iml" />
     </modules>
   </component>
 </project>
