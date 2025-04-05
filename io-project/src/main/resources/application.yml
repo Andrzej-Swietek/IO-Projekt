@@ -5,8 +5,11 @@ spring:
     active: local
   ai:
     openai:
-      enabled: false
+      #      enabled: false
       api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-3.5-turbo
   threads:
     virtual:
       enabled: true
@@ -67,6 +70,10 @@ logging:
     io.micrometer: DEBUG
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+    enabled: true
   endpoints:
     web:
       exposure:
@@ -75,12 +82,15 @@ management:
     health:
       show-details: always
   metrics:
+    enable:
+      all: true
     tags:
       application: io-project
   prometheus:
     metrics:
       export:
         enabled: true
+        step: 30s
 
 keycloak:
   server-url: http://localhost:9098

@@ -1,5 +1,6 @@
 package pl.edu.agh.io_project.tasks.comment;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +30,7 @@ public class Comment {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = false)
     private Task task;

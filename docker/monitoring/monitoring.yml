@@ -6,7 +6,7 @@ services:
     image: prom/prometheus
     container_name: prometheus
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../../config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
     networks:
@@ -22,8 +22,16 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/dashboards/ai-metrics-dashboard.json
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ../../config/grafana/provisioning:/etc/grafana/provisioning
+      - ../../config/grafana/dashboards:/etc/grafana/dashboards
     ports:
       - "9091:3000"
     networks:
       - microservices-net
     restart: unless-stopped
+
+volumes:
+  grafana-storage:

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
+import pl.edu.agh.io_project.exceptions.AIFailureException;
 import pl.edu.agh.io_project.exceptions.ValidationException;
 import pl.edu.agh.io_project.responses.ErrorResponse;
 
@@ -42,6 +43,23 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleValidationFailedException(ValidationException exception) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                Map.of(
+                        "message", exception.getMessage(),
+                        "errors", exception.getErrors() != null
+                                ? String.join("\n ", exception.getErrors())
+                                : "no errors"
+                )
+        );
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(errorResponse);
+    }
+
+
+    @ExceptionHandler(AIFailureException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleAIFailureException(AIFailureException exception) {
         ErrorResponse errorResponse = new ErrorResponse(
                 Map.of(
                         "message", exception.getMessage(),

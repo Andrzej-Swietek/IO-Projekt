@@ -56,9 +56,8 @@ services:
 #      - 1080:1080 # UI
 #      - 1025:1025 # SMTP
 
-# TODO: Issue #xx Add monitoring
-#include:
-#  - docker/monitoring/monitoring.yml
+include:
+  - docker/monitoring/monitoring.yml
 
 #  ================== Networks ===================
 
