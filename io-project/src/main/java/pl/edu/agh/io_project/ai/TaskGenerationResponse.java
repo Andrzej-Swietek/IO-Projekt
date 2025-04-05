@@ -6,5 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class TaskGenerationResponse {
-    private String generatedTask;
+    private String title;
+    private String description;
+    private Integer priority;
+    private Integer estimatedHours;
 }

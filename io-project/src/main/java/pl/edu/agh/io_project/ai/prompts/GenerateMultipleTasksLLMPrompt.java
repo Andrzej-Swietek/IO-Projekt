@@ -10,26 +10,28 @@ import org.springframework.core.io.Resource;
 import java.util.List;
 import java.util.Map;
 
-public record GenerateTaskLLMPrompt(
-        String taskDescription
+public record GenerateMultipleTasksLLMPrompt(
+        String tasksDescription,
+        Integer count
 ) implements LLMPrompt {
 
     private static final Resource generateTasksSystemMessageResource = new ClassPathResource("prompts/generateTasksSystemMessage.st");
-    private static final Resource generateTaskPromptResource = new ClassPathResource("prompts/generateTaskPrompt.st");
+    private static final Resource generateMultipleTasksPromptResource = new ClassPathResource("prompts/generateMultipleTasksPrompt.st");
 
     @Override
     public PromptTemplate getPromptTemplate() {
-        return new PromptTemplate(generateTaskPromptResource);
+        return new PromptTemplate(generateMultipleTasksPromptResource);
     }
 
     @Override
     public Prompt getPrompt() {
         Map<String, Object> params = Map.of(
-                "taskDescription", taskDescription
+                "tasksDescription", tasksDescription,
+                "count", count
         );
 
         var systemMessage = new SystemMessage(generateTasksSystemMessageResource);
-        var userMessage = new PromptTemplate(generateTaskPromptResource)
+        var userMessage = new PromptTemplate(generateMultipleTasksPromptResource)
                 .create(params)
                 .getContents();
         return new Prompt(List.of(systemMessage, new UserMessage(userMessage)));
