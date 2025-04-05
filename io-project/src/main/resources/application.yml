@@ -5,21 +5,34 @@ spring:
     active: local
   ai:
     openai:
-      enabled: false
+      #      enabled: false
       api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-3.5-turbo
   threads:
     virtual:
       enabled: true
 
   security:
     oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: io-project-backend
+            client-secret: HmNltqvNvZdfg8yrw256Hq4pVkuFYgB0
+            authorization-grant-type: client_credentials
+            scope: openid,profile,email
+      provider:
+        keycloak:
+          token-uri: "http://localhost:9098/realms/io-project"
       resourceserver:
         jwt:
           issuer-uri: "http://localhost:9098/realms/io-project"
 
   datasource:
     url: jdbc:postgresql://localhost:5432/io-db
-    username:  user #${DB_USERNAME}
+    username: user #${DB_USERNAME}
     password: password #${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
@@ -57,17 +70,30 @@ logging:
     io.micrometer: DEBUG
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+    enabled: true
   endpoints:
     web:
       exposure:
-        include: ["health", "info", "metrics", "prometheus"]
+        include: [ "health", "info", "metrics", "prometheus" ]
   endpoint:
     health:
       show-details: always
   metrics:
+    enable:
+      all: true
     tags:
       application: io-project
   prometheus:
     metrics:
       export:
         enabled: true
+        step: 30s
+
+keycloak:
+  server-url: http://localhost:9098
+  realm: io-project
+  client-id: kanban-backend
+  client-secret: HmNltqvNvZdfg8yrw256Hq4pVkuFYgB0

@@ -1,8 +1,8 @@
 package pl.edu.agh.io_project.reports;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -19,6 +19,7 @@ public class ReportResult {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "report_id", nullable = false)
     private Report report;
 
