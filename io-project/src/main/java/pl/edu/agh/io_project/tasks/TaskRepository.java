@@ -35,4 +35,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     @Query("SELECT e FROM Estimate e WHERE e.task.id = :taskId")
     Optional<Estimate> findEstimateByTaskId(@Param("taskId") Long taskId);
+
+    int countByColumnId(Long columnId);
 }

@@ -3,6 +3,9 @@ package pl.edu.agh.io_project.tasks;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.edu.agh.io_project.ai.MultiTaskGenerationRequest;
+import pl.edu.agh.io_project.ai.TaskGenerationRequest;
+import pl.edu.agh.io_project.ai.ports.AiTaskGeneratorPort;
 
 import java.util.List;
 
@@ -11,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TaskController {
     private final TaskService taskService;
+    private final AiTaskGeneratorPort aiTaskGeneratorPort;
 
     @GetMapping
     public ResponseEntity<List<Task>> getAllTasks() {
@@ -60,5 +64,22 @@ public class TaskController {
     ) {
         taskService.reorderTasks(columnId, taskIdsInNewOrder);
         return ResponseEntity.ok().build();
+    }
+
+
+    @PostMapping("/generate")
+    public ResponseEntity<Task> generateTask(@RequestBody TaskGenerationRequest request) {
+        Task task = aiTaskGeneratorPort.generateTask(request.description(), request.columnId(), request.position());
+        return ResponseEntity.ok(task);
+    }
+
+    @PostMapping("/generate-multiple")
+    public ResponseEntity<List<Task>> generateMultipleTasks(@RequestBody MultiTaskGenerationRequest request) {
+        List<Task> tasks = aiTaskGeneratorPort.generateMultipleTasks(
+                request.description(),
+                request.columnId(),
+                request.count()
+        );
+        return ResponseEntity.ok(tasks);
     }
 }
