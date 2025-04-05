@@ -5,8 +5,10 @@ Each task should have the following fields:
 - description: a short detailed description of what should be done
 - priority: an integer from 1 (low) to 5 (high)
 - estimatedHours: an integer between 1 and 48 representing the estimated time to complete the task
-Respond ONLY with a valid JSON array of objects (not wrapped in any object) like this:
-[
-  {{ "title": "...", "description": "...", "priority": ..., "estimatedHours": ... }},
-  {{ "title": "...", "description": "...", "priority": ..., "estimatedHours": ... }}
-]
+Respond ONLY with a valid JSON array of objects (not wrapped in any object). A Single task looks like this:
+{{
+  "title": "...",
+  "description": "...",
+  "priority": ...,
+  "estimatedHours": ...
+}}
