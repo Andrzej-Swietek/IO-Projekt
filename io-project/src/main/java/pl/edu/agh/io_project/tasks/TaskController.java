@@ -3,9 +3,12 @@ package pl.edu.agh.io_project.tasks;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.edu.agh.io_project.ai.EstimateRequest;
 import pl.edu.agh.io_project.ai.MultiTaskGenerationRequest;
 import pl.edu.agh.io_project.ai.TaskGenerationRequest;
+import pl.edu.agh.io_project.ai.ports.AiEstimatorPort;
 import pl.edu.agh.io_project.ai.ports.AiTaskGeneratorPort;
+import pl.edu.agh.io_project.tasks.estimate.Estimate;
 
 import java.util.List;
 
@@ -15,6 +18,7 @@ import java.util.List;
 public class TaskController {
     private final TaskService taskService;
     private final AiTaskGeneratorPort aiTaskGeneratorPort;
+    private final AiEstimatorPort aiEstimatorPort;
 
     @GetMapping
     public ResponseEntity<List<Task>> getAllTasks() {
@@ -66,6 +70,11 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/task-estimate")
+    public ResponseEntity<Estimate> estimateTask(@RequestBody EstimateRequest estimateRequest) {
+        Estimate estimate = aiEstimatorPort.estimateTask(estimateRequest.taskId(), estimateRequest.taskDescription());
+        return ResponseEntity.ok(estimate);
+    }
 
     @PostMapping("/generate")
     public ResponseEntity<Task> generateTask(@RequestBody TaskGenerationRequest request) {

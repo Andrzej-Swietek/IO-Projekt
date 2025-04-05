@@ -1,5 +1,6 @@
 package pl.edu.agh.io_project.tasks;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +33,7 @@ public class Task {
     private String description;
     private Integer position;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "column_id", nullable = false)
     private BoardColumn column;
