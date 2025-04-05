@@ -1,5 +1,6 @@
 package pl.edu.agh.io_project.tasks.estimate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +25,8 @@ public class Estimate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "task_id", nullable = false)
     private Task task;

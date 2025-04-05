@@ -2,6 +2,7 @@ package pl.edu.agh.io_project.ai.adapters;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OpenAiEstimatorAdapter implements AiEstimatorPort {
@@ -31,12 +33,15 @@ public class OpenAiEstimatorAdapter implements AiEstimatorPort {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new EntityNotFoundException("Task with id " + taskId + " not found"));
 
         Prompt prompt = new EstimateTaskLLMPrompt(taskId, taskDescription).getPrompt();
+        log.info(prompt.toString());
+
         EstimateResponse response = Optional.ofNullable(
                 chatClient.prompt(prompt)
                         .call()
                         .entity(EstimateResponse.class)
         ).orElseThrow(() -> new AIFailureException(List.of("AI result Parsing ")));
-
+        log.info("Estimated Time: " + response.estimatedHours());
+        
         try {
             Estimate estimate = Estimate.builder()
                     .estimatedTime(response.estimatedHours())

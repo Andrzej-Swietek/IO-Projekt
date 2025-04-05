@@ -4,7 +4,7 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import java.util.List;
@@ -15,11 +15,9 @@ public record EstimateTaskLLMPrompt(
         String taskDescription
 ) implements LLMPrompt {
 
-    @Value("classpath:/prompts/estimateSystemMessage.st")
-    private static Resource estimateSystemMessage;
+    private static final Resource estimateSystemMessage = new ClassPathResource("prompts/estimateSystemMessage.st");
+    private static final Resource estimatePromptResource = new ClassPathResource("prompts/estimatePrompt.st");
 
-    @Value("classpath:/prompts/estimatePrompt.st")
-    private static Resource estimatePromptResource;
 
     @Override
     public PromptTemplate getPromptTemplate() {

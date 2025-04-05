@@ -20,7 +20,7 @@ public class TaskHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
     @ManyToOne
     @JoinColumn(name = "task_id")
     private Task task;
