@@ -53,6 +53,7 @@ public class Task {
     @Column(nullable = false)
     private TaskStatus status;
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "task_label",
