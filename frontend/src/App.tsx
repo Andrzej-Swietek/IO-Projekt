@@ -1,7 +1,6 @@
 import { FC } from 'react';
 import { createBrowserRouter, Outlet } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
-import './App.css';
 
 import { About } from '@routes/About.tsx';
 import { Home } from '@routes/Home.tsx';

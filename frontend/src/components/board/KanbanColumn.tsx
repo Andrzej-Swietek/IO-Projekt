@@ -37,26 +37,26 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({ id, title, tasks, colorCla
       style={style}
       className={cn('flex flex-col rounded-xl border-2 shadow-md', colorClass, isDragging ? 'opacity-50' : '')}
     >
-      <div className="flex items-center justify-between border-b border-inherit p-3">
+      <div className="flex items-center justify-between border-b border-inherit !p-4">
         <h2 className="font-serif text-lg font-bold">{title}</h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center !gap-2">
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-medium">
             {tasks.length}
           </span>
           <button
             {...attributes}
             {...listeners}
-            className="cursor-grab rounded p-1 hover:bg-black/5 active:cursor-grabbing"
+            className="cursor-grab rounded !p-2 hover:bg-black/5 active:cursor-grabbing"
           >
-            <GripVertical className="h-5 w-5" />
+            <GripVertical className="h-6 w-6" />
             <span className="sr-only">Drag column</span>
           </button>
         </div>
       </div>
 
-      <div className="flex-1 p-3">
+      <div className="flex-1 p-4">
         <SortableContext items={taskIds}>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             {tasks.map(task => (
               <TaskCard key={`task-${task.id}`} task={task} />
             ))}

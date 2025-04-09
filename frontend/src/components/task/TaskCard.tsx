@@ -22,9 +22,9 @@ const priorityColors: Record<TaskStatusEnum, string> = {
 
 const priorityIcons: Record<TaskStatusEnum, ReactNode> = {
   TODO: null,
-  DONE: <Clock className="mr-1 h-3 w-3" />,
-  IN_PROGRESS: <AlertCircle className="mr-1 h-3 w-3" />,
-  BLOCKED: <AlertCircle className="mr-1 h-3 w-3" />,
+  DONE: <Clock className="mr-2 h-4 w-4" />,
+  IN_PROGRESS: <AlertCircle className="mr-2 h-4 w-4" />,
+  BLOCKED: <AlertCircle className="mr-2 h-4 w-4" />,
 };
 
 export const TaskCard: FC<TaskCardProps> = ({
@@ -63,26 +63,26 @@ export const TaskCard: FC<TaskCardProps> = ({
         dragging ? 'opacity-50 shadow-md ring-2 ring-primary' : '',
       )}
     >
-      <CardHeader className="flex flex-row items-start justify-between p-3 pb-0">
+      <CardHeader className="flex flex-row items-start justify-between !p-4 !pb-0">
         <h3 className="font-medium">{task.title}</h3>
         <button
           {...attributes}
           {...listeners}
-          className="cursor-grab rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 active:cursor-grabbing"
+          className="cursor-grab rounded !p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 active:cursor-grabbing"
         >
           <GripVertical className="h-4 w-4" />
           <span className="sr-only">Drag task</span>
         </button>
       </CardHeader>
 
-      <CardContent className="p-3 pt-2 text-sm text-gray-600">{task.description}</CardContent>
+      <CardContent className="!p-4 !pt-2 text-sm text-gray-600">{task.description}</CardContent>
 
-      <CardFooter className="flex flex-wrap gap-2 p-3 pt-0">
+      <CardFooter className="flex flex-wrap gap-2 !p-4 pt-0">
         {task.status && (
           <Badge
             variant="secondary"
             className={cn(
-              'font-normal',
+              'font-normal px-2',
               priorityColors[task.status as keyof typeof priorityColors] || 'bg-gray-100 text-gray-800',
             )}
           >
@@ -92,7 +92,7 @@ export const TaskCard: FC<TaskCardProps> = ({
         )}
         {
           Array.from(task?.labels ?? new Set<Label>()).map((label: Label) => (
-            <Badge key={label.id} variant="outline" className={`bg-[${label.color}] font-normal`}>
+            <Badge key={label.id} variant="outline" className={`bg-[${label.color}] font-normal px-2`}>
               {label.name}
             </Badge>
           ))
