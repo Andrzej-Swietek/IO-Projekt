@@ -12,5 +12,5 @@ else
 fi
 
 echo "✅ Using: $CONTAINER_TOOL"
-$CONTAINER_TOOL exec keycloak /bin/bash -c 'cd opt/keycloak/bin && ./kc.sh export --file realm.json --realm tani-bilet -v'
+$CONTAINER_TOOL exec keycloak /bin/bash -c 'cd opt/keycloak/bin && ./kc.sh export --file realm.json --realm io-project -v'
 $CONTAINER_TOOL cp keycloak:/opt/keycloak/bin/realm.json ./realm.json
