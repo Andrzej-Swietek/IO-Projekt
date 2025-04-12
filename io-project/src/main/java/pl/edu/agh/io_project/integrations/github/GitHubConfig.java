@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "github")
 public class GitHubConfig {
-    private String apiUrl;
-    private String token;
+    private Long appId;
+    private String clientId;
+    private String clientSecret;
+    private String privateKeyPath;
 }
