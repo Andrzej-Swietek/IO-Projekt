@@ -97,3 +97,9 @@ keycloak:
   realm: io-project
   client-id: kanban-backend
   client-secret: HmNltqvNvZdfg8yrw256Hq4pVkuFYgB0
+
+github:
+  app-id: ${GITHUB_APP_ID}
+  client-id: ${GITHUB_CLIENT_ID}
+  client-secret: ${GITHUB_CLIENT_SECRET}
+  private-key-path: classpath:certs/github-app-private-key.pem

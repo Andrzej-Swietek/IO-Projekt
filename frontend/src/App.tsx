@@ -1,43 +1,59 @@
-import { FC, useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import { FC } from 'react';
+import { createBrowserRouter, Outlet } from 'react-router';
+import { RouterProvider } from 'react-router/dom';
 
-interface Props {}
+import { About } from '@routes/About.tsx';
+import { Home } from '@routes/Home.tsx';
+import { Login } from '@routes/auth/Login.tsx';
+import { MainLayout } from '@layouts/MainLayout.tsx';
+import { Register } from '@routes/auth/Register.tsx';
+import { UserProfile } from '@routes/UserProfile.tsx';
+import { BoardPage } from '@routes/Board.tsx';
+
+
+interface Props {
+}
+
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: (
+      <MainLayout>
+        <Outlet />
+      </MainLayout>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: 'about',
+        element: <About />,
+      },
+      {
+        path: 'auth',
+        element: <Outlet />,
+        children: [
+          { path: 'login', element: <Login /> },
+          { path: 'register', element: <Register /> },
+        ],
+      },
+      {
+        path: 'user/:id',
+        element: <UserProfile />,
+      },
+      {
+        path: 'board/:id',
+        element: <BoardPage />,
+      },
+    ],
+  },
+]);
 
 const App: FC<Props> = () => {
-  const [count, setCount] = useState(0);
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card shadow">
-        <button onClick={() => setCount(currentCount => currentCount + 1)}>
-          count is
-          {' '}
-          {count}
-        </button>
-        <p>
-          Edit
-          {' '}
-          <code>src/App.tsx</code>
-          {' '}
-          and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default App;
