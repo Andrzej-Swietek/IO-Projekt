@@ -1,11 +1,10 @@
 package pl.edu.agh.sentinel.kafka.example
 
 import zio.ZIO
-import zio.kafka.serde.{Deserializer, Serde}
+import zio.kafka.serde.{ Deserializer, Serde }
 
 import pl.edu.agh.sentinel.kafka.consumers.KafkaConsumer
 import pl.edu.agh.sentinel.kafka.topics.SentinelTopics
-
 
 final case class PeriodicConsumer(kafkaConsumer: KafkaConsumer) {
   given Deserializer[Any, String] = Serde.string

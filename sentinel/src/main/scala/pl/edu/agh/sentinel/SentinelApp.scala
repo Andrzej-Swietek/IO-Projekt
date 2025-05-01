@@ -1,9 +1,10 @@
 package pl.edu.agh.sentinel
 
-import pl.edu.agh.sentinel.kafka.KafkaModule
 import zio.*
 import zio.config.typesafe.*
 import zio.logging.backend.SLF4J
+
+import pl.edu.agh.sentinel.kafka.KafkaModule
 import pl.edu.agh.sentinel.kafka.config.KafkaConfig
 import pl.edu.agh.sentinel.kafka.consumers.KafkaConsumer
 import pl.edu.agh.sentinel.kafka.producers.KafkaProducer

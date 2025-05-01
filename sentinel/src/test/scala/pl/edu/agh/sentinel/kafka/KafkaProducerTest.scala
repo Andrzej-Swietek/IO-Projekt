@@ -1,15 +1,16 @@
 package pl.edu.agh.sentinel.kafka
 
+import zio.*
+import zio.json.{ JsonDecoder, JsonEncoder }
+import zio.kafka.serde.{ Deserializer, Serde, Serializer }
+import zio.test.{ assertTrue, Spec, TestAspect, TestEnvironment, ZIOSpecDefault }
+import zio.test.Assertion.*
+
 import pl.edu.agh.sentinel.kafka.config.KafkaConfig
 import pl.edu.agh.sentinel.kafka.consumers.ConsumingStrategy
 import pl.edu.agh.sentinel.kafka.consumers.ConsumingStrategy.Earliest
 import pl.edu.agh.sentinel.kafka.serdes.ZioJsonSerde
-import pl.edu.agh.sentinel.kafka.topics.{KafkaTopic, TopicManager}
-import zio.*
-import zio.json.{JsonDecoder, JsonEncoder}
-import zio.kafka.serde.{Deserializer, Serde, Serializer}
-import zio.test.{Spec, TestAspect, TestEnvironment, ZIOSpecDefault, assertTrue}
-import zio.test.Assertion.*
+import pl.edu.agh.sentinel.kafka.topics.{ KafkaTopic, TopicManager }
 
 object KafkaProducerTest extends ZIOSpecDefault {
   given Serializer[Any, String] = Serde.string

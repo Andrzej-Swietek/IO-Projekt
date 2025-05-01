@@ -1,8 +1,9 @@
 package pl.edu.agh.sentinel.kafka
 
-import pl.edu.agh.sentinel.kafka.consumers.ConsumingStrategy.Earliest
 import zio.*
 import zio.test.*
+
+import pl.edu.agh.sentinel.kafka.consumers.ConsumingStrategy.Earliest
 object KafkaTestContainerTest extends ZIOSpecDefault {
 
   override def spec: Spec[TestEnvironment & Scope, Any] = {

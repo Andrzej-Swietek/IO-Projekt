@@ -5,7 +5,8 @@ import zio.*
 import zio.kafka.*
 import zio.kafka.producer.*
 import zio.kafka.serde.*
-import org.apache.kafka.clients.producer.{ProducerConfig, RecordMetadata}
+
+import org.apache.kafka.clients.producer.{ ProducerConfig, RecordMetadata }
 import pl.edu.agh.sentinel.kafka.config.KafkaConfig
 
 class KafkaProducer(producer: Producer) {
@@ -14,8 +15,8 @@ class KafkaProducer(producer: Producer) {
     key: K,
     value: V,
   )(using
-     keySerializer: Serializer[Any, K],
-     valueSerializer: Serializer[Any, V],
+    keySerializer: Serializer[Any, K],
+    valueSerializer: Serializer[Any, V],
   ): Task[RecordMetadata] = producer.produce(topic, key, value, keySerializer, valueSerializer)
 }
 

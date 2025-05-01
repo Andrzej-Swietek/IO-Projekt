@@ -1,7 +1,7 @@
 package pl.edu.agh.sentinel
 package kafka.config
 
-import zio.{Config, ZIO, ZLayer}
+import zio.{ Config, ZIO, ZLayer }
 import zio.config.magnolia.deriveConfig
 import zio.json.JsonCodec
 
@@ -12,12 +12,12 @@ type GroupId = String
 type BootstrapServer = String
 
 case class KafkaConfig(
-   bootstrapServers: List[BootstrapServer],
-   groupId: GroupId,
-   clientId: ClientId,
-   autoOffsetReset: String,
-   topics: List[KafkaTopic],
-   producerProperties: Map[String, String],
+  bootstrapServers: List[BootstrapServer],
+  groupId: GroupId,
+  clientId: ClientId,
+  autoOffsetReset: String,
+  topics: List[KafkaTopic],
+  producerProperties: Map[String, String],
 )
 
 object KafkaConfig {

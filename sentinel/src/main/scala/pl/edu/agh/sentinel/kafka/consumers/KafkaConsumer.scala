@@ -1,9 +1,10 @@
 package pl.edu.agh.sentinel
 package kafka.consumers
 
-import zio.{Scope, ZIO, ZLayer}
-import zio.kafka.consumer.{Consumer, ConsumerSettings, Subscription}
+import zio.{ Scope, ZIO, ZLayer }
+import zio.kafka.consumer.{ Consumer, ConsumerSettings, Subscription }
 import zio.kafka.serde.Deserializer
+
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import pl.edu.agh.sentinel.kafka.config.KafkaConfig
 
@@ -25,9 +26,9 @@ object KafkaConsumer {
   }
 
   def settingsWithOffset(
-     cfg: KafkaConfig,
-     offsetReset: ConsumingStrategy,
-   ): ConsumerSettings = {
+    cfg: KafkaConfig,
+    offsetReset: ConsumingStrategy,
+  ): ConsumerSettings = {
     ConsumerSettings(cfg.bootstrapServers)
       .withGroupId(cfg.groupId)
       .withClientId(cfg.clientId)
@@ -35,8 +36,8 @@ object KafkaConsumer {
   }
 
   def layerFromConfig(
-  offsetReset: ConsumingStrategy = ConsumingStrategy.Latest
-                     ): ZLayer[Scope, Throwable, KafkaConsumer] = {
+    offsetReset: ConsumingStrategy = ConsumingStrategy.Latest
+  ): ZLayer[Scope, Throwable, KafkaConsumer] = {
     ZLayer.fromZIO {
       for {
         cfg <- KafkaConfig.getConfig

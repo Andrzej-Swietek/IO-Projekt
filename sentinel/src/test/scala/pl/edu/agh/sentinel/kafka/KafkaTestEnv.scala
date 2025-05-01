@@ -2,13 +2,13 @@ package pl.edu.agh.sentinel.kafka
 
 import zio.*
 import zio.kafka.producer.ProducerSettings
+
 import org.testcontainers.containers.Network
 import org.testcontainers.kafka.KafkaContainer
+import pl.edu.agh.sentinel.kafka.{ config, consumers }
 import pl.edu.agh.sentinel.kafka.config.KafkaConfig
-import pl.edu.agh.sentinel.kafka.{config, consumers}
-import pl.edu.agh.sentinel.kafka.consumers.{ConsumingStrategy, KafkaConsumer}
+import pl.edu.agh.sentinel.kafka.consumers.{ ConsumingStrategy, KafkaConsumer }
 import pl.edu.agh.sentinel.kafka.producers.KafkaProducer
-
 
 final case class KafkaTestEnv(
   network: Network,

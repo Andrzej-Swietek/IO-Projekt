@@ -1,10 +1,10 @@
 package pl.edu.agh.sentinel.kafka.example
 
-import pl.edu.agh.sentinel.kafka.producers.KafkaProducer
 import zio.*
-import zio.json.{JsonDecoder, JsonEncoder}
-import zio.kafka.serde.{Serde, Serializer}
+import zio.json.{ JsonDecoder, JsonEncoder }
+import zio.kafka.serde.{ Serde, Serializer }
 import zio.stream.ZStream
+
 import pl.edu.agh.sentinel.kafka.producers.KafkaProducer
 import pl.edu.agh.sentinel.kafka.topics.SentinelTopics
 

@@ -4,34 +4,35 @@ package kafka.topics
 import zio.*
 import zio.kafka.admin.{ AdminClient, AdminClientSettings }
 import zio.logging.*
+
 import pl.edu.agh.sentinel.kafka.config.KafkaConfig
 
 /** Trait defining contract for managing Kafka topics. Can be used for mocking in tests or providing alternate
- * implementations.
- */
+  * implementations.
+  */
 trait KafkaTopicManager {
 
   /** Ensures that all topics defined in the configuration exist in the Kafka cluster. If any are missing, they will be
-   * created.
-   */
+    * created.
+    */
   def ensureTopicsExist: Task[Unit]
 
   /** Deletes topics that are present in Kafka but not in the configuration. Use with caution in production
-   * environments.
-   */
+    * environments.
+    */
   def deleteUnusedTopics: Task[Unit]
 
   /** Synchronizes Kafka topics with the configuration by:
-   *   - Creating missing topics
-   *   - Deleting unused topics
-   */
+    *   - Creating missing topics
+    *   - Deleting unused topics
+    */
   def cleanupTopics: Task[Unit]
 
   /** Creates a single topic as defined in the provided KafkaTopic configuration.
-   *
-   * @param topic
-   *   The topic to be created
-   */
+    *
+    * @param topic
+    *   The topic to be created
+    */
   def createTopic(topic: KafkaTopic): Task[Unit]
 }
 

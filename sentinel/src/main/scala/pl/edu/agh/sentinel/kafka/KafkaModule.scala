@@ -1,14 +1,15 @@
 package pl.edu.agh.sentinel
 package kafka
 
+import zio.*
+import zio.config.typesafe.*
+import zio.logging.backend.SLF4J
+
 import pl.edu.agh.sentinel.kafka.config.KafkaConfig
 import pl.edu.agh.sentinel.kafka.consumers.ConsumingStrategy.Earliest
 import pl.edu.agh.sentinel.kafka.consumers.KafkaConsumer
 import pl.edu.agh.sentinel.kafka.producers.KafkaProducer
 import pl.edu.agh.sentinel.kafka.topics.TopicManager
-import zio.*
-import zio.config.typesafe.*
-import zio.logging.backend.SLF4J
 
 object KafkaModule {
 
