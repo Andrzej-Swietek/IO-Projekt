@@ -12,9 +12,9 @@ enum SentinelTopics(val topic: KafkaTopic) {
   case Events extends SentinelTopics(KafkaTopic("events"))
   case TaskEvents extends SentinelTopics(KafkaTopic("task-events"))
   case UserActivity extends SentinelTopics(KafkaTopic("user-activity-events"))
-  case audits extends SentinelTopics(KafkaTopic("audits"))
-  case alerts extends SentinelTopics(KafkaTopic("alerts"))
-  case statusUpdate extends SentinelTopics(KafkaTopic("status-updates"))
+  case Audits extends SentinelTopics(KafkaTopic("audits"))
+  case Alerts extends SentinelTopics(KafkaTopic("alerts"))
+  case StatusUpdate extends SentinelTopics(KafkaTopic("status-updates"))
   case ManualTestTopic extends SentinelTopics(KafkaTopic("manual-test-topic"))
 
   def topicName: String = topic.name

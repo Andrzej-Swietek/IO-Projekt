@@ -15,6 +15,9 @@ object TaskEvent {
   final case class TaskCreated(taskId: String, title: String, columnId: String, creatorId: String, timestamp: Instant)
     extends TaskEvent derives JsonCodec
 
+  final case class TaskAssigned(taskId: String, assigneeId: String, teamId: String, projectId: String, timestamp: Instant)
+    extends TaskEvent derives JsonCodec
+
   final case class TaskClosed(taskId: String, title: String, columnId: String, creatorId: String, timestamp: Instant)
     extends TaskEvent derives JsonCodec
 

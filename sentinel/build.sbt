@@ -34,7 +34,7 @@ lazy val root = (project in file("."))
       "io.scalaland" %% "chimney" % chimneyVersion,
       "dev.zio" %% "zio-prelude" % zioPreludeVersion,
       "dev.zio" %% "zio-config-magnolia" % zioMagnoliaVersion,
-
+      "com.softwaremill.sttp.client3" %% "core" % "3.8.0",
       // logging
       "dev.zio" %% "zio-logging" % zioLoggingVersion,
       "dev.zio" %% "zio-logging-slf4j" % zioLoggingVersion,
