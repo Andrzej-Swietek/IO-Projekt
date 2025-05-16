@@ -5,12 +5,13 @@ import zio.config.typesafe.*
 import zio.logging.backend.SLF4J
 
 import pl.edu.agh.sentinel.configs.AlertConfig
-import pl.edu.agh.sentinel.kafka.KafkaModule
+import pl.edu.agh.sentinel.kafka.{ KafkaEnv, KafkaModule }
 import pl.edu.agh.sentinel.kafka.config.KafkaConfig
-import pl.edu.agh.sentinel.kafka.consumers.{AlertConsumer, KafkaConsumer}
+import pl.edu.agh.sentinel.kafka.consumers.{ AlertConsumer, KafkaConsumer }
 import pl.edu.agh.sentinel.kafka.producers.KafkaProducer
 import pl.edu.agh.sentinel.kafka.topics.TopicManager
-import pl.edu.agh.sentinel.processing.{AlertingEngine, SentinelAlertingEngine}
+import pl.edu.agh.sentinel.processing.{ AlertingEngine, SentinelAlertingEngine }
+import pl.edu.agh.sentinel.store.redis.{ RedisEnv, RedisModule }
 
 object SentinelApp extends ZIOAppDefault {
   override val bootstrap: ZLayer[ZIOAppArgs, Any, Any] = {
@@ -19,10 +20,8 @@ object SentinelApp extends ZIOAppDefault {
     ) >>> Runtime.removeDefaultLoggers >>> SLF4J.slf4j
   }
 
-  private val workflow
-  : ZIO[KafkaConfig & KafkaConsumer & KafkaProducer & TopicManager & AlertingEngine, Throwable, Unit] = for {
-    _ <- ZIO.logInfo("Starting Lesheq...")
-    _ <- KafkaModule.initialize
+  private val workflow: ZIO[KafkaEnv & AlertingEngine & RedisEnv, Throwable, Unit] = for {
+    _ <- ZIO.logInfo("Starting Sentinel...")
 
     consumer <- ZIO.service[KafkaConsumer]
     producer <- ZIO.service[KafkaProducer]
@@ -38,10 +37,14 @@ object SentinelApp extends ZIOAppDefault {
   } yield ()
 
   override val run: ZIO[ZIOAppArgs & Scope, Throwable, Unit] = workflow
-    .provideSomeLayer[ZIOAppArgs & Scope](
-      KafkaConfig.layer >>> KafkaModule.live ++ (AlertConfig.layer >>> SentinelAlertingEngine.layer)
+    .provide(
+      KafkaModule.live,
+      AlertConfig.layer >>> SentinelAlertingEngine.layer,
+      RedisModule.live,
     )
     .catchAll { error =>
       ZIO.debug(s"Error occurred: ${error.getMessage}")
     }
 }
+
+// ZIO ENV: KafkaConfig.layer >>> KafkaModule.live ++ (AlertConfig.layer >>> SentinelAlertingEngine.layer) ++ RedisModule.live

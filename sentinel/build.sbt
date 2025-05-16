@@ -16,6 +16,8 @@ val testContainersVersion = "0.43.0"
 val zioMockVersion = "1.0.0-RC12"
 val zioMagnoliaVersion = "4.0.4"
 val testcontainersVersion = "1.20.6"
+val zioRedisVersion = "1.1.3"
+val zioSchemaProtobufVersion = "1.6.1"
 
 lazy val root = (project in file("."))
   .settings(
@@ -34,6 +36,8 @@ lazy val root = (project in file("."))
       "io.scalaland" %% "chimney" % chimneyVersion,
       "dev.zio" %% "zio-prelude" % zioPreludeVersion,
       "dev.zio" %% "zio-config-magnolia" % zioMagnoliaVersion,
+      "dev.zio" %% "zio-redis" % zioRedisVersion,
+      "dev.zio" %% "zio-schema-protobuf" % zioSchemaProtobufVersion,
       "com.softwaremill.sttp.client3" %% "core" % "3.8.0",
       // logging
       "dev.zio" %% "zio-logging" % zioLoggingVersion,

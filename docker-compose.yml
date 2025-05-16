@@ -46,18 +46,11 @@ services:
       timeout: 5s
       retries: 20
 
-  #  ================ Mailer Service ================
-
-# TODO: Issue #xx Add email notification
-#  mail-dev:
-#    container_name: ms-mail-dev
-#    image: maildev/maildev
-#    ports:
-#      - 1080:1080 # UI
-#      - 1025:1025 # SMTP
-
 include:
   - docker/monitoring/monitoring.yml
+
+include:
+  - docker/sentinel/sentinel.yml
 
 #  ================== Networks ===================
 

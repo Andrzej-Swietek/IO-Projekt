@@ -11,19 +11,28 @@ import pl.edu.agh.sentinel.kafka.consumers.KafkaConsumer
 import pl.edu.agh.sentinel.kafka.producers.KafkaProducer
 import pl.edu.agh.sentinel.kafka.topics.TopicManager
 
+type KafkaEnv = KafkaConfig & KafkaProducer & KafkaConsumer & TopicManager
+
 object KafkaModule {
 
-  val live: ZLayer[KafkaConfig & Scope, Throwable, KafkaProducer & KafkaConsumer & KafkaConfig & TopicManager] = {
-    KafkaConfig.layer ++
-      (for {
-        prod <- KafkaProducer.layerFromConfig()
-        cons <- KafkaConsumer.layerFromConfig(Earliest)
-      } yield prod ++ cons) ++
-      TopicManager.layer
+  val kafkaScope: ZLayer[KafkaConfig, Nothing, Scope.Closeable] = ZLayer.fromZIO {
+    for {
+        config <- ZIO.service[KafkaConfig]
+        _ <- ZIO.logInfo(s"Kafka Config: ${config.toString}")
+        _ <- ZIO.logInfo("Kafka Module initialized")
+      scope <- Scope.make
+    } yield scope
   }
 
-  val initialize: ZIO[KafkaConfig, Throwable, Unit] = for {
-    config <- ZIO.service[KafkaConfig]
-    _ <- ZIO.logInfo(s"Kafka Config: ${config.toString}")
-  } yield ()
+  val live: ZLayer[Any, Throwable, KafkaEnv] = {
+    ZLayer.make[KafkaEnv](
+      kafkaScope,
+      KafkaConfig.layer,
+      KafkaProducer.layerFromConfig(),
+      KafkaConsumer.layerFromConfig(Earliest),
+      TopicManager.layer
+    ).mapError { e =>
+      new RuntimeException(s"Failed to create Kafka layer: ${e.getMessage}", e)
+    }
+  }
 }

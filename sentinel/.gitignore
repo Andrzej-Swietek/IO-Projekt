@@ -1,2 +1,5 @@
 target/
 project/target
+*.iml
+sentinel/.idea/libraries
+.idea/*
