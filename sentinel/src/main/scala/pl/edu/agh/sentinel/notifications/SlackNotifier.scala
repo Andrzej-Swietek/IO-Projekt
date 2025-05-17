@@ -1,25 +1,38 @@
 package pl.edu.agh.sentinel.notifications
 
-import zio._
-import sttp.client3._
+import zio.*
+import sttp.client3.*
 import sttp.client3.quick.backend
 import sttp.model.Uri
+import zio.*
+import sttp.client3.*
+import sttp.client3.ziojson.*
+import sttp.model.Uri
+import pl.edu.agh.sentinel.events.AlertEvent
+import sttp.client3.httpclient.zio.HttpClientZioBackend
+import sttp.client3._
+import sttp.client3.ziojson._
+import zio._
+import zio.json._
 
-class SlackNotifier(webhookUrl: String) {
+case class SlackPayload(text: String) derives JsonCodec
 
-//  def send(message: String): ZIO[Any, Throwable, Unit] = {
-//    val request = basicRequest
-//      .body(Map("text" -> message))
-//      .post(Uri.parse(webhookUrl).getOrElse(throw new IllegalStateException("Invalid webhook URL")))
-//
-//    ZIO.fromFuture { _ =>
-//      request.send(backend).map { response =>
-//        if (response.code.isSuccess) {
-//          println(s"Slack message sent: $message")
-//        } else {
-//          println(s"Failed to send Slack message: ${response.body}")
-//        }
-//      }
-//    }
-//  }
+final case class SlackNotifier(webhookUrl: String) extends Notifier {
+  def send(alert: AlertEvent): Task[Unit] = {
+    val payload = SlackPayload(s"SENTINEL ALERT\n ${alert.timestamp} - ${alert.severity} n${alert.message}")
+
+    ZIO.scoped {
+      HttpClientZioBackend.scoped().flatMap { implicit backend =>
+        basicRequest
+          .post(uri"$webhookUrl")
+          .body(payload)
+          .response(asStringAlways)
+          .send()
+          .flatMap { response =>
+            if (response.code.isSuccess) ZIO.unit
+            else ZIO.fail(new RuntimeException(s"Slack error: ${response.body}"))
+          }
+      }
+    }
+  }
 }

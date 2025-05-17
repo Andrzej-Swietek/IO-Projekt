@@ -39,6 +39,10 @@ lazy val root = (project in file("."))
       "dev.zio" %% "zio-redis" % zioRedisVersion,
       "dev.zio" %% "zio-schema-protobuf" % zioSchemaProtobufVersion,
       "com.softwaremill.sttp.client3" %% "core" % "3.8.0",
+      "com.softwaremill.sttp.client3" %% "zio" % "3.11.0",
+      "com.softwaremill.sttp.client3" %% "zio-json" % "3.11.0",
+      "com.sun.mail" % "jakarta.mail" % "1.6.7",
+
       // logging
       "dev.zio" %% "zio-logging" % zioLoggingVersion,
       "dev.zio" %% "zio-logging-slf4j" % zioLoggingVersion,

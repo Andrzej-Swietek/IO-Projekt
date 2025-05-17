@@ -41,13 +41,13 @@ services:
   # =================== REDIS ===================
   
   redis:
-    image: redis:7.2
+    image: redis:8.0
     container_name: sentinel-redis
     ports:
       - "6379:6379"
     command: ["redis-server", "--appendonly", "yes", "--save", "60", "1"]
     volumes:
-      - redis_data:/data
+      - ./redis_data:/data
     restart: unless-stopped
 
   #  ================ Mailer Service ================

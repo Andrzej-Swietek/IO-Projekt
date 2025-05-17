@@ -1,24 +1,33 @@
 package pl.edu.agh.sentinel.notifications
 
-import zio._
-import sttp.client3._
+import pl.edu.agh.sentinel.configs.EmailConfig
+import pl.edu.agh.sentinel.events.AlertEvent
+import zio.*
+import sttp.client3.*
 import sttp.client3.quick.backend
 import sttp.model.Uri
 
+import java.util.Properties
+import javax.mail.*
+import javax.mail.internet.*
 
-class EmailNotifier(smtpServer: String, smtpPort: Int, fromEmail: String)  {
-//    override def send(message: String): Task[Unit] = Task {
-  //    val properties = new java.util.Properties()
-  //    properties.put("mail.smtp.host", smtpServer)
-  //    properties.put("mail.smtp.port", smtpPort.toString)
-  //    val session = Session.getDefaultInstance(properties)
-  //
-  //    val mimeMessage = new MimeMessage(session)
-  //    mimeMessage.setFrom(new InternetAddress(fromEmail))
-  //    mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress("recipient@example.com"))
-  //    mimeMessage.setSubject("Alert Notification")
-  //    mimeMessage.setText(message)
-  //
-  //    Transport.send(mimeMessage)
-  //  }
+
+final case class EmailNotifier(config: EmailConfig) extends Notifier {
+  def send(event: AlertEvent): Task[Unit] = ZIO.attemptBlocking {
+    if (config.enabled && config.smtpServer.isDefined && config.fromAddress.isDefined) {
+      val props = new Properties()
+      props.put("mail.smtp.host", config.smtpServer)
+      props.put("mail.smtp.port",  config.smtpPort.toString)
+      val session = Session.getInstance(props, null)
+
+      val message = new MimeMessage(session)
+      message.setFrom(new InternetAddress(config.fromAddress.get))
+      val toAddresses = List("aswietek@student.agh.edu.pl")
+      toAddresses.foreach(to => message.addRecipient(Message.RecipientType.TO, new InternetAddress(to)))
+      message.setSubject(s"[${event.severity}] ${event.timestamp}")
+      message.setText(event.message)
+
+      Transport.send(message)
+    }
+  }
 }
