@@ -48,8 +48,6 @@ services:
 
 include:
   - docker/monitoring/monitoring.yml
-
-include:
   - docker/sentinel/sentinel.yml
 
 #  ================== Networks ===================
