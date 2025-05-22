@@ -22,7 +22,7 @@ final case class EmailNotifier(config: EmailConfig) extends Notifier {
 
       val message = new MimeMessage(session)
       message.setFrom(new InternetAddress(config.fromAddress.get))
-      val toAddresses = List("aswietek@student.agh.edu.pl")
+      val toAddresses = List("aswietek@student.agh.edu.pl") // TODO - make this configurable / get from Kanban Core REST
       toAddresses.foreach(to => message.addRecipient(Message.RecipientType.TO, new InternetAddress(to)))
       message.setSubject(s"[${event.severity}] ${event.timestamp}")
       message.setText(event.message)

@@ -38,12 +38,12 @@ object SentinelNotifier {
           if config.slack.enabled
         } yield SlackNotifier(token) 
 
-//        val discordNotifier = for {
-//          webhook <- config.discord.webhookUrl
-//          if config.discord.enabled
-//        } yield DiscordNotifier(webhook)
+        val discordNotifier = for {
+          webhook <- config.discord.webhookUrl
+          if config.discord.enabled
+        } yield DiscordNotifier(webhook)
 
-        List(emailNotifier, slackNotifier).flatten
+        List(emailNotifier, slackNotifier, discordNotifier).flatten
       }
     } yield SentinelNotifier(notifiers)
   }
