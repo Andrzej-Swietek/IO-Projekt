@@ -27,11 +27,11 @@ object SentinelApp extends ZIOAppDefault {
 
   def runAlertingPipeline(consumer: KafkaConsumer, engine: AlertingEngine): ZIO[KafkaEnv & AlertingEngine & NotificationEnv, Throwable, Unit] = for {
     notifier <- ZIO.service[SentinelNotifier]
-    
-    // 1. Pobierz strumień task events z konsumenta Kafka
-    taskEventStream <- ZIO.succeed(TaskEventConsumer(consumer).run) // lub z environment
 
-    // 2. Przetwórz eventy przez alerting engine, otrzymując stream alertów
+    // 1. Consume/Poll stream of task events from Kafka consumer
+    taskEventStream <- ZIO.succeed(TaskEventConsumer(consumer).run.tap(event => ZIO.logInfo(s"Incoming TaskEvent: $event")))
+
+    // 2. Process events through alerting engine, receiving stream of alerts
     alertEventStream = engine.process(taskEventStream)
     _ <- alertEventStream
       .tap(alert => notifier.send(alert))
@@ -45,10 +45,19 @@ object SentinelApp extends ZIOAppDefault {
 
     consumer <- ZIO.service[KafkaConsumer]
     producer <- ZIO.service[KafkaProducer]
+    topicManager <- ZIO.service[TopicManager]
     engine <- ZIO.service[AlertingEngine]
 
+    // Ensure all topics are created
+    _ <- topicManager.ensureTopicsExist
 
     _ <- ZIO.logInfo("Starting alert consumer stream...")
+    _ <-     TaskEventConsumer(consumer).run
+      .tap(event => ZIO.logInfo(s"Incoming TaskEvent: $event"))
+      .runDrain
+
+    _ <- runAlertingPipeline(consumer, engine)
+
     _ <- ZIO.never
   } yield ()
 

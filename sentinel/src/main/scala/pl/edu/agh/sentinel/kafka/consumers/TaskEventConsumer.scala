@@ -1,6 +1,8 @@
 package pl.edu.agh.sentinel.kafka.consumers
 
 import zio.*
+import zio.json.*
+
 import zio.kafka.serde.{Deserializer, Serde}
 import zio.stream.ZStream
 import pl.edu.agh.sentinel.events.TaskEvent
@@ -14,9 +16,23 @@ final case class TaskEventConsumer(kafkaConsumer: KafkaConsumer) extends KafkaRu
 
   def name: String = s"consumer-${SentinelTopics.TaskEvents.topicName}"
   
-  def run: ZStream[Any, Throwable, TaskEvent] = kafkaConsumer
-    .stream[String, TaskEvent](SentinelTopics.TaskEvents.topicName)
-    .map(_.value)
-    .tap(x => ZIO.logInfo(s"Got event: $x"))
-    .retry(Schedule.exponential(1.second))
+//  def run: ZStream[Any, Throwable, TaskEvent] = kafkaConsumer
+//    .stream[String, TaskEvent](SentinelTopics.TaskEvents.topicName)
+//    .mapZIO(record => record.offset.commit.as(record.value))
+//    .tap(x => ZIO.logDebug(s"Got event: $x"))
+
+  def run: ZStream[Any, Throwable, TaskEvent] =
+    kafkaConsumer
+      .stream[String, String](SentinelTopics.TaskEvents.topicName)
+      .mapZIO { record =>
+        record.value.fromJson[TaskEvent] match {
+          case Right(event) =>
+            record.offset.commit.as(Some(event))
+          case Left(error) =>
+            ZIO.logWarning(s"Deserialization failed: $error, skipping message") *>
+              record.offset.commit.as(None)
+        }
+      }
+      .collectSome
+      .tap(event => ZIO.logDebug(s"Got event: $event"))
 }

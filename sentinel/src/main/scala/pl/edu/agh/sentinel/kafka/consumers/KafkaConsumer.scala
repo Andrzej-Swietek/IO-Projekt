@@ -3,7 +3,7 @@ package kafka.consumers
 
 import zio.{ Scope, ZIO, ZLayer }
 import zio.kafka.consumer.{ Consumer, ConsumerSettings, Subscription }
-import zio.kafka.serde.Deserializer
+import zio.kafka.serde.{ Deserializer, Serde }
 
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import pl.edu.agh.sentinel.kafka.config.KafkaConfig

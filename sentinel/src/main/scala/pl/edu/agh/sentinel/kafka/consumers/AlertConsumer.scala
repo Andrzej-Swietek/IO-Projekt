@@ -17,6 +17,6 @@ case class AlertConsumer(kafkaConsumer: KafkaConsumer) extends KafkaRunner[Throw
   def run: ZStream[Any, Throwable, TaskEvent] = kafkaConsumer
     .stream[String, TaskEvent](SentinelTopics.Alerts.topicName)
     .map(_.value)
-    .tap(x => ZIO.logInfo(s"Got event: $x"))
+    .tap(x => ZIO.logDebug(s"Got event: $x"))
     .retry(Schedule.exponential(1.second))
 }

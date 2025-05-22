@@ -2,9 +2,11 @@ package pl.edu.agh.sentinel.events
 
 import zio.json
 import zio.json.{ DeriveJsonCodec, DeriveJsonDecoder, DeriveJsonEncoder, JsonCodec, JsonDecoder, JsonEncoder }
+import zio.json._
 
 import java.time.Instant
 
+@jsonDiscriminator("type")
 sealed trait TaskEvent {
   def taskId: String;
 
