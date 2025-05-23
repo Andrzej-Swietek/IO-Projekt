@@ -1,12 +1,12 @@
 package pl.edu.agh.sentinel.notifications
 
-import zio._
-import zio.json._
+import zio.*
+import zio.json.*
 import sttp.client3.httpclient.zio.HttpClientZioBackend
-import sttp.client3._
-import sttp.client3.ziojson._
-import pl.edu.agh.sentinel.events.AlertEvent
-import pl.edu.agh.sentinel.events.AlertEvent._
+import sttp.client3.*
+import sttp.client3.ziojson.*
+import pl.edu.agh.sentinel.events.{AlertEvent, AlertSeverity}
+import pl.edu.agh.sentinel.events.AlertEvent.*
 
 case class DiscordPayload(content: String) derives JsonCodec
 

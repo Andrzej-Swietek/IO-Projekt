@@ -1,6 +1,9 @@
 package pl.edu.agh.sentinel
 package processing
 
+import pl.edu.agh.sentinel.events.TaskEvent
+import zio.stream.ZStream
+
 
 /**
  * TODO: Stats that are to be collected and processed:
