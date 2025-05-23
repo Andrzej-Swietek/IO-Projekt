@@ -44,6 +44,11 @@ Code follows all good preacticies and multiple design patterns are used to ensur
 </p>
 <p align="center">
   <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=scala,kafka,redis" />
+  </a>
+</p>
+<p align="center">
+  <a href="https://skillicons.dev">
     <img src="https://skillicons.dev/icons?i=react,typescript,tailwind,vite" />
   </a>
 </p>
@@ -62,6 +67,13 @@ Code follows all good preacticies and multiple design patterns are used to ensur
 - Keycloack
 - Spring AI
 - Open API and Swagger
+
+### Sentinel Microservice
+- Scala 3
+- ZIO
+- ZIO Kafka
+- ZIO Redis
+- SBT
 
 ### Frontend
 

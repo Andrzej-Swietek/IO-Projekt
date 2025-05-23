@@ -89,5 +89,5 @@ object AlertEvent {
 }
 
 enum AlertSeverity derives JsonCodec {
-  case Info, Warning, Critical
+  case Info, Warning, Critical, Message
 }
