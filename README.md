@@ -127,7 +127,7 @@ Code follows all good preacticies and multiple design patterns are used to ensur
 
     - You can also use the provided `docker-compose.yml` file to run the database. Just run:
    ```shell
-     docker-compose up --build -d
+     docker compose up --build -d
      ```
 
 9. Run the following command to build and start the backend application:
@@ -280,7 +280,7 @@ scrape_configs:
 
 -----------------
 
-## Running with Docker and docker-compose
+## Running with Docker and docker compose
 
 Build and run the application using Docker Compose.
 
@@ -290,5 +290,5 @@ Build and run the application using Docker Compose.
 4. Run the following command to build and start the application:
 
 ```shell
-docker-compose up --build
+docker compose up --build
 ```
