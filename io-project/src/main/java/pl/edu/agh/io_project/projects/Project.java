@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.edu.agh.io_project.boards.Board;
 import pl.edu.agh.io_project.teams.Team;
+import pl.edu.agh.io_project.integrations.github.GitHubIntegration;
 
 import java.util.List;
 
@@ -33,4 +34,7 @@ public class Project {
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Board> boards;
+
+    @OneToOne(mappedBy = "project", cascade = CascadeType.ALL)
+    private GitHubIntegration githubIntegration;
 }
