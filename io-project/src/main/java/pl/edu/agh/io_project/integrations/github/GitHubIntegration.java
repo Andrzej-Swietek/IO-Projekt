@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,8 +22,12 @@ public class GitHubIntegration implements VersionControlIntegration {
     @GeneratedValue
     private Long id;
 
-    @OneToOne(mappedBy = "githubIntegration")
+//    @OneToOne(mappedBy = "githubIntegration")
+//    private Project project;
+    @OneToOne
+    @JoinColumn(name = "project_id")
     private Project project;
+
 
     private String repoOwner;
     private String repoName;
