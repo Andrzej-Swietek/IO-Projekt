@@ -36,7 +36,7 @@ services:
       - microservices-net
     volumes:
       - ./config/keycloak/realm.json:/opt/keycloak/data/import/realm-export.json
-      - ./keycloak/theme:/opt/keycloak/themes
+      - ./keycloak/theme:/opt/keycloak/providers/
     command:
       - "start-dev"
       - "--import-realm"
