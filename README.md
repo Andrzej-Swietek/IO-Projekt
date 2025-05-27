@@ -260,23 +260,24 @@ scrape_configs:
 
 -----------------
 
-| Endpoint                                                                              | Description                           |
-|---------------------------------------------------------------------------------------|---------------------------------------|
-| http://localhost:8080/swagger-ui.html                                                 | Swagger UI for API documentation      |
-| http://localhost:8080/v3/api-docs                                                     | OpenAPI documentation                 |
-| http://localhost:8080/actuator                                                        | Spring Boot Actuator endpoints        |
-| http://localhost:8080/actuator/prometheus                                             | Prometheus metrics endpoint           |
-| http://localhost:8080/actuator/health                                                 | Health check endpoint                 |
-| http://localhost:8080/actuator/metrics                                                | Metrics endpoint                      |
-| http://localhost:8080/actuator/info                                                   | Info endpoint                         |
-| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/auth             | Keycloak authentication endpoint      |
-| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/token            | Keycloak token endpoint               |
-| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/userinfo         | Keycloak user info endpoint           |
-| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/logout           | Keycloak logout endpoint              |
-| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/certs            | Keycloak public key endpoint          |
-| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/token/introspect | Keycloak token introspection endpoint |
-| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/token/revoke     | Keycloak token revocation endpoint    |
-| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/userinfo         | Keycloak user info endpoint           |
+| Endpoint                                                                              | Description                                     |
+|---------------------------------------------------------------------------------------|-------------------------------------------------|
+| http://localhost:8080/notification/ws                                                 | Websocket with client displayed notifications   |
+| http://localhost:8080/swagger-ui.html                                                 | Swagger UI for API documentation                |
+| http://localhost:8080/v3/api-docs                                                     | OpenAPI documentation                           |
+| http://localhost:8080/actuator                                                        | Spring Boot Actuator endpoints                  |
+| http://localhost:8080/actuator/prometheus                                             | Prometheus metrics endpoint                     |
+| http://localhost:8080/actuator/health                                                 | Health check endpoint                           |
+| http://localhost:8080/actuator/metrics                                                | Metrics endpoint                                |
+| http://localhost:8080/actuator/info                                                   | Info endpoint                                   |
+| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/auth             | Keycloak authentication endpoint                |
+| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/token            | Keycloak token endpoint                         |
+| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/userinfo         | Keycloak user info endpoint                     |
+| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/logout           | Keycloak logout endpoint                        |
+| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/certs            | Keycloak public key endpoint                    |
+| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/token/introspect | Keycloak token introspection endpoint           |
+| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/token/revoke     | Keycloak token revocation endpoint              |
+| http://localhost:9098/auth/realms/io-project/protocol/openid-connect/userinfo         | Keycloak user info endpoint                     |
 
 -----------------
 
