@@ -31,19 +31,8 @@ public class KeycloakUserService implements UserService {
         this.keycloakService = keycloakService;
     }
 
-    public String getUserDetails(String userId) {
-        String token = authService.getAccessToken();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        String url = String.format("%s/admin/realms/%s/users/%s", serverUrl, realm, userId);
-
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-
-        return response.getBody();
+    public UserRepresentation getUserDetails(String userId) {
+        return this.keycloakService.getUserById(userId);
     }
 
     public String getUserRoles(String userId) {

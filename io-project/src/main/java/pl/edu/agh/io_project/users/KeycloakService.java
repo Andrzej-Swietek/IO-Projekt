@@ -35,6 +35,10 @@ public class KeycloakService {
         return keycloak.realm(realm).users().list();
     }
 
+    public UserRepresentation getUserById(String userId) {
+        return keycloak.realm(realm).users().get(userId).toRepresentation();
+    }
+
     public List<RoleRepresentation> getAllRoles() {
         return keycloak.realm(realm).roles().list();
     }

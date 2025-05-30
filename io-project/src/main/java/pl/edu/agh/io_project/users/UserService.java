@@ -1,7 +1,9 @@
 package pl.edu.agh.io_project.users;
 
+import org.keycloak.representations.idm.UserRepresentation;
+
 public interface UserService {
-    String getUserDetails(String userId);
+    UserRepresentation getUserDetails(String userId);
 
     String getUserRoles(String userId);
 }

@@ -31,6 +31,18 @@ public class TaskController {
         return ResponseEntity.ok(task);
     }
 
+    @GetMapping("/by-column/{columnId}")
+    public ResponseEntity<List<Task>> getTasksByColumnId(@PathVariable Long columnId) {
+        List<Task> tasks = taskService.getTasksByColumnId(columnId);
+        return ResponseEntity.ok(tasks);
+    }
+
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<List<Task>> getTasksByUserId(@PathVariable String userId) {
+        List<Task> tasks = taskService.getTasksByUserId(userId);
+        return ResponseEntity.ok(tasks);
+    }
+
     @PostMapping
     public ResponseEntity<Task> createTask(@RequestBody TaskRequest taskRequest) {
         Task task = taskService.createTask(taskRequest);

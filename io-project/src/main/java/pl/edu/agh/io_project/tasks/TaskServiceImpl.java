@@ -105,4 +105,14 @@ public class TaskServiceImpl implements TaskService {
 
         taskRepository.saveAll(tasks);
     }
+
+    @Override
+    public List<Task> getTasksByUserId(String userId) {
+        return taskRepository.findByAssigneesContaining(userId);
+    }
+
+    @Override
+    public List<Task> getTasksByColumnId(Long columnId) {
+        return taskRepository.findByColumnIdOrderByPosition(columnId);
+    }
 }

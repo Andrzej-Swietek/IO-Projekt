@@ -1,0 +1,61 @@
+services:
+
+  # =================== KAFKA ===================
+
+  sentinel-kafka:
+    hostname: sentinel-kafka
+    image: bitnami/kafka:3.9.0
+    expose:
+      - "9092"
+    ports:
+      - "9092:9093"
+    volumes:
+      - "./kafka-data:/bitnami"
+    environment:
+      KAFKA_CFG_NODE_ID: "0"
+      KAFKA_CFG_PROCESS_ROLES: "controller,broker"
+      KAFKA_CFG_LISTENERS: "CONTROLLER://:9094,INTERNAL://:9092,EXTERNAL://:9093"
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "0@sentinel-kafka:9094"
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "INTERNAL://sentinel-kafka:9092,EXTERNAL://127.0.0.1:9092"
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: "INTERNAL"
+      KAFKA_CFG_NUM_PARTITIONS: "8"
+    restart: unless-stopped
+
+  sentinel-kafka-ui:
+    container_name: sentinel-kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "9002:8080"
+    depends_on:
+      - sentinel-kafka
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: sentinel-kafka:9092
+      DYNAMIC_CONFIG_ENABLED: 'true'
+
+  # =================== REDIS ===================
+  
+  redis:
+    image: redis:8.0
+    container_name: sentinel-redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "1"]
+    volumes:
+      - ./redis_data:/data
+    restart: unless-stopped
+
+  #  ================ Mailer Service ================
+
+  # TODO: Issue #xx Add email notification
+  #  mail-dev:
+  #    container_name: ms-mail-dev
+  #    image: maildev/maildev
+  #    ports:
+  #      - 1080:1080 # UI
+  #      - 1025:1025 # SMTP
