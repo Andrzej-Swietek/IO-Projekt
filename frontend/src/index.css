@@ -193,3 +193,7 @@
         font-family: var(--font-sans), sans-serif;
     }
 /*}*/
+
+.retro-shadow {
+  @apply shadow-[8px_8px_0px_#000000];
+}

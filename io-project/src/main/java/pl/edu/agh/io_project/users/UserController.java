@@ -3,10 +3,8 @@ package pl.edu.agh.io_project.users;
 import lombok.AllArgsConstructor;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,6 +27,16 @@ public class UserController {
     @GetMapping("/{userId}")
     public UserRepresentation getUserDetails(@PathVariable String userId) {
         return keycloakUserService.getUserDetails(userId);
+    }
+
+    @PostMapping("/populate")
+    public ResponseEntity<List<UserRepresentation>> populateUsers(@RequestBody PopulateUsersRequest request) {
+
+        return ResponseEntity.ok(
+                request.userIds().stream()
+                        .map(keycloakUserService::getUserDetails)
+                        .toList()
+        );
     }
 
     @GetMapping("/{userId}/roles")

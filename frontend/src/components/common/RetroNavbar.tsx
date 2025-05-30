@@ -29,11 +29,15 @@ export const RetroNavbar: FC<RetroNavbarProps> = () => {
 
       {/* Logo */}
       <div className="flex items-center gap-2 px-8">
-        <div className="w-12 h-12 rounded flex items-center justify-center">
-          <img src="/logo.png" alt="Logo" />
-        </div>
-        <span className="text-3xl font-normal text-black">retro</span>
-        <span className="text-4xl -ml-4 font-bold text-black">Board</span>
+        <NavLink to="/">
+          <div className="w-12 h-12 rounded flex items-center justify-center">
+            <img src="/logo.png" alt="Logo" />
+          </div>
+        </NavLink>
+        <NavLink to="/">
+          <span className="text-3xl font-normal text-black">retro</span>
+          <span className="text-4xl -ml-4 font-bold text-black">Board</span>
+        </NavLink>
       </div>
 
       {/* User Actions */}
