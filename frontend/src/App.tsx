@@ -7,13 +7,12 @@ import { Home } from '@routes/Home.tsx';
 import { Login } from '@routes/auth/Login.tsx';
 import { MainLayout } from '@layouts/MainLayout.tsx';
 import { Register } from '@routes/auth/Register.tsx';
-import { UserProfile } from '@routes/UserProfile.tsx';
+import { OtherUserProfile } from '@routes/user/OtherUserProfile.tsx';
 import { BoardPage } from '@routes/Board.tsx';
-
+import { UserProfileTab } from '@routes/user/UserProfile.tsx';
 
 interface Props {
 }
-
 
 const router = createBrowserRouter([
   {
@@ -41,8 +40,12 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: 'user/:id',
-        element: <UserProfile />,
+        path: 'user',
+        element: <Outlet />,
+        children: [
+          { path: 'my-profile', element: <UserProfileTab /> },
+          { path: ':id', element: <OtherUserProfile /> },
+        ],
       },
       {
         path: 'board/:id',

@@ -1,4 +1,4 @@
-import { createContext, FC, ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, FC, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import Keycloak from 'keycloak-js';
 
 interface KeycloakContextType {
@@ -14,22 +14,30 @@ const KeycloakContext = createContext<KeycloakContextType | undefined>(undefined
 
 export const KeycloakProvider: FC<KeycloakProviderProps> = ({ children }) => {
   const [keycloak, setKeycloak] = useState<Keycloak | null>(null);
-  const [authenticated, setAuthenticated] = useState<boolean>(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
+    if (initializedRef.current) return;
+
+    initializedRef.current = true;
+
     const keycloakInstance = new Keycloak({
       url: import.meta.env.VITE_KEYCLOAK_URL,
       realm: import.meta.env.VITE_KEYCLOAK_REALM,
       clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID,
     });
 
-    keycloakInstance.init({ onLoad: 'check-sso' }).then((successfullyAuthenticated: boolean) => {
-      setKeycloak(keycloakInstance);
-      setAuthenticated(successfullyAuthenticated);
-    }).catch(error => {
-      // eslint-disable-next-line
-      console.error('Keycloak initialization error:', error);
-    });
+    keycloakInstance
+      .init({ onLoad: 'check-sso' })
+      .then((isAuthenticated: boolean) => {
+        setKeycloak(keycloakInstance);
+        setAuthenticated(isAuthenticated);
+      })
+      .catch(err => {
+        // eslint-disable-next-line
+        console.error('Keycloak init error', err);
+      });
   }, []);
 
   return (
@@ -39,9 +47,9 @@ export const KeycloakProvider: FC<KeycloakProviderProps> = ({ children }) => {
   );
 };
 
-
+// eslint-disable-next-line react-refresh/only-export-components
 export const useKeycloak = (): KeycloakContextType => {
-  const context = useContext(KeycloakContext);
+  const context = useContext<KeycloakContextType | undefined>(KeycloakContext);
   if (!context) {
     throw new Error('useKeycloak must be used within a KeycloakProvider');
   }

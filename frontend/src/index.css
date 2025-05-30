@@ -1,9 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+    --font-sans: 'Josefin Sans', sans-serif;
+
     --border: 0, 0%, 80%;
     --input: 0, 0%, 90%;
     --ring: 210, 100%, 40%;
@@ -126,6 +129,21 @@
     --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
     --sidebar-border: oklch(0.929 0.013 255.508);
     --sidebar-ring: oklch(0.704 0.04 256.788);
+
+    --primary-yellow: #FFD44C;
+
+    --primary-black: #000000;
+    --primary-white: #FFFFFF;
+    --secondary-white: #F8E2E2;
+    --primary-blue: #83BDFF;
+    --secondary-blue: rgba(131, 189, 255, 0.26);
+    --primary-red: #DD6E6E;
+    --secondary-yellow: #FFECB0;
+    --primary-gray: #808080;
+
+    --navbar-height: 80px;
+    --footer-height: 80px;
+    --screen-view-height: 100vh - --footer-height;
 }
 
 .dark {
@@ -162,12 +180,16 @@
     --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
-@layer base {
+/*@layer base {*/
     * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
         @apply border-border outline-ring/50;
     }
 
     body {
         @apply bg-background text-foreground;
+        font-family: var(--font-sans), sans-serif;
     }
-}
+/*}*/

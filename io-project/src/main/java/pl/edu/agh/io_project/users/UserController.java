@@ -27,7 +27,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public String getUserDetails(@PathVariable String userId) {
+    public UserRepresentation getUserDetails(@PathVariable String userId) {
         return keycloakUserService.getUserDetails(userId);
     }
 

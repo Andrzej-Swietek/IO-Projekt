@@ -134,7 +134,7 @@ final case class SentinelAlertingEngine(
     } yield a1 ++ a2 ++ a3
   }
 
-  def daysBetween(from: Instant, to: Instant): Int =
+  private def daysBetween(from: Instant, to: Instant): Int =
     JDuration.between(from, to).nn.toDays.toInt
 }
 
