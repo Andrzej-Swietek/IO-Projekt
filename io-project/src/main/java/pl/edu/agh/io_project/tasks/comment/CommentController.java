@@ -1,5 +1,6 @@
 package pl.edu.agh.io_project.tasks.comment;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +19,27 @@ public class CommentController {
         return ResponseEntity.ok(comments);
     }
 
+    @GetMapping("{commentId}")
+    public ResponseEntity<Comment> getCommentById(@PathVariable Integer commentId) {
+        return ResponseEntity.ok(
+                commentService.getCommentById(commentId)
+        );
+    }
+
     @PostMapping
     public ResponseEntity<Comment> addComment(@RequestBody CommentRequest request) {
         Comment savedComment = commentService.addComment(request);
         return ResponseEntity.ok(savedComment);
+    }
+
+    @PutMapping("/{commentId}")
+    public ResponseEntity<Comment> updateComment(
+            @PathVariable Integer commentId,
+            @Valid @RequestBody CommentRequest request
+    ) {
+        return ResponseEntity.ok(
+                commentService.updateComment(commentId, request)
+        );
     }
 
     @DeleteMapping("/{commentId}")
