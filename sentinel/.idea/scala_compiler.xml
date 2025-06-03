@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaCompilerConfiguration">
+    <profile name="sbt 1" modules="sentinel" />
+    <profile name="sbt 2" modules="pl_edu_agh_sentinel">
+      <parameters>
+        <parameter value="-Xmax-inlines:128" />
+        <parameter value="-Yexplicit-nulls" />
+        <parameter value="-Yno-flexible-types" />
+        <parameter value="-Wsafe-init" />
+        <parameter value="-Wunused:all" />
+        <parameter value="-Wnonunit-statement" />
+        <parameter value="-explain" />
+        <parameter value="-explain-types" />
+        <parameter value="-no-indent" />
+      </parameters>
+    </profile>
+  </component>
+</project>

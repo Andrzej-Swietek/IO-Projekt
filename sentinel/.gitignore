@@ -1,0 +1,7 @@
+target/
+project/target
+*.iml
+sentinel/.idea/libraries
+.idea/
+sentinel/.idea
+docker/sentinel/kafka-data

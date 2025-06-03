@@ -18,4 +18,8 @@ public interface TaskService {
     void assignUserToTask(Long taskId, String userId);
 
     void reorderTasks(Long columnId, List<Long> taskIds);
+
+    List<Task> getTasksByUserId(String userId);
+
+    List<Task> getTasksByColumnId(Long columnId);
 }

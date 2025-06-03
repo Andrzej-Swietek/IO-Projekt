@@ -34,12 +34,19 @@ public class TaskServiceImpl implements TaskService {
         BoardColumn column = columnRepository.findById(taskDTO.columnId())
                 .orElseThrow(() -> new IllegalArgumentException("Column not found"));
 
+        int lastPosition = taskRepository.findByColumnIdOrderByPosition(column.getId())
+                .stream()
+                .mapToInt(Task::getPosition)
+                .max()
+                .orElse(-1) + 1;
+
         Task task = Task.builder()
                 .title(taskDTO.title())
                 .description(taskDTO.description())
                 .status(taskDTO.status())
                 .column(column)
-                .position(taskDTO.position())
+                .position(lastPosition)
+//                .position(taskDTO.position())
                 .build();
 
         return taskRepository.save(task);
@@ -104,5 +111,15 @@ public class TaskServiceImpl implements TaskService {
                 });
 
         taskRepository.saveAll(tasks);
+    }
+
+    @Override
+    public List<Task> getTasksByUserId(String userId) {
+        return taskRepository.findByAssigneesContaining(userId);
+    }
+
+    @Override
+    public List<Task> getTasksByColumnId(Long columnId) {
+        return taskRepository.findByColumnIdOrderByPosition(columnId);
     }
 }

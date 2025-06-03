@@ -1,103 +1,134 @@
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Label, Task, TaskStatusEnum } from '@/api';
-import { AlertCircle, Clock, GripVertical } from 'lucide-react';
+import { Task } from '@/api';
+import { AlertCircle, Flame, GripVertical } from 'lucide-react';
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FC, ReactNode } from 'react';
+import { FC, HTMLAttributes } from 'react';
+import { useUsersByIds } from '@hooks/useUsersByIds.ts';
+import { Link } from 'react-router';
 
-interface TaskCardProps {
+interface TaskCardProps extends HTMLAttributes<HTMLDivElement> {
   task: Task;
   isDragging?: boolean;
 }
 
-const priorityColors: Record<TaskStatusEnum, string> = {
-  TODO: 'bg-green-100 text-green-800 hover:bg-green-200',
-  DONE: 'bg-amber-100 text-amber-800 hover:bg-amber-200',
-  IN_PROGRESS: 'bg-red-100 text-red-800 hover:bg-red-200',
+const statusStyles = {
+  TODO: 'bg-gray-100 text-gray-800 hover:bg-gray-200',
+  IN_PROGRESS: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
+  DONE: 'bg-green-100 text-green-800 hover:bg-green-200',
   BLOCKED: 'bg-red-100 text-red-800 hover:bg-red-200',
+} as const;
+
+const priorityIcons = {
+  LOW: null,
+  MEDIUM: <Flame className="h-4 w-4 text-yellow-500" />,
+  HIGH: <Flame className="h-4 w-4 text-orange-600" />,
+  CRITICAL: <AlertCircle className="h-4 w-4 text-red-600" />,
 };
 
-const priorityIcons: Record<TaskStatusEnum, ReactNode> = {
-  TODO: null,
-  DONE: <Clock className="mr-2 h-4 w-4" />,
-  IN_PROGRESS: <AlertCircle className="mr-2 h-4 w-4" />,
-  BLOCKED: <AlertCircle className="mr-2 h-4 w-4" />,
-};
-
-export const TaskCard: FC<TaskCardProps> = ({
-  task,
-  isDragging = false,
-}) => {
-  const taskId = `task-${task.id}`;
-
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging: isSortableDragging,
-  } = useSortable({
-    id: taskId,
-    data: {
-      type: 'task',
-    },
+export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, className, ...props }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging: dndDragging } = useSortable({
+    id: `task-${task.id}`,
+    data: { type: 'task' },
   });
 
+  const dragging = isDragging || dndDragging;
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
 
-  const dragging = isDragging || isSortableDragging;
+  const avatarUrl = (email: string): string =>
+    `https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=${encodeURIComponent(email)}`;
+
+
+  const taskLabels = Array.from(task.labels ?? []);
+  const { data: usersById } = useUsersByIds(task.assignees ?? []);
 
   return (
-    <Card
+    <div
       ref={setNodeRef}
       style={style}
+      {...attributes}
+      {...listeners}
+      {...props}
       className={cn(
-        'border-2 bg-white shadow-sm transition-shadow hover:shadow-md',
-        dragging ? 'opacity-50 shadow-md ring-2 ring-primary' : '',
+        'bg-[var(--primary-white)] rounded-md border border-gray-200 text-sm transition-shadow !p-4 !pb-0 min-h-[15vh]',
+        'hover:shadow-lg retro-shadow flex flex-col gap-2',
+        dragging && 'opacity-60 ring-2 ring-blue-400',
+        className,
       )}
     >
-      <CardHeader className="flex flex-row items-start justify-between !p-4 !pb-0">
-        <h3 className="font-medium">{task.title}</h3>
+      {/* Top Row: Title + Drag Handle */}
+      <div className="flex justify-between items-start">
+        <h3 className="font-semibold text-gray-800">{task.title}</h3>
         <button
-          {...attributes}
-          {...listeners}
-          className="cursor-grab rounded !p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 active:cursor-grabbing"
+          className="cursor-grab rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 active:cursor-grabbing"
         >
           <GripVertical className="h-4 w-4" />
-          <span className="sr-only">Drag task</span>
+          <span className="sr-only">Drag</span>
         </button>
-      </CardHeader>
+      </div>
 
-      <CardContent className="!p-4 !pt-2 text-sm text-gray-600">{task.description}</CardContent>
+      {/* Description */}
+      {task.description && (
+        <div className="text-gray-600 !text-[14px]">{task.description}</div>
+      )}
 
-      <CardFooter className="flex flex-wrap gap-2 !p-4 pt-0">
+      {/* Badges: status, labels, priority */}
+      <div className="flex flex-wrap gap-2">
         {task.status && (
-          <Badge
-            variant="secondary"
-            className={cn(
-              'font-normal px-2',
-              priorityColors[task.status as keyof typeof priorityColors] || 'bg-gray-100 text-gray-800',
-            )}
-          >
+          <Badge className={cn('!px-4 !py-2 font-normal', statusStyles[task.status])}>
             {task.status && priorityIcons[task.status as keyof typeof priorityIcons]}
             {task.status}
           </Badge>
         )}
-        {
-          Array.from(task?.labels ?? new Set<Label>()).map((label: Label) => (
-            <Badge key={label.id} variant="outline" className={`bg-[${label.color}] font-normal px-2`}>
-              {label.name}
-            </Badge>
-          ))
-        }
-      </CardFooter>
-    </Card>
+
+        {taskLabels?.map(label => (
+          <Badge
+            key={label.id}
+            variant="outline"
+            className="px-2 font-normal"
+            style={{ backgroundColor: label.color, color: 'white' }}
+          >
+            {label.name}
+          </Badge>
+        ))}
+      </div>
+
+      {/* Footer: assignees and dueDate */}
+      {(task.assignees?.length || task.createdDate) && (
+        <div className="flex items-center justify-between pt-2 text-xs text-gray-500">
+          <div className="flex -space-x-2">
+            {task.assignees?.map(userId => {
+              const user = usersById?.[userId];
+              if (!user) return null;
+
+              return (
+                <Link to={`/user/${userId}`}>
+                  <div className="w-auto flex row nowrap items-center justify-around gap-4 border-2 rounded-sm !px-4 !py-2">
+                    <img
+                      key={user.id}
+                      src={avatarUrl(user.email!)}
+                      title={user.firstName}
+                      className="h-6 w-6 rounded-full object-cover"
+                      alt="user avatar"
+                      loading="lazy"
+                    />
+                    <span>
+                      {user.firstName}
+                      {' '}
+                      {user.lastName}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
   );
 };

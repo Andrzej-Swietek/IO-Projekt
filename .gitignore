@@ -1,0 +1,5 @@
+/target
+.idea/
+/sentinel/project/target
+/sentinel/project/target/*
+/sentinel/.idea
