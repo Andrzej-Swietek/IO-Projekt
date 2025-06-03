@@ -26,8 +26,8 @@ public class Comment {
 
     private String authorId;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
+    @Basic(fetch = FetchType.EAGER)
     private String content;
 
     @JsonIgnore

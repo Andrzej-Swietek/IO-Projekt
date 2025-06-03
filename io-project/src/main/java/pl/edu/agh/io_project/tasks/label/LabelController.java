@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -15,7 +16,7 @@ public class LabelController {
     private final LabelService labelService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<Label>> getAllLabels(@RequestParam String query) {
+    public ResponseEntity<List<Label>> getAllLabels(@RequestParam Optional<String> query) {
         return ResponseEntity.ok(
                 labelService.getAllLabels(query) // full text search
         );
