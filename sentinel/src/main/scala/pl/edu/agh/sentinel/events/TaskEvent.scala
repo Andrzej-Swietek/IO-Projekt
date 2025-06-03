@@ -9,7 +9,6 @@ import java.time.Instant
 @jsonDiscriminator("type")
 sealed trait TaskEvent {
   def taskId: String;
-
   def timestamp: Instant
 }
 

@@ -1,7 +1,10 @@
 package pl.edu.agh.sentinel
 package processing
 
+import zio.*
 import pl.edu.agh.sentinel.events.TaskEvent
+import pl.edu.agh.sentinel.processing.stats.StatsAggregator
+import pl.edu.agh.sentinel.store.repositories.StatsRepository
 import zio.stream.ZStream
 
 
@@ -35,3 +38,25 @@ trait StatsProcessor {
 }
 
 
+case class StatsProcessorLive(repository: StatsRepository) extends StatsProcessor {
+
+  override def process(events: ZStream[Any, Throwable, TaskEvent]): ZStream[Any, Throwable, Nothing] = {
+    events
+      .groupedWithin(1000, 5.seconds)
+      .mapZIO { batch =>
+        val teamGrouped = batch.groupBy(_.teamId)
+        ZIO.foreachDiscard(teamGrouped) { case (teamId, events) =>
+          for {
+            maybeOldStats <- repository.getTeamStats(teamId)
+            updatedStats <- StatsAggregator.updateStats(maybeOldStats, events)
+            _ <- repository.saveTeamStats(updatedStats)
+          } yield ()
+        }
+      }
+      .drain
+  }
+
+  override def clean(): Unit = ()
+}
+
+// TODO : StatsRepository implementation, StatsAggregator implementation, Stats model
