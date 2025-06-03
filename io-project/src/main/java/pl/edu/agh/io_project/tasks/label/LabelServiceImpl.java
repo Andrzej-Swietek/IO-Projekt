@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.io_project.tasks.TaskRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -15,19 +16,20 @@ public class LabelServiceImpl implements LabelService {
     private final TaskRepository taskRepository;
 
     @Override
-    public List<Label> getAllLabels(String query) {
-        if (query == null || query.strip().isBlank()) {
-            return this.labelRepository.findAll();
-        }
-        String strippedQuery = query.strip();
-        return this.labelRepository.searchByName(strippedQuery);
+    public List<Label> getAllLabels(Optional<String> query) {
+        Optional<String> strippedQuery = query
+                .map(String::strip)
+                .filter(q -> !q.isBlank());
+
+        return strippedQuery.isEmpty() ?
+                this.labelRepository.findAll() : this.labelRepository.searchByName(strippedQuery.get());
     }
 
     @Override
     @Transactional
     public Label getLabelById(Integer labelId) {
         return this.labelRepository.findById(labelId.longValue())
-                .orElseThrow(()-> new IllegalStateException("Label not found"));
+                .orElseThrow(() -> new IllegalStateException("Label not found"));
     }
 
     @Override
