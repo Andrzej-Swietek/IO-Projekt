@@ -38,7 +38,7 @@ export const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose, teamI
         teamMember: teamMember,
       };
       await TeamControllerApiFactory().addTeamMember(memberRequest);
-      queryClient.invalidateQueries({ queryKey: ['team-boards', teamId] });
+      queryClient.invalidateQueries({ queryKey: ['team-projects', teamId] });
       onClose();
     },
   });
@@ -64,7 +64,7 @@ export const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose, teamI
           required
         />
         <div className="flex justify-end gap-4 mt-4">
-          <RetroButton size="sm" type="button" onClick={onClose}>
+          <RetroButton size="sm" type="button" onClick={onClose} variant="secondary" icon={null}>
             Cancel
           </RetroButton>
           <RetroButton size="sm" type="submit" disabled={createProjectMutation.isPending}>
