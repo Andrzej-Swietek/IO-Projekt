@@ -1,13 +1,12 @@
 import { FC, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Project, ProjectControllerApiFactory } from '@/api';
-import { RetroContainer } from '@components/common/RetroContainer';
+import { ProjectControllerApiFactory, Project } from '@/api';
+import { RetroModal } from '@components/common/RetroModal';
 import { RetroButton } from '@components/common/RetroButton';
 import { RetroEntryCard } from '@components/common/RetroEntryCard';
-import { FolderKanban, Plus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { CreateBoardModal } from '@components/board/CreateBoardModal';
 import { CreateProjectModal } from '@components/project/CreateProjectModal';
+import { CreateBoardModal } from '@components/board/CreateBoardModal';
+import { KanbanBoard } from '@components/board/KanbanBoard';
 
 interface TeamProjectsModalProps {
   teamId: number;
@@ -16,88 +15,94 @@ interface TeamProjectsModalProps {
 }
 
 export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName, onClose }) => {
-  const navigate = useNavigate();
-  const [showCreateBoard, setShowCreateBoard] = useState(false);
-  const [showCreateProject, setShowCreateProject] = useState(false);
+  const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [showCreateBoardModal, setShowCreateBoardModal] = useState(false);
 
-  const { data: projects, isLoading } = useQuery<Project[]>({
-    queryKey: ['team-boards', teamId],
+  const { data: projects, isLoading } = useQuery<Project[], Error>({
+    queryKey: ['team-projects', teamId],
     queryFn: async () => {
       const response = await ProjectControllerApiFactory().getProjectsByTeamId(teamId);
       return response.data;
     },
   });
 
-  const handleBoardClick = (boardId: number) => {
-    navigate(`/board/${boardId}`);
-    onClose();
-  };
+  if (isLoading) {
+    return (
+      <RetroModal onClose={onClose} title={`${teamName} - Projects`}>
+        <div className="flex items-center justify-center h-32">Loading projects...</div>
+      </RetroModal>
+    );
+  }
+
+  if (selectedProject) {
+    return (
+      <RetroModal onClose={onClose} title={selectedProject.name || ''}>
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold">Boards</h2>
+            <div className="flex gap-2">
+              <RetroButton onClick={() => setShowCreateBoardModal(true)}>
+                New Board
+              </RetroButton>
+              <RetroButton variant="secondary" onClick={onClose}>
+                Close
+              </RetroButton>
+            </div>
+          </div>
+          {selectedProject.id && <KanbanBoard projectId={selectedProject.id} />}
+        </div>
+      </RetroModal>
+    );
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <RetroContainer className="w-[600px] max-h-[80vh] overflow-y-auto p-8">
-        <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-amber-800">{teamName} Projects</h2>
-          <div className="flex gap-4">
-            <RetroButton
-              className="!px-4 !py-2"
-              icon={<Plus className="h-5 w-5" />}
-              onClick={() => setShowCreateProject(true)}
-            >
-              New Project
-            </RetroButton>
-            <RetroButton
-              className="!px-4 !py-2"
-              icon={<Plus className="h-5 w-5" />}
-              onClick={() => setShowCreateBoard(true)}
-            >
-              New Board
-            </RetroButton>
+    <>
+      <RetroModal onClose={onClose} title={`${teamName} - Projects`}>
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold">Projects</h2>
+            <div className="flex gap-2">
+              <RetroButton onClick={() => setShowCreateProjectModal(true)}>
+                New Project
+              </RetroButton>
+              <RetroButton variant="secondary" onClick={onClose}>
+                Close
+              </RetroButton>
+            </div>
           </div>
-        </div>
-
-        {isLoading ? (
-          <div className="text-center">Loading projects...</div>
-        ) : projects?.length === 0 ? (
-          <div className="text-center text-gray-500">No projects found. Create your first project!</div>
-        ) : (
-          <div className="space-y-6">
+          <div className="flex flex-col gap-2">
             {projects?.map((project: Project) => (
               <RetroEntryCard
-                key={project.id}
+                key={project.id || 'temp-id'}
                 left={<>{project.name}</>}
                 right={(
                   <RetroButton
-                    className="!px-4 !py-2"
-                    icon={<FolderKanban className="h-5 w-5" />}
-                    onClick={() => handleBoardClick(project.id!)}
+                    className="!px-4 !py-4 w-auto"
+                    onClick={() => setSelectedProject(project)}
                   >
-                    Open
+                    View Boards
                   </RetroButton>
                 )}
               />
             ))}
           </div>
-        )}
-
-        <div className="mt-8 flex justify-end">
-          <RetroButton onClick={onClose}>Close</RetroButton>
         </div>
-      </RetroContainer>
+      </RetroModal>
 
-      {showCreateBoard && (
-        <CreateBoardModal
-          onClose={() => setShowCreateBoard(false)}
-          projectId={teamId}
-        />
-      )}
-
-      {showCreateProject && (
+      {showCreateProjectModal && (
         <CreateProjectModal
-          onClose={() => setShowCreateProject(false)}
           teamId={teamId}
+          onClose={() => setShowCreateProjectModal(false)}
         />
       )}
-    </div>
+
+      {showCreateBoardModal && selectedProject?.id && (
+        <CreateBoardModal
+          projectId={selectedProject.id}
+          onClose={() => setShowCreateBoardModal(false)}
+        />
+      )}
+    </>
   );
 }; 

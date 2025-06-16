@@ -11,122 +11,11 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { createPortal } from 'react-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { KanbanColumn } from '@components/board/KanbanColumn.tsx';
 import { TaskCard } from '@components/task/TaskCard.tsx';
-import type { Board, BoardColumn, Label } from '@api/api';
-import type { Task } from '@/api';
-
-const mockLabels: Label[] = [
-  { id: 1, name: 'Research', color: 'bg-blue-500' },
-  { id: 2, name: 'Marketing', color: 'bg-green-500' },
-  { id: 3, name: 'Development', color: 'bg-red-500' },
-  { id: 4, name: 'Design', color: 'bg-yellow-500' },
-  { id: 5, name: 'Documentation', color: 'bg-purple-500' },
-  { id: 6, name: 'Management', color: 'bg-rose-500' },
-];
-
-
-const initialBoard: Board = {
-  id: 1,
-  name: 'Project Tasks',
-  description: 'Organize and track project tasks',
-  ownerId: 'user-123',
-  columns: [
-    {
-      id: 1,
-      name: 'To Do',
-      position: 0,
-      tasks: [
-        {
-          id: 1,
-          title: 'Research competitors',
-          description: 'Look into what our competitors are doing',
-          status: 'TODO',
-          labels: new Set([mockLabels[1], mockLabels[1]]),
-          position: 0,
-        },
-        {
-          id: 2,
-          title: 'Design new landing page',
-          description: 'Create wireframes for the new landing page',
-          status: 'TODO',
-          labels: new Set([mockLabels[1], mockLabels[1]]),
-          position: 1,
-        },
-        {
-          id: 3,
-          title: 'Update documentation',
-          description: 'Make sure our docs are up to date',
-          status: 'TODO',
-          labels: new Set([mockLabels[1], mockLabels[1]]),
-          position: 2,
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: 'In Progress',
-      position: 1,
-      tasks: [
-        {
-          id: 4,
-          title: 'Implement authentication',
-          description: 'Add login and signup functionality',
-          status: 'IN_PROGRESS',
-          labels: new Set([mockLabels[3], mockLabels[4]]),
-          position: 0,
-        },
-        {
-          id: 5,
-          title: 'Create component library',
-          description: 'Build reusable UI components',
-          status: 'IN_PROGRESS',
-          labels: new Set([mockLabels[3], mockLabels[4]]),
-          position: 1,
-        },
-      ],
-    },
-    {
-      id: 3,
-      name: 'Review',
-      position: 2,
-      tasks: [
-        {
-          id: 6,
-          title: 'Code review PR #42',
-          description: 'Review the pull request for the new feature',
-          status: 'IN_PROGRESS',
-          labels: new Set([mockLabels[4], mockLabels[5]]),
-          position: 0,
-        },
-      ],
-    },
-    {
-      id: 4,
-      name: 'Done',
-      position: 3,
-      tasks: [
-        {
-          id: 7,
-          title: 'Set up CI/CD pipeline',
-          description: 'Configure automated testing and deployment',
-          status: 'DONE',
-          labels: new Set([mockLabels[4], mockLabels[5]]),
-          position: 0,
-        },
-        {
-          id: 8,
-          title: 'User interviews',
-          description: 'Conduct user interviews for feedback',
-          status: 'DONE',
-          labels: new Set([mockLabels[4], mockLabels[5]]),
-          position: 1,
-        },
-      ],
-    },
-  ],
-};
+import { BoardControllerApiFactory, BoardColumnControllerApiFactory, Board, BoardColumn, Task, ReorderBoardRequest, ColumnOrderItem } from '@/api';
 
 // Column color mapping
 const columnColors: Record<number, string> = {
@@ -137,12 +26,34 @@ const columnColors: Record<number, string> = {
 };
 
 interface KanbanBoardProps {
+  projectId: number;
 }
 
-export const KanbanBoard: FC<KanbanBoardProps> = () => {
-  const [board, setBoard] = useState<Board>(initialBoard);
+export const KanbanBoard: FC<KanbanBoardProps> = ({ projectId }) => {
+  const queryClient = useQueryClient();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [activeColumnId, setActiveColumnId] = useState<number | null>(null);
+
+  const { data: boards, isLoading: isBoardsLoading } = useQuery({
+    queryKey: ['project-boards', projectId],
+    queryFn: async () => {
+      const response = await BoardControllerApiFactory().getBoardsByProjectId(projectId);
+      return response.data;
+    },
+  });
+
+  const board = boards?.[0]; // For now, we'll just use the first board
+
+  const reorderColumnsMutation = useMutation({
+    mutationFn: async (orderList: ColumnOrderItem[]) => {
+      const reorderRequest: ReorderBoardRequest = { orderList };
+      const response = await BoardControllerApiFactory().reorderColumns(board?.id!, reorderRequest);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['project-boards', projectId] });
+    },
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -159,7 +70,7 @@ export const KanbanBoard: FC<KanbanBoardProps> = () => {
     if (id.startsWith('task-')) {
       const taskId = Number.parseInt(id.replace('task-', ''), 10);
 
-      for (const column of board.columns || []) {
+      for (const column of board?.columns || []) {
         const task = column.tasks?.find(t => t.id === taskId);
         if (task) {
           setActiveTask(task);
@@ -187,37 +98,23 @@ export const KanbanBoard: FC<KanbanBoardProps> = () => {
       if (activeColumnId === targetColumnId) return;
       if (!activeTask) return;
 
-      setBoard((prev: Board) => {
-        const newBoard = { ...prev };
-        const newColumns = [...(newBoard.columns || [])];
-
-        // Find source and target columns
-        const sourceColumnIndex = newColumns.findIndex(col => col.id === activeColumnId);
-        const targetColumnIndex = newColumns.findIndex(col => col.id === targetColumnId);
-
-        if (sourceColumnIndex === -1 || targetColumnIndex === -1) return prev;
-
-        // Remove from source column
-        const sourceColumn = { ...newColumns[sourceColumnIndex] };
-        sourceColumn.tasks = sourceColumn.tasks?.filter(task => task.id !== activeTask.id) || [];
-
-        // Add to target column
-        const targetColumn = { ...newColumns[targetColumnIndex] };
-        const updatedTask = {
-          ...activeTask,
-          columnId: targetColumnId,
-          position: targetColumn.tasks?.length || 0,
-        };
-        targetColumn.tasks = [...(targetColumn.tasks || []), updatedTask];
-
-        // Update columns in the board
-        newColumns[sourceColumnIndex] = sourceColumn;
-        newColumns[targetColumnIndex] = targetColumn;
-        newBoard.columns = newColumns;
-
-        setActiveColumnId(targetColumnId);
-        return newBoard;
+      // Update task status in the backend
+      const taskMutation = useMutation({
+        mutationFn: async () => {
+          const updatedTask = {
+            ...activeTask,
+            columnId: targetColumnId,
+            position: board?.columns?.find(col => col.id === targetColumnId)?.tasks?.length || 0,
+          };
+          // TODO: Add task update API call
+          return updatedTask;
+        },
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['project-boards', projectId] });
+        },
       });
+
+      taskMutation.mutate();
     }
 
     // If over another task
@@ -229,8 +126,10 @@ export const KanbanBoard: FC<KanbanBoardProps> = () => {
       let targetTaskIndex = -1;
       let targetColumnIndex = -1;
 
-      for (let i = 0; i < (board.columns || []).length; i++) {
-        const column = board.columns![i];
+      for (let i = 0; i < (board?.columns || []).length; i++) {
+        const column = board?.columns?.[i];
+        if (!column) continue;
+        
         const taskIndex = column.tasks?.findIndex(t => t.id === targetTaskId) || -1;
 
         if (taskIndex !== -1) {
@@ -245,71 +144,39 @@ export const KanbanBoard: FC<KanbanBoardProps> = () => {
 
       // If in the same column, reorder
       if (activeColumnId === targetColumnId) {
-        setBoard((prev: Board) => {
-          const newBoard = { ...prev };
-          const newColumns = [...(newBoard.columns || [])];
-          const columnIndex = newColumns.findIndex(col => col.id === activeColumnId);
-
-          if (columnIndex === -1) return prev;
-
-          const column = { ...newColumns[columnIndex] };
-          const sourceTaskIndex = column.tasks?.findIndex(task => task.id === activeTask.id) || -1;
-
-          if (sourceTaskIndex === -1 || !column.tasks) return prev;
-
-          // Reorder tasks in the column
-          column.tasks = arrayMove(column.tasks, sourceTaskIndex, targetTaskIndex);
-
-          // Update positions
-          column.tasks = column.tasks.map((task, index) => ({
-            ...task,
-            position: index,
-          }));
-
-          newColumns[columnIndex] = column;
-          newBoard.columns = newColumns;
-
-          return newBoard;
+        const taskMutation = useMutation({
+          mutationFn: async () => {
+            const updatedTask = {
+              ...activeTask,
+              position: targetTaskIndex,
+            };
+            // TODO: Add task reorder API call
+            return updatedTask;
+          },
+          onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['project-boards', projectId] });
+          },
         });
+
+        taskMutation.mutate();
       } else {
         // Move to different column
-        setBoard((prev: Board) => {
-          const newBoard = { ...prev };
-          const newColumns = [...(newBoard.columns || [])];
-
-          // Find source column
-          const sourceColumnIndex = newColumns.findIndex(col => col.id === activeColumnId);
-
-          if (sourceColumnIndex === -1) return prev;
-
-          // Remove from source column
-          const sourceColumn = { ...newColumns[sourceColumnIndex] };
-          sourceColumn.tasks = sourceColumn.tasks?.filter(task => task.id !== activeTask.id) || [];
-
-          // Add to target column at specific position
-          const targetColumn = { ...newColumns[targetColumnIndex] };
-          const updatedTask = {
-            ...activeTask,
-            columnId: targetColumnId,
-          };
-
-          const newTasks = [...(targetColumn.tasks || [])];
-          newTasks.splice(targetTaskIndex, 0, updatedTask);
-
-          // Update positions
-          targetColumn.tasks = newTasks.map((task, index) => ({
-            ...task,
-            position: index,
-          }));
-
-          // Update columns in the board
-          newColumns[sourceColumnIndex] = sourceColumn;
-          newColumns[targetColumnIndex] = targetColumn;
-          newBoard.columns = newColumns;
-
-          setActiveColumnId(targetColumnId);
-          return newBoard;
+        const taskMutation = useMutation({
+          mutationFn: async () => {
+            const updatedTask = {
+              ...activeTask,
+              columnId: targetColumnId,
+              position: targetTaskIndex,
+            };
+            // TODO: Add task move API call
+            return updatedTask;
+          },
+          onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['project-boards', projectId] });
+          },
         });
+
+        taskMutation.mutate();
       }
     }
   };
@@ -318,6 +185,14 @@ export const KanbanBoard: FC<KanbanBoardProps> = () => {
     setActiveTask(null);
     setActiveColumnId(null);
   };
+
+  if (isBoardsLoading) {
+    return <div className="flex items-center justify-center h-full">Loading board...</div>;
+  }
+
+  if (!board) {
+    return <div className="flex items-center justify-center h-full">No board found. Create a new board to get started.</div>;
+  }
 
   return (
     <DndContext
