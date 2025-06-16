@@ -36,7 +36,7 @@ export const RetroNavbar: FC<RetroNavbarProps> = () => {
         </NavLink>
         <NavLink to="/">
           <span className="text-3xl font-normal text-black">retro</span>
-          <span className="text-4xl -ml-4 font-bold text-black">Board</span>
+          <span className="text-4xl font-bold text-black">Board</span>
         </NavLink>
       </div>
 
