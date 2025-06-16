@@ -108,8 +108,6 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
     const { active } = event;
     const id = active.id as string;
 
-    console.log('DnD: Drag started', { id });
-
     if (id.startsWith('task-')) {
       const taskId = Number.parseInt(id.replace('task-', ''), 10);
 
@@ -192,7 +190,6 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
   };
 
   const handleDragEnd = (_: DragEndEvent) => {
-    console.log('DnD: Drag ended');
     setActiveTask(null);
     setActiveColumnId(null);
   };
@@ -228,6 +225,7 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
               setEditTask(task);
               setEditTaskColumnId(column.id ?? null);
             }}
+            isTaskDragging={!!activeTask}
           />
         ))}
       </div>

@@ -168,6 +168,7 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
                       size="sm"
                       className="!px-4 !py-2 w-auto"
                       onClick={() => setSelectedProject(project)}
+                      icon={null}
                     >
                       View Boards
                     </RetroButton>

@@ -41,9 +41,6 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
     transition,
   };
 
-  // Debug logs for DnD
-  console.log('TaskCard render:', { taskId: task.id, attributes, listeners, dragging });
-
   const avatarUrl = (email: string): string =>
     `https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=${encodeURIComponent(email)}`;
 

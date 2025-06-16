@@ -16,9 +16,10 @@ interface KanbanColumnProps {
   colorClass: string;
   onAddTask?: () => void;
   onEditTask?: (task: Task) => void;
+  isTaskDragging?: boolean;
 }
 
-export const KanbanColumn: FC<KanbanColumnProps> = ({ id, title, tasks, colorClass, onAddTask, onEditTask }) => {
+export const KanbanColumn: FC<KanbanColumnProps> = ({ id, title, tasks, colorClass, onAddTask, onEditTask, isTaskDragging }) => {
   const columnId = `column-${id}`;
   const taskIds = tasks.map(task => `task-${task.id}`);
 
@@ -74,10 +75,10 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({ id, title, tasks, colorCla
               <TaskCard key={`task-${task.id}`} task={task} onEdit={onEditTask} />
             ))}
 
-            {tasks.length === 0 && (
+            {isTaskDragging && (
               <div
-                className="flex h-20 items-center justify-center rounded-lg border-2
-                 border-dashed border-gray-300 bg-white/50 p-4 text-center text-sm text-gray-500"
+                className="flex h-20 items-center justify-center rounded-lg border-2 border-dashed border-blue-400 bg-blue-50/60 p-4 text-center text-sm text-blue-700 mt-2"
+                style={{ minHeight: 48 }}
               >
                 Drop tasks here
               </div>
