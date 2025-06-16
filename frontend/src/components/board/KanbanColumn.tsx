@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Task } from '@/api';
 import { TaskCard } from '@components/task/TaskCard.tsx';
 import { FC } from 'react';
+import { RetroButton } from '@components/common/RetroButton';
 
 
 interface KanbanColumnProps {
@@ -13,9 +14,12 @@ interface KanbanColumnProps {
   title: string;
   tasks: Task[];
   colorClass: string;
+  onAddTask?: () => void;
+  onEditTask?: (task: Task) => void;
+  isTaskDragging?: boolean;
 }
 
-export const KanbanColumn: FC<KanbanColumnProps> = ({ id, title, tasks, colorClass }) => {
+export const KanbanColumn: FC<KanbanColumnProps> = ({ id, title, tasks, colorClass, onAddTask, onEditTask, isTaskDragging }) => {
   const columnId = `column-${id}`;
   const taskIds = tasks.map(task => `task-${task.id}`);
 
@@ -39,7 +43,7 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({ id, title, tasks, colorCla
     >
       <div className="flex items-center justify-between border-b border-inherit !p-4">
         <h2 className="font-serif text-lg font-bold">{title}</h2>
-        <div className="flex items-center !gap-2">
+        <div className="flex items-center gap-2">
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-medium">
             {tasks.length}
           </span>
@@ -53,18 +57,28 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({ id, title, tasks, colorCla
           </button>
         </div>
       </div>
+      <div className="px-4 pt-2">
+        <RetroButton
+          size="sm"
+          icon={null}
+          onClick={onAddTask}
+          className="w-full h-8 text-sm"
+        >
+          Add Task
+        </RetroButton>
+      </div>
 
       <div className="flex-1 p-4">
         <SortableContext items={taskIds}>
           <div className="flex flex-col gap-4">
             {tasks.map(task => (
-              <TaskCard key={`task-${task.id}`} task={task} />
+              <TaskCard key={`task-${task.id}`} task={task} onEdit={onEditTask} />
             ))}
 
-            {tasks.length === 0 && (
+            {isTaskDragging && (
               <div
-                className="flex h-20 items-center justify-center rounded-lg border-2
-                 border-dashed border-gray-300 bg-white/50 p-4 text-center text-sm text-gray-500"
+                className="flex h-20 items-center justify-center rounded-lg border-2 border-dashed border-blue-400 bg-blue-50/60 p-4 text-center text-sm text-blue-700 mt-2"
+                style={{ minHeight: 48 }}
               >
                 Drop tasks here
               </div>

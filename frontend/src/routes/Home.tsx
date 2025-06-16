@@ -1,41 +1,49 @@
-import { FC } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { FC, useState } from 'react';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Task, TaskControllerApiFactory, Team, TeamControllerApiFactory } from '@/api';
 import { useUserProfile } from '@context/UserProfileProvider.tsx';
 import { ColumnTitle } from '@components/board';
 import { RetroContainer } from '@components/common/RetroContainer.tsx';
 import { RetroButton } from '@components/common/RetroButton.tsx';
-import { FolderKanban } from 'lucide-react';
+import { FolderKanban, Trash2 } from 'lucide-react';
 import { RetroEntryCard } from '@components/common/RetroEntryCard.tsx';
 import { TaskCard } from '@components/task';
+import { TeamProjectsModal } from '@components/team/TeamProjectsModal';
+import { CreateTeamModal } from '@components/team/CreateTeamModal';
 
 interface HomeProps {
 }
 
 const fetchTeams = async () => {
-  const api = TeamControllerApiFactory();
-  const response = await api.getAllTeams({});
+  const response = await TeamControllerApiFactory().getAllTeams({});
   return response.data;
 };
 
-const fetchUsersTeams = async (userId: string): Promise<Team[]> => {
-  const api = TeamControllerApiFactory();
-  const response = await api.getTeamsByUserId(userId);
+const fetchUsersTeams = async (userId: string) => {
+  const response = await TeamControllerApiFactory().getTeamsByUserId(userId);
   return response.data;
 };
 
-
-const fetchUserTasks = async (userId: string): Promise<Task[]> => {
-  const api = TaskControllerApiFactory();
-  const response = await api.getTasksByUserId(userId);
+const fetchUserTasks = async (userId: string) => {
+  const response = await TaskControllerApiFactory().getTasksByUserId(userId);
   return response.data;
 };
 
 export const Home: FC<HomeProps> = () => {
   const { profile } = useUserProfile();
-
   const userId = profile?.id;
-
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
+  const queryClient = useQueryClient();
+  const deleteTeamMutation = useMutation({
+    mutationFn: async (teamId: number) => {
+      await TeamControllerApiFactory().deleteTeam(teamId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      queryClient.invalidateQueries({ queryKey: ['my-teams', userId] });
+    },
+  });
 
   const { data, error, isLoading, isError } = useQuery({
     queryKey: ['teams'],
@@ -61,13 +69,12 @@ export const Home: FC<HomeProps> = () => {
   });
 
   if (isError) {
-    return <div>Loading...</div>;
+    return <div>Error loading teams</div>;
   }
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
 
   return (
     <>
@@ -93,27 +100,44 @@ export const Home: FC<HomeProps> = () => {
             }
             {teams && teams.map(team => (
               <RetroEntryCard
-                key={window.crypto.randomUUID()}
+                key={team.id}
                 left={<>{team.name}</>}
                 right={(
-                  <RetroButton
-                    className="!px-4 !py-4 w-auto"
-                    icon={<FolderKanban />}
-                    onClick={() => alert(`opening modal for team ${team.id}`)}
-                  >
-                    Boards
-                  </RetroButton>
+                  <div className="flex gap-2 items-center">
+                    <RetroButton
+                      className="!px-4 !py-4 w-auto"
+                      icon={<FolderKanban />}
+                      onClick={() => setSelectedTeam(team)}
+                    >
+                      Projects
+                    </RetroButton>
+                    <RetroButton
+                      className="!px-2 !py-2 w-auto"
+                      icon={<Trash2 className="text-red-500" />}
+                      variant="secondary"
+                      onClick={() => {
+                        if (window.confirm(`Are you sure you want to delete team '${team.name}'?`)) {
+                          deleteTeamMutation.mutate(team.id!);
+                        }
+                      }}
+                    >
+                      {''}
+                    </RetroButton>
+                  </div>
                 )}
               />
             ))}
 
-            <RetroButton className="absolute -bottom-4 right-8 !px-12 !py-4 w-1/3 text-[24px]">
+            <RetroButton
+              className="absolute -bottom-4 right-8 !px-8 !py-3 w-1/3 text-base md:text-lg"
+              icon={<span className="text-lg md:text-2xl">+</span>}
+              onClick={() => setShowCreateTeamModal(true)}
+            >
               Add a new team
             </RetroButton>
           </RetroContainer>
         </main>
         <aside className="col-span-4 grid grid-cols-12 gap-y-8 relative">
-
           <div className="w-1/2 h-full min-h-[70vh] top-22 bg-blue-100 absolute -z-1 retro-shadow"></div>
           <div className="col-span-full h-[60px]">
             <ColumnTitle title="My Tasks" />
@@ -125,25 +149,25 @@ export const Home: FC<HomeProps> = () => {
           }
           {
             tasks?.map(task => (
-              <div className="col-span-full !px-8">
+              <div key={task.id} className="col-span-full !px-8">
                 <TaskCard className="col-span-full" task={task} isDragging={false} />
               </div>
-
             ))
           }
-
         </aside>
       </div>
-      <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-4xl font-bold">Welcome to the Home Page</h1>
-        <p className="mt-4 text-lg">This is the main page of our application.</p>
-        {
-          data?.data && data.data[0].name
-        }
-        {
-          isError && <>{error}</>
-        }
-      </div>
+
+      {selectedTeam && (
+        <TeamProjectsModal
+          teamId={selectedTeam.id!}
+          teamName={selectedTeam.name!}
+          onClose={() => setSelectedTeam(null)}
+        />
+      )}
+
+      {showCreateTeamModal && (
+        <CreateTeamModal onClose={() => setShowCreateTeamModal(false)} />
+      )}
     </>
   );
 };

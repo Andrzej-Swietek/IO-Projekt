@@ -46,7 +46,7 @@ public class TaskServiceImpl implements TaskService {
                 .status(taskDTO.status())
                 .column(column)
                 .position(lastPosition)
-//                .position(taskDTO.position())
+                .assignees(taskDTO.assignees())
                 .build();
 
         return taskRepository.save(task);
@@ -65,6 +65,7 @@ public class TaskServiceImpl implements TaskService {
         task.setStatus(taskDTO.status());
         task.setColumn(column);
         task.setPosition(taskDTO.position());
+        task.setAssignees(taskDTO.assignees());
 
         return taskRepository.save(task);
     }
