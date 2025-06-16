@@ -21,7 +21,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public Team createTeam(TeamRequest team) {
-        return teamRepository.save(
+        Team newTeam = teamRepository.save(
                 Team.builder()
                         .name(team.name())
                         .description(team.description())
@@ -29,6 +29,16 @@ public class TeamServiceImpl implements TeamService {
                         .projects(List.of())
                         .build()
         );
+
+        // Add creator as ADMIN
+        TeamMember creatorMember = TeamMember.builder()
+                .userId(team.creatorId())
+                .team(newTeam)
+                .role(TeamMember.Role.ADMIN)
+                .build();
+        teamMemberRepository.save(creatorMember);
+
+        return newTeam;
     }
 
     @Override

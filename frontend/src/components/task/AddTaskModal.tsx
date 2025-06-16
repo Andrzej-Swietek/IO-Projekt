@@ -4,6 +4,8 @@ import { TaskControllerApiFactory, TaskRequest, BoardControllerApiFactory, Board
 import { RetroModal } from '@components/common/RetroModal';
 import { RetroInput } from '@components/common/RetroInput';
 import { RetroButton } from '@components/common/RetroButton';
+import { useUserProfile } from '@context/UserProfileProvider';
+import { useUsersByIds } from '@/common/hooks/useUsersByIds';
 
 interface AddTaskModalProps {
   onClose: () => void;
@@ -16,6 +18,8 @@ interface AddTaskModalProps {
 
 export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId, teamId, task, isEdit }) => {
   const queryClient = useQueryClient();
+  const { profile } = useUserProfile();
+  const userId = profile?.id;
   const [title, setTitle] = useState(task?.title || '');
   const [description, setDescription] = useState(task?.description || '');
   const [priority, setPriority] = useState(1);
@@ -41,6 +45,7 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
     enabled: !!teamId,
   });
   const teamMembers: TeamMember[] = team?.members || [];
+  const { data: usersById } = useUsersByIds(teamMembers.map(m => m.userId!));
 
   // Fetch labels (placeholder, as before)
   const { data: labels } = useQuery<Label[]>({
@@ -91,6 +96,7 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
     },
     onSuccess: () => {
       queryClient.invalidateQueries();
+      if (userId) queryClient.invalidateQueries({ queryKey: ['my-tasks', userId] });
       onClose();
     },
   });
@@ -148,13 +154,19 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
             onChange={e => setAssignees(Array.from(e.target.selectedOptions, o => o.value))}
             className="w-full rounded-md border border-gray-300 px-3 py-2"
           >
-            {(teamMembers || []).map(member => (
-              <option key={member.userId} value={member.userId}>{member.userId} ({member.role})</option>
-            ))}
+            {(teamMembers || []).map(member => {
+              const user = usersById?.[member.userId!];
+              const name = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : member.userId;
+              return (
+                <option key={member.userId} value={member.userId}>
+                  {name} {member.role ? `(${member.role})` : ''}
+                </option>
+              );
+            })}
           </select>
         </div>
         <div className="flex justify-end gap-4 mt-4">
-          <RetroButton size="sm" type="button" onClick={onClose}>
+          <RetroButton size="sm" type="button" onClick={onClose} icon={null}>
             Cancel
           </RetroButton>
           <RetroButton size="sm" type="submit" disabled={isEdit ? updateTaskMutation.isPending : createTaskMutation.isPending}>

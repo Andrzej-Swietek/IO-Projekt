@@ -21,20 +21,11 @@ export const CreateTeamModal: FC<CreateTeamModalProps> = ({ onClose }) => {
       const response = await TeamControllerApiFactory().createTeam({
         name: teamName,
         description: description,
+        creatorId: profile?.id!,
       });
       return response.data;
     },
     onSuccess: async (team) => {
-      // Add current user as ADMIN
-      const teamMember: TeamMemberDTO = {
-        userId: profile?.id!,
-        role: 'ADMIN',
-      };
-      const memberRequest: TeamMemberRequest = {
-        teamId: team.id!,
-        teamMember: teamMember,
-      };
-      await TeamControllerApiFactory().addTeamMember(memberRequest);
       queryClient.invalidateQueries({ queryKey: ['my-teams'] });
       onClose();
     },

@@ -77,7 +77,7 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
   if (selectedProject) {
     return (
       <>
-        <RetroModal onClose={onClose} title={selectedProject.name || ''}>
+        <RetroModal onClose={onClose} title={selectedProject.name || ''} subtitle={selectedProject.description}>
           <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Boards</h2>
@@ -106,6 +106,7 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
                           size="sm"
                           className="!px-4 !py-2 w-auto"
                           onClick={() => navigate(`/board/${board.id}/${teamId}`)}
+                          icon={null}
                         >
                           Open Board
                         </RetroButton>

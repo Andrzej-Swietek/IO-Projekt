@@ -62,7 +62,7 @@ export const CreateBoardModal: FC<CreateBoardModalProps> = ({ onClose, projectId
           required
         />
         <div className="flex justify-end gap-4 mt-4">
-          <RetroButton size="sm" type="button" onClick={onClose}>
+          <RetroButton size="sm" type="button" onClick={onClose} variant="secondary" icon={null}>
             Cancel
           </RetroButton>
           <RetroButton size="sm" type="submit" disabled={createBoardMutation.isPending}>

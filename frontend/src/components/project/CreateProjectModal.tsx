@@ -28,16 +28,6 @@ export const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose, teamI
       return response.data;
     },
     onSuccess: async (project) => {
-      // Add current user as ADMIN if not already a team member
-      const teamMember: TeamMemberDTO = {
-        userId: profile?.id!,
-        role: 'ADMIN',
-      };
-      const memberRequest: TeamMemberRequest = {
-        teamId: teamId,
-        teamMember: teamMember,
-      };
-      await TeamControllerApiFactory().addTeamMember(memberRequest);
       queryClient.invalidateQueries({ queryKey: ['team-projects', teamId] });
       onClose();
     },

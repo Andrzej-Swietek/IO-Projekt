@@ -244,7 +244,8 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
           boardId={board.id}
           teamId={teamId}
           onClose={() => { setEditTask(null); setEditTaskColumnId(null); }}
-          // TODO: Implement EditTaskModal or extend AddTaskModal for editing
+          task={editTask}
+          isEdit={true}
         />
       )}
     </DndContext>
