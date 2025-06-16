@@ -31,6 +31,15 @@ const getColumnColorClass = (name?: string) => {
   return 'bg-gray-100 border-gray-300';
 };
 
+// Helper to map column name to TaskStatus
+const getStatusForColumn = (columnName: string): 'TODO' | 'IN_PROGRESS' | 'DONE' | 'BLOCKED' => {
+  const lower = columnName.toLowerCase();
+  if (lower.includes('progress')) return 'IN_PROGRESS';
+  if (lower.includes('done')) return 'DONE';
+  if (lower.includes('block')) return 'BLOCKED';
+  return 'TODO';
+};
+
 interface KanbanBoardProps {
   teamId?: number;
 }
@@ -70,11 +79,14 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
   // Mutation for moving a task to a different column or position
   const moveTaskMutation = useMutation({
     mutationFn: async (data: { task: Task; columnId: number; position: number }) => {
-      // Call the backend to update the task's column and position
+      // Find the target column to get its name
+      const targetColumn = board?.columns?.find(col => col.id === data.columnId);
+      const newStatus = targetColumn ? getStatusForColumn(targetColumn.name || '') : data.task.status;
       await TaskControllerApiFactory().updateTask(Number(data.task.id), {
         ...data.task,
         columnId: Number(data.columnId),
         position: data.position,
+        status: newStatus,
       });
     },
     onSuccess: () => {
@@ -85,7 +97,6 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
   // Mutation for reordering tasks within the same column
   const reorderTaskMutation = useMutation({
     mutationFn: async (data: { task: Task; position: number }) => {
-      // Call the backend to update the task's position
       await TaskControllerApiFactory().updateTask(Number(data.task.id), {
         ...data.task,
         position: data.position,
