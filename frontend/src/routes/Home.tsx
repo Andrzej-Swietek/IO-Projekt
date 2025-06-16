@@ -98,7 +98,7 @@ export const Home: FC<HomeProps> = () => {
                     icon={<FolderKanban />}
                     onClick={() => setSelectedTeam(team)}
                   >
-                    Boards
+                    Projects
                   </RetroButton>
                 )}
               />

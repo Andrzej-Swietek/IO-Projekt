@@ -57,7 +57,7 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
                 <RetroButton size="sm" onClick={() => setShowCreateBoardModal(true)}>
                   New Board
                 </RetroButton>
-                <RetroButton size="sm" variant="secondary" onClick={onClose}>
+                <RetroButton size="sm" variant="secondary" icon={null} onClick={onClose}>
                   Close
                 </RetroButton>
               </div>
@@ -108,7 +108,7 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
               <RetroButton size="sm" onClick={() => setShowCreateProjectModal(true)}>
                 New Project
               </RetroButton>
-              <RetroButton size="sm" variant="secondary" onClick={onClose}>
+              <RetroButton size="sm" variant="secondary" icon={null} onClick={onClose}>
                 Close
               </RetroButton>
             </div>
