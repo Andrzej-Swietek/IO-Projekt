@@ -19,6 +19,7 @@ import { TaskCard } from '@components/task/TaskCard.tsx';
 import { BoardControllerApiFactory, BoardColumnControllerApiFactory, Board, BoardColumn, Task, ReorderBoardRequest, ColumnOrderItem } from '@/api';
 import { ProjectControllerApiFactory } from '@/api';
 import { AddTaskModal } from '@components/task/AddTaskModal';
+import { TaskControllerApiFactory } from '@/api';
 
 // Column color mapping by name (case-insensitive)
 const getColumnColorClass = (name?: string) => {
@@ -69,9 +70,12 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
   // Mutation for moving a task to a different column or position
   const moveTaskMutation = useMutation({
     mutationFn: async (data: { task: Task; columnId: number; position: number }) => {
-      // TODO: Replace with actual API call to update/move task
-      // Example: await TaskControllerApiFactory().updateTask(data.task.id, { ...data.task, columnId: data.columnId, position: data.position });
-      return data;
+      // Call the backend to update the task's column and position
+      await TaskControllerApiFactory().updateTask(Number(data.task.id), {
+        ...data.task,
+        columnId: Number(data.columnId),
+        position: data.position,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['board', id] });
@@ -81,9 +85,11 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
   // Mutation for reordering tasks within the same column
   const reorderTaskMutation = useMutation({
     mutationFn: async (data: { task: Task; position: number }) => {
-      // TODO: Replace with actual API call to reorder task
-      // Example: await TaskControllerApiFactory().updateTask(data.task.id, { ...data.task, position: data.position });
-      return data;
+      // Call the backend to update the task's position
+      await TaskControllerApiFactory().updateTask(Number(data.task.id), {
+        ...data.task,
+        position: data.position,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['board', id] });
@@ -101,6 +107,8 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     const id = active.id as string;
+
+    console.log('DnD: Drag started', { id });
 
     if (id.startsWith('task-')) {
       const taskId = Number.parseInt(id.replace('task-', ''), 10);
@@ -184,6 +192,7 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
   };
 
   const handleDragEnd = (_: DragEndEvent) => {
+    console.log('DnD: Drag ended');
     setActiveTask(null);
     setActiveColumnId(null);
   };
