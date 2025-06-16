@@ -626,6 +626,31 @@ export interface Label {
 /**
  * 
  * @export
+ * @interface LabelRequest
+ */
+export interface LabelRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof LabelRequest
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LabelRequest
+     */
+    'color'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof LabelRequest
+     */
+    'taskId'?: number;
+}
+/**
+ * 
+ * @export
  * @interface MultiTaskGenerationRequest
  */
 export interface MultiTaskGenerationRequest {
@@ -683,13 +708,13 @@ export interface PageRequestObject {
      * @type {boolean}
      * @memberof PageRequestObject
      */
-    'paged'?: boolean;
+    'unpaged'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof PageRequestObject
      */
-    'unpaged'?: boolean;
+    'paged'?: boolean;
 }
 /**
  * 
@@ -1134,13 +1159,13 @@ export interface SortObject {
      * @type {boolean}
      * @memberof SortObject
      */
-    'sorted'?: boolean;
+    'unsorted'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof SortObject
      */
-    'unsorted'?: boolean;
+    'sorted'?: boolean;
     /**
      * 
      * @type {boolean}
@@ -2681,6 +2706,39 @@ export const CommentControllerApiAxiosParamCreator = function (configuration?: C
         },
         /**
          * 
+         * @param {number} commentId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCommentById: async (commentId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'commentId' is not null or undefined
+            assertParamExists('getCommentById', 'commentId', commentId)
+            const localVarPath = `/api/comments/{commentId}`
+                .replace(`{${"commentId"}}`, encodeURIComponent(String(commentId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {number} taskId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2706,6 +2764,45 @@ export const CommentControllerApiAxiosParamCreator = function (configuration?: C
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} commentId 
+         * @param {CommentRequest} commentRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateComment: async (commentId: number, commentRequest: CommentRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'commentId' is not null or undefined
+            assertParamExists('updateComment', 'commentId', commentId)
+            // verify required parameter 'commentRequest' is not null or undefined
+            assertParamExists('updateComment', 'commentRequest', commentRequest)
+            const localVarPath = `/api/comments/{commentId}`
+                .replace(`{${"commentId"}}`, encodeURIComponent(String(commentId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(commentRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2748,6 +2845,18 @@ export const CommentControllerApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {number} commentId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCommentById(commentId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Comment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCommentById(commentId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CommentControllerApi.getCommentById']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {number} taskId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2756,6 +2865,19 @@ export const CommentControllerApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getCommentsByTask(taskId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CommentControllerApi.getCommentsByTask']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} commentId 
+         * @param {CommentRequest} commentRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateComment(commentId: number, commentRequest: CommentRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Comment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateComment(commentId, commentRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CommentControllerApi.updateComment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -2788,12 +2910,31 @@ export const CommentControllerApiFactory = function (configuration?: Configurati
         },
         /**
          * 
+         * @param {number} commentId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCommentById(commentId: number, options?: RawAxiosRequestConfig): AxiosPromise<Comment> {
+            return localVarFp.getCommentById(commentId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {number} taskId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         getCommentsByTask(taskId: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<Comment>> {
             return localVarFp.getCommentsByTask(taskId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} commentId 
+         * @param {CommentRequest} commentRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateComment(commentId: number, commentRequest: CommentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Comment> {
+            return localVarFp.updateComment(commentId, commentRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2829,6 +2970,17 @@ export class CommentControllerApi extends BaseAPI {
 
     /**
      * 
+     * @param {number} commentId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CommentControllerApi
+     */
+    public getCommentById(commentId: number, options?: RawAxiosRequestConfig) {
+        return CommentControllerApiFp(this.configuration).getCommentById(commentId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @param {number} taskId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -2836,6 +2988,18 @@ export class CommentControllerApi extends BaseAPI {
      */
     public getCommentsByTask(taskId: number, options?: RawAxiosRequestConfig) {
         return CommentControllerApiFp(this.configuration).getCommentsByTask(taskId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} commentId 
+     * @param {CommentRequest} commentRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CommentControllerApi
+     */
+    public updateComment(commentId: number, commentRequest: CommentRequest, options?: RawAxiosRequestConfig) {
+        return CommentControllerApiFp(this.configuration).updateComment(commentId, commentRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -3057,6 +3221,447 @@ export class GitHubWebhookControllerApi extends BaseAPI {
      */
     public handleWebhook(xGitHubEvent: string, body: object, options?: RawAxiosRequestConfig) {
         return GitHubWebhookControllerApiFp(this.configuration).handleWebhook(xGitHubEvent, body, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * LabelControllerApi - axios parameter creator
+ * @export
+ */
+export const LabelControllerApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {LabelRequest} labelRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createLabel: async (labelRequest: LabelRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'labelRequest' is not null or undefined
+            assertParamExists('createLabel', 'labelRequest', labelRequest)
+            const localVarPath = `/api/label`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(labelRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} labelId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteLabel: async (labelId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'labelId' is not null or undefined
+            assertParamExists('deleteLabel', 'labelId', labelId)
+            const localVarPath = `/api/label/{labelId}`
+                .replace(`{${"labelId"}}`, encodeURIComponent(String(labelId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} [query] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAllLabels: async (query?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/label/all`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (query !== undefined) {
+                localVarQueryParameter['query'] = query;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} labelId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLabelById: async (labelId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'labelId' is not null or undefined
+            assertParamExists('getLabelById', 'labelId', labelId)
+            const localVarPath = `/api/label/{labelId}`
+                .replace(`{${"labelId"}}`, encodeURIComponent(String(labelId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} taskId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLabelsByTaskId: async (taskId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'taskId' is not null or undefined
+            assertParamExists('getLabelsByTaskId', 'taskId', taskId)
+            const localVarPath = `/api/label/by-task/{taskId}`
+                .replace(`{${"taskId"}}`, encodeURIComponent(String(taskId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} labelId 
+         * @param {LabelRequest} labelRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateLabel: async (labelId: number, labelRequest: LabelRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'labelId' is not null or undefined
+            assertParamExists('updateLabel', 'labelId', labelId)
+            // verify required parameter 'labelRequest' is not null or undefined
+            assertParamExists('updateLabel', 'labelRequest', labelRequest)
+            const localVarPath = `/api/label/{labelId}`
+                .replace(`{${"labelId"}}`, encodeURIComponent(String(labelId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(labelRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * LabelControllerApi - functional programming interface
+ * @export
+ */
+export const LabelControllerApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = LabelControllerApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {LabelRequest} labelRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createLabel(labelRequest: LabelRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Label>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createLabel(labelRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['LabelControllerApi.createLabel']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} labelId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteLabel(labelId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Label>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteLabel(labelId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['LabelControllerApi.deleteLabel']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} [query] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getAllLabels(query?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Label>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAllLabels(query, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['LabelControllerApi.getAllLabels']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} labelId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getLabelById(labelId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Label>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getLabelById(labelId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['LabelControllerApi.getLabelById']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} taskId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getLabelsByTaskId(taskId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Label>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getLabelsByTaskId(taskId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['LabelControllerApi.getLabelsByTaskId']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} labelId 
+         * @param {LabelRequest} labelRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateLabel(labelId: number, labelRequest: LabelRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Label>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateLabel(labelId, labelRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['LabelControllerApi.updateLabel']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * LabelControllerApi - factory interface
+ * @export
+ */
+export const LabelControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = LabelControllerApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {LabelRequest} labelRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createLabel(labelRequest: LabelRequest, options?: RawAxiosRequestConfig): AxiosPromise<Label> {
+            return localVarFp.createLabel(labelRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} labelId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteLabel(labelId: number, options?: RawAxiosRequestConfig): AxiosPromise<Label> {
+            return localVarFp.deleteLabel(labelId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} [query] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAllLabels(query?: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<Label>> {
+            return localVarFp.getAllLabels(query, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} labelId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLabelById(labelId: number, options?: RawAxiosRequestConfig): AxiosPromise<Label> {
+            return localVarFp.getLabelById(labelId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} taskId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLabelsByTaskId(taskId: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<Label>> {
+            return localVarFp.getLabelsByTaskId(taskId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} labelId 
+         * @param {LabelRequest} labelRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateLabel(labelId: number, labelRequest: LabelRequest, options?: RawAxiosRequestConfig): AxiosPromise<Label> {
+            return localVarFp.updateLabel(labelId, labelRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * LabelControllerApi - object-oriented interface
+ * @export
+ * @class LabelControllerApi
+ * @extends {BaseAPI}
+ */
+export class LabelControllerApi extends BaseAPI {
+    /**
+     * 
+     * @param {LabelRequest} labelRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LabelControllerApi
+     */
+    public createLabel(labelRequest: LabelRequest, options?: RawAxiosRequestConfig) {
+        return LabelControllerApiFp(this.configuration).createLabel(labelRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} labelId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LabelControllerApi
+     */
+    public deleteLabel(labelId: number, options?: RawAxiosRequestConfig) {
+        return LabelControllerApiFp(this.configuration).deleteLabel(labelId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} [query] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LabelControllerApi
+     */
+    public getAllLabels(query?: string, options?: RawAxiosRequestConfig) {
+        return LabelControllerApiFp(this.configuration).getAllLabels(query, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} labelId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LabelControllerApi
+     */
+    public getLabelById(labelId: number, options?: RawAxiosRequestConfig) {
+        return LabelControllerApiFp(this.configuration).getLabelById(labelId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} taskId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LabelControllerApi
+     */
+    public getLabelsByTaskId(taskId: number, options?: RawAxiosRequestConfig) {
+        return LabelControllerApiFp(this.configuration).getLabelsByTaskId(taskId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} labelId 
+     * @param {LabelRequest} labelRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LabelControllerApi
+     */
+    public updateLabel(labelId: number, labelRequest: LabelRequest, options?: RawAxiosRequestConfig) {
+        return LabelControllerApiFp(this.configuration).updateLabel(labelId, labelRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

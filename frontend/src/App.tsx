@@ -51,6 +51,10 @@ const router = createBrowserRouter([
         path: 'board/:id',
         element: <BoardPage />,
       },
+      {
+        path: 'board/:id/:teamId',
+        element: <BoardPage />,
+      },
     ],
   },
 ]);
