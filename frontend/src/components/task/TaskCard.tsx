@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Task } from '@/api';
-import { AlertCircle, Flame, GripVertical } from 'lucide-react';
+import { AlertCircle, Flame, GripVertical, Pencil } from 'lucide-react';
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -12,6 +12,7 @@ import { Link } from 'react-router';
 interface TaskCardProps extends HTMLAttributes<HTMLDivElement> {
   task: Task;
   isDragging?: boolean;
+  onEdit?: (task: Task) => void;
 }
 
 const statusStyles = {
@@ -28,7 +29,7 @@ const priorityIcons = {
   CRITICAL: <AlertCircle className="h-4 w-4 text-red-600" />,
 };
 
-export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, className, ...props }) => {
+export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, className, onEdit, ...props }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging: dndDragging } = useSortable({
     id: `task-${task.id}`,
     data: { type: 'task' },
@@ -61,15 +62,25 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
         className,
       )}
     >
-      {/* Top Row: Title + Drag Handle */}
+      {/* Top Row: Title + Drag Handle + Edit Button */}
       <div className="flex justify-between items-start">
         <h3 className="font-semibold text-gray-800">{task.title}</h3>
-        <button
-          className="cursor-grab rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 active:cursor-grabbing"
-        >
-          <GripVertical className="h-4 w-4" />
-          <span className="sr-only">Drag</span>
-        </button>
+        <div className="flex gap-1 items-center">
+          <button
+            className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            onClick={e => { e.stopPropagation(); onEdit?.(task); }}
+            title="Edit Task"
+            type="button"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+          <button
+            className="cursor-grab rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 active:cursor-grabbing"
+          >
+            <GripVertical className="h-4 w-4" />
+            <span className="sr-only">Drag</span>
+          </button>
+        </div>
       </div>
 
       {/* Description */}

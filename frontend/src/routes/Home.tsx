@@ -1,11 +1,11 @@
 import { FC, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Task, TaskControllerApiFactory, Team, TeamControllerApiFactory } from '@/api';
 import { useUserProfile } from '@context/UserProfileProvider.tsx';
 import { ColumnTitle } from '@components/board';
 import { RetroContainer } from '@components/common/RetroContainer.tsx';
 import { RetroButton } from '@components/common/RetroButton.tsx';
-import { FolderKanban } from 'lucide-react';
+import { FolderKanban, Trash2 } from 'lucide-react';
 import { RetroEntryCard } from '@components/common/RetroEntryCard.tsx';
 import { TaskCard } from '@components/task';
 import { TeamProjectsModal } from '@components/team/TeamProjectsModal';
@@ -34,6 +34,16 @@ export const Home: FC<HomeProps> = () => {
   const userId = profile?.id;
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
+  const queryClient = useQueryClient();
+  const deleteTeamMutation = useMutation({
+    mutationFn: async (teamId: number) => {
+      await TeamControllerApiFactory().deleteTeam(teamId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      queryClient.invalidateQueries({ queryKey: ['my-teams', userId] });
+    },
+  });
 
   const { data, error, isLoading, isError } = useQuery({
     queryKey: ['teams'],
@@ -93,13 +103,27 @@ export const Home: FC<HomeProps> = () => {
                 key={team.id}
                 left={<>{team.name}</>}
                 right={(
-                  <RetroButton
-                    className="!px-4 !py-4 w-auto"
-                    icon={<FolderKanban />}
-                    onClick={() => setSelectedTeam(team)}
-                  >
-                    Projects
-                  </RetroButton>
+                  <div className="flex gap-2 items-center">
+                    <RetroButton
+                      className="!px-4 !py-4 w-auto"
+                      icon={<FolderKanban />}
+                      onClick={() => setSelectedTeam(team)}
+                    >
+                      Projects
+                    </RetroButton>
+                    <RetroButton
+                      className="!px-2 !py-2 w-auto"
+                      icon={<Trash2 className="text-red-500" />}
+                      variant="secondary"
+                      onClick={() => {
+                        if (window.confirm(`Are you sure you want to delete team '${team.name}'?`)) {
+                          deleteTeamMutation.mutate(team.id!);
+                        }
+                      }}
+                    >
+                      {''}
+                    </RetroButton>
+                  </div>
                 )}
               />
             ))}

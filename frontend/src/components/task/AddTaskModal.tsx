@@ -1,6 +1,6 @@
-import { FC, useState, FormEvent, ChangeEvent } from 'react';
+import { FC, useState, FormEvent, ChangeEvent, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { TaskControllerApiFactory, TaskRequest, BoardControllerApiFactory, Board, Label, TeamControllerApiFactory, TeamMember } from '@/api';
+import { TaskControllerApiFactory, TaskRequest, BoardControllerApiFactory, Board, Label, TeamControllerApiFactory, TeamMember, Task } from '@/api';
 import { RetroModal } from '@components/common/RetroModal';
 import { RetroInput } from '@components/common/RetroInput';
 import { RetroButton } from '@components/common/RetroButton';
@@ -10,15 +10,26 @@ interface AddTaskModalProps {
   columnId: number;
   boardId: number;
   teamId: number;
+  task?: Task;
+  isEdit?: boolean;
 }
 
-export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId, teamId }) => {
+export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId, teamId, task, isEdit }) => {
   const queryClient = useQueryClient();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState(task?.title || '');
+  const [description, setDescription] = useState(task?.description || '');
   const [priority, setPriority] = useState(1);
-  const [labelIds, setLabelIds] = useState<number[]>([]);
-  const [assignees, setAssignees] = useState<string[]>([]);
+  const [labelIds, setLabelIds] = useState<number[]>(task?.labels ? Array.from(task.labels).map(l => l.id!) : []);
+  const [assignees, setAssignees] = useState<string[]>(task?.assignees || []);
+
+  useEffect(() => {
+    if (isEdit && task) {
+      setTitle(task.title || '');
+      setDescription(task.description || '');
+      setLabelIds(task.labels ? Array.from(task.labels).map(l => l.id!) : []);
+      setAssignees(task.assignees || []);
+    }
+  }, [isEdit, task]);
 
   // Fetch team members
   const { data: team } = useQuery({
@@ -62,13 +73,39 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
     },
   });
 
+  const updateTaskMutation = useMutation({
+    mutationFn: async () => {
+      if (!task?.id) throw new Error('No task to update');
+      const taskRequest: TaskRequest = {
+        title,
+        description,
+        columnId,
+        priority,
+        position: task.position,
+        status: task.status,
+        labelIds,
+        assignees,
+      };
+      const response = await TaskControllerApiFactory().updateTask(task.id, taskRequest);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      onClose();
+    },
+  });
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    createTaskMutation.mutate();
+    if (isEdit) {
+      updateTaskMutation.mutate();
+    } else {
+      createTaskMutation.mutate();
+    }
   };
 
   return (
-    <RetroModal onClose={onClose} title="Add Task">
+    <RetroModal onClose={onClose} title={isEdit ? 'Edit Task' : 'Add Task'}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <RetroInput
           label="Title"
@@ -120,8 +157,10 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
           <RetroButton size="sm" type="button" onClick={onClose}>
             Cancel
           </RetroButton>
-          <RetroButton size="sm" type="submit" disabled={createTaskMutation.isPending}>
-            {createTaskMutation.isPending ? 'Creating...' : 'Add Task'}
+          <RetroButton size="sm" type="submit" disabled={isEdit ? updateTaskMutation.isPending : createTaskMutation.isPending}>
+            {isEdit
+              ? (updateTaskMutation.isPending ? 'Saving...' : 'Save Changes')
+              : (createTaskMutation.isPending ? 'Creating...' : 'Add Task')}
           </RetroButton>
         </div>
       </form>

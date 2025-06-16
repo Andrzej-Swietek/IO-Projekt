@@ -15,9 +15,10 @@ interface KanbanColumnProps {
   tasks: Task[];
   colorClass: string;
   onAddTask?: () => void;
+  onEditTask?: (task: Task) => void;
 }
 
-export const KanbanColumn: FC<KanbanColumnProps> = ({ id, title, tasks, colorClass, onAddTask }) => {
+export const KanbanColumn: FC<KanbanColumnProps> = ({ id, title, tasks, colorClass, onAddTask, onEditTask }) => {
   const columnId = `column-${id}`;
   const taskIds = tasks.map(task => `task-${task.id}`);
 
@@ -70,7 +71,7 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({ id, title, tasks, colorCla
         <SortableContext items={taskIds}>
           <div className="flex flex-col gap-4">
             {tasks.map(task => (
-              <TaskCard key={`task-${task.id}`} task={task} />
+              <TaskCard key={`task-${task.id}`} task={task} onEdit={onEditTask} />
             ))}
 
             {tasks.length === 0 && (

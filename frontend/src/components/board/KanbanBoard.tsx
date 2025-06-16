@@ -41,6 +41,8 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
   const [activeColumnId, setActiveColumnId] = useState<number | null>(null);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [addTaskColumnId, setAddTaskColumnId] = useState<number | null>(null);
+  const [editTask, setEditTask] = useState<Task | null>(null);
+  const [editTaskColumnId, setEditTaskColumnId] = useState<number | null>(null);
 
   const { data: board, isLoading } = useQuery({
     queryKey: ['board', id],
@@ -213,6 +215,10 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
               setAddTaskColumnId(column.id ?? null);
               setShowAddTaskModal(true);
             }}
+            onEditTask={task => {
+              setEditTask(task);
+              setEditTaskColumnId(column.id ?? null);
+            }}
           />
         ))}
       </div>
@@ -229,6 +235,16 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
           boardId={board.id}
           teamId={teamId}
           onClose={() => setShowAddTaskModal(false)}
+        />
+      )}
+
+      {editTask && board?.id && teamId && editTaskColumnId && (
+        <AddTaskModal
+          columnId={editTaskColumnId}
+          boardId={board.id}
+          teamId={teamId}
+          onClose={() => { setEditTask(null); setEditTaskColumnId(null); }}
+          // TODO: Implement EditTaskModal or extend AddTaskModal for editing
         />
       )}
     </DndContext>
