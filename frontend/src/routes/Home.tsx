@@ -8,7 +8,7 @@ import { RetroButton } from '@components/common/RetroButton.tsx';
 import { FolderKanban } from 'lucide-react';
 import { RetroEntryCard } from '@components/common/RetroEntryCard.tsx';
 import { TaskCard } from '@components/task';
-import { TeamBoardsModal } from '@components/team/TeamBoardsModal';
+import { TeamProjectsModal } from '@components/team/TeamProjectsModal';
 import { CreateTeamModal } from '@components/team/CreateTeamModal';
 
 interface HomeProps {
@@ -133,7 +133,7 @@ export const Home: FC<HomeProps> = () => {
       </div>
 
       {selectedTeam && (
-        <TeamBoardsModal
+        <TeamProjectsModal
           teamId={selectedTeam.id!}
           teamName={selectedTeam.name!}
           onClose={() => setSelectedTeam(null)}

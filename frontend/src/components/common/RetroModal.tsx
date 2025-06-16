@@ -11,8 +11,10 @@ export const RetroModal: FC<RetroModalProps> = ({ onClose, title, children }) =>
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <RetroContainer className="w-[500px] p-8">
-        <h2 className="mb-6 text-2xl font-bold text-amber-800">{title}</h2>
-        {children}
+        <h2 className="mb-8 text-2xl font-bold text-amber-800">{title}</h2>
+        <div className="space-y-6">
+          {children}
+        </div>
       </RetroContainer>
     </div>
   );
