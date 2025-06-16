@@ -64,10 +64,10 @@ export const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose, teamI
           required
         />
         <div className="flex justify-end gap-4 mt-4">
-          <RetroButton type="button" onClick={onClose}>
+          <RetroButton size="sm" type="button" onClick={onClose}>
             Cancel
           </RetroButton>
-          <RetroButton type="submit" disabled={createProjectMutation.isPending}>
+          <RetroButton size="sm" type="submit" disabled={createProjectMutation.isPending}>
             {createProjectMutation.isPending ? 'Creating...' : 'Create Project'}
           </RetroButton>
         </div>

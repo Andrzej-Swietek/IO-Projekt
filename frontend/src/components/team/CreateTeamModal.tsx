@@ -61,10 +61,10 @@ export const CreateTeamModal: FC<CreateTeamModalProps> = ({ onClose }) => {
           required
         />
         <div className="flex justify-end gap-4 mt-4">
-          <RetroButton type="button" onClick={onClose}>
+          <RetroButton size="sm" type="button" onClick={onClose}>
             Cancel
           </RetroButton>
-          <RetroButton type="submit" disabled={createTeamMutation.isPending}>
+          <RetroButton size="sm" type="submit" disabled={createTeamMutation.isPending}>
             {createTeamMutation.isPending ? 'Creating...' : 'Create Team'}
           </RetroButton>
         </div>

@@ -21,7 +21,7 @@ export const RetroContainer: FC<RetroContainerProps> = ({
   };
 
   return (
-    <div className={cn('relative p-6 border border-black', bgColor, shadowStyles[shadowSize], className)}>
+    <div className={cn('relative p-8 border border-black', bgColor, shadowStyles[shadowSize], className)}>
       {children}
     </div>
   );

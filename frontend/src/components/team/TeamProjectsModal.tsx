@@ -54,10 +54,10 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Boards</h2>
               <div className="flex gap-2">
-                <RetroButton onClick={() => setShowCreateBoardModal(true)}>
+                <RetroButton size="sm" onClick={() => setShowCreateBoardModal(true)}>
                   New Board
                 </RetroButton>
-                <RetroButton variant="secondary" onClick={onClose}>
+                <RetroButton size="sm" variant="secondary" onClick={onClose}>
                   Close
                 </RetroButton>
               </div>
@@ -74,7 +74,8 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
                     left={<>{board.name}</>}
                     right={(
                       <RetroButton
-                        className="!px-4 !py-4 w-auto"
+                        size="sm"
+                        className="!px-4 !py-2 w-auto"
                         onClick={() => navigate(`/board/${board.id}`)}
                       >
                         Open Board
@@ -104,10 +105,10 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">Projects</h2>
             <div className="flex gap-2">
-              <RetroButton onClick={() => setShowCreateProjectModal(true)}>
+              <RetroButton size="sm" onClick={() => setShowCreateProjectModal(true)}>
                 New Project
               </RetroButton>
-              <RetroButton variant="secondary" onClick={onClose}>
+              <RetroButton size="sm" variant="secondary" onClick={onClose}>
                 Close
               </RetroButton>
             </div>
@@ -119,7 +120,8 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
                 left={<>{project.name}</>}
                 right={(
                   <RetroButton
-                    className="!px-4 !py-4 w-auto"
+                    size="sm"
+                    className="!px-4 !py-2 w-auto"
                     onClick={() => setSelectedProject(project)}
                   >
                     View Boards
