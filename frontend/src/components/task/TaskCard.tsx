@@ -44,6 +44,7 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['board'] });
       queryClient.invalidateQueries({ queryKey: ['boards'] });
+      queryClient.invalidateQueries({ queryKey: ['my-tasks'] });
     },
   });
 
