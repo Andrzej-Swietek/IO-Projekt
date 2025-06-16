@@ -118,10 +118,9 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
               if (!user) return null;
 
               return (
-                <Link to={`/user/${userId}`}>
+                <Link to={`/user/${userId}`} key={userId}>
                   <div className="w-auto flex row nowrap items-center justify-around gap-4 border-2 rounded-sm !px-4 !py-2">
                     <img
-                      key={user.id}
                       src={avatarUrl(user.email!)}
                       title={user.firstName}
                       className="h-6 w-6 rounded-full object-cover"

@@ -59,6 +59,7 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
 
   const createTaskMutation = useMutation({
     mutationFn: async () => {
+      console.log('Creating task with assignees:', assignees);
       const taskRequest: TaskRequest = {
         title,
         description,
@@ -69,7 +70,9 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
         labelIds,
         assignees,
       };
+      console.log('Task request:', taskRequest);
       const response = await TaskControllerApiFactory().createTask(taskRequest);
+      console.log('Task creation response:', response.data);
       return response.data;
     },
     onSuccess: () => {
@@ -81,6 +84,7 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
   const updateTaskMutation = useMutation({
     mutationFn: async () => {
       if (!task?.id) throw new Error('No task to update');
+      console.log('Updating task with assignees:', assignees);
       const taskRequest: TaskRequest = {
         title,
         description,
@@ -91,7 +95,9 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
         labelIds,
         assignees,
       };
+      console.log('Task update request:', taskRequest);
       const response = await TaskControllerApiFactory().updateTask(task.id, taskRequest);
+      console.log('Task update response:', response.data);
       return response.data;
     },
     onSuccess: () => {
@@ -103,11 +109,19 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted with assignees:', assignees);
     if (isEdit) {
       updateTaskMutation.mutate();
     } else {
       createTaskMutation.mutate();
     }
+  };
+
+  // Add log for assignee selection
+  const handleAssigneeChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const selectedAssignees = Array.from(e.target.selectedOptions, o => o.value);
+    console.log('Selected assignees:', selectedAssignees);
+    setAssignees(selectedAssignees);
   };
 
   return (
@@ -151,7 +165,7 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
           <select
             multiple
             value={assignees}
-            onChange={e => setAssignees(Array.from(e.target.selectedOptions, o => o.value))}
+            onChange={handleAssigneeChange}
             className="w-full rounded-md border border-gray-300 px-3 py-2"
           >
             {(teamMembers || []).map(member => {
