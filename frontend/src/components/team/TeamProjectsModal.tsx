@@ -1,12 +1,12 @@
 import { FC, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ProjectControllerApiFactory, Project } from '@/api';
+import { useNavigate } from 'react-router-dom';
+import { ProjectControllerApiFactory, Project, BoardControllerApiFactory, Board } from '@/api';
 import { RetroModal } from '@components/common/RetroModal';
 import { RetroButton } from '@components/common/RetroButton';
 import { RetroEntryCard } from '@components/common/RetroEntryCard';
 import { CreateProjectModal } from '@components/project/CreateProjectModal';
 import { CreateBoardModal } from '@components/board/CreateBoardModal';
-import { KanbanBoard } from '@components/board/KanbanBoard';
 
 interface TeamProjectsModalProps {
   teamId: number;
@@ -15,11 +15,12 @@ interface TeamProjectsModalProps {
 }
 
 export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName, onClose }) => {
+  const navigate = useNavigate();
   const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [showCreateBoardModal, setShowCreateBoardModal] = useState(false);
 
-  const { data: projects, isLoading } = useQuery<Project[], Error>({
+  const { data: projects, isLoading: isProjectsLoading } = useQuery<Project[], Error>({
     queryKey: ['team-projects', teamId],
     queryFn: async () => {
       const response = await ProjectControllerApiFactory().getProjectsByTeamId(teamId);
@@ -27,7 +28,17 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
     },
   });
 
-  if (isLoading) {
+  const { data: boards, isLoading: isBoardsLoading } = useQuery<Board[], Error>({
+    queryKey: ['project-boards', selectedProject?.id],
+    queryFn: async () => {
+      if (!selectedProject?.id) return [];
+      const response = await BoardControllerApiFactory().getBoardsByProjectId(selectedProject.id);
+      return response.data;
+    },
+    enabled: !!selectedProject?.id,
+  });
+
+  if (isProjectsLoading) {
     return (
       <RetroModal onClose={onClose} title={`${teamName} - Projects`}>
         <div className="flex items-center justify-center h-32">Loading projects...</div>
@@ -51,7 +62,28 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
                 </RetroButton>
               </div>
             </div>
-            {selectedProject.id && <KanbanBoard projectId={selectedProject.id} />}
+            <div className="flex flex-col gap-2">
+              {isBoardsLoading ? (
+                <div className="flex items-center justify-center h-32">Loading boards...</div>
+              ) : boards?.length === 0 ? (
+                <div className="text-center text-gray-500 py-4">No boards found. Create a new board to get started.</div>
+              ) : (
+                boards?.map((board) => (
+                  <RetroEntryCard
+                    key={board.id}
+                    left={<>{board.name}</>}
+                    right={(
+                      <RetroButton
+                        className="!px-4 !py-4 w-auto"
+                        onClick={() => navigate(`/board/${board.id}`)}
+                      >
+                        Open Board
+                      </RetroButton>
+                    )}
+                  />
+                ))
+              )}
+            </div>
           </div>
         </RetroModal>
 
