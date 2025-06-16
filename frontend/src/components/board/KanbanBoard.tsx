@@ -1,4 +1,5 @@
 import { FC, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   DndContext,
   type DragEndEvent,
@@ -11,138 +12,100 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { createPortal } from 'react-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { KanbanColumn } from '@components/board/KanbanColumn.tsx';
 import { TaskCard } from '@components/task/TaskCard.tsx';
-import type { Board, BoardColumn, Label } from '@api/api';
-import type { Task } from '@/api';
+import { BoardControllerApiFactory, BoardColumnControllerApiFactory, Board, BoardColumn, Task, ReorderBoardRequest, ColumnOrderItem } from '@/api';
+import { ProjectControllerApiFactory } from '@/api';
+import { AddTaskModal } from '@components/task/AddTaskModal';
+import { TaskControllerApiFactory } from '@/api';
 
-const mockLabels: Label[] = [
-  { id: 1, name: 'Research', color: 'bg-blue-500' },
-  { id: 2, name: 'Marketing', color: 'bg-green-500' },
-  { id: 3, name: 'Development', color: 'bg-red-500' },
-  { id: 4, name: 'Design', color: 'bg-yellow-500' },
-  { id: 5, name: 'Documentation', color: 'bg-purple-500' },
-  { id: 6, name: 'Management', color: 'bg-rose-500' },
-];
-
-
-const initialBoard: Board = {
-  id: 1,
-  name: 'Project Tasks',
-  description: 'Organize and track project tasks',
-  ownerId: 'user-123',
-  columns: [
-    {
-      id: 1,
-      name: 'To Do',
-      position: 0,
-      tasks: [
-        {
-          id: 1,
-          title: 'Research competitors',
-          description: 'Look into what our competitors are doing',
-          status: 'TODO',
-          labels: new Set([mockLabels[1], mockLabels[1]]),
-          position: 0,
-        },
-        {
-          id: 2,
-          title: 'Design new landing page',
-          description: 'Create wireframes for the new landing page',
-          status: 'TODO',
-          labels: new Set([mockLabels[1], mockLabels[1]]),
-          position: 1,
-        },
-        {
-          id: 3,
-          title: 'Update documentation',
-          description: 'Make sure our docs are up to date',
-          status: 'TODO',
-          labels: new Set([mockLabels[1], mockLabels[1]]),
-          position: 2,
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: 'In Progress',
-      position: 1,
-      tasks: [
-        {
-          id: 4,
-          title: 'Implement authentication',
-          description: 'Add login and signup functionality',
-          status: 'IN_PROGRESS',
-          labels: new Set([mockLabels[3], mockLabels[4]]),
-          position: 0,
-        },
-        {
-          id: 5,
-          title: 'Create component library',
-          description: 'Build reusable UI components',
-          status: 'IN_PROGRESS',
-          labels: new Set([mockLabels[3], mockLabels[4]]),
-          position: 1,
-        },
-      ],
-    },
-    {
-      id: 3,
-      name: 'Review',
-      position: 2,
-      tasks: [
-        {
-          id: 6,
-          title: 'Code review PR #42',
-          description: 'Review the pull request for the new feature',
-          status: 'IN_PROGRESS',
-          labels: new Set([mockLabels[4], mockLabels[5]]),
-          position: 0,
-        },
-      ],
-    },
-    {
-      id: 4,
-      name: 'Done',
-      position: 3,
-      tasks: [
-        {
-          id: 7,
-          title: 'Set up CI/CD pipeline',
-          description: 'Configure automated testing and deployment',
-          status: 'DONE',
-          labels: new Set([mockLabels[4], mockLabels[5]]),
-          position: 0,
-        },
-        {
-          id: 8,
-          title: 'User interviews',
-          description: 'Conduct user interviews for feedback',
-          status: 'DONE',
-          labels: new Set([mockLabels[4], mockLabels[5]]),
-          position: 1,
-        },
-      ],
-    },
-  ],
+// Column color mapping by name (case-insensitive)
+const getColumnColorClass = (name?: string) => {
+  if (!name) return 'bg-gray-100 border-gray-300';
+  const lower = name.toLowerCase();
+  if (lower.includes('done')) return 'bg-green-100 border-green-300';
+  if (lower.includes('progress')) return 'bg-purple-100 border-purple-300';
+  if (lower.includes('to do')) return 'bg-gray-100 border-gray-300';
+  return 'bg-gray-100 border-gray-300';
 };
 
-// Column color mapping
-const columnColors: Record<number, string> = {
-  1: 'bg-pink-100 border-pink-300',
-  2: 'bg-blue-100 border-blue-300',
-  3: 'bg-purple-100 border-purple-300',
-  4: 'bg-green-100 border-green-300',
+// Helper to map column name to TaskStatus
+const getStatusForColumn = (columnName: string): 'TODO' | 'IN_PROGRESS' | 'DONE' | 'BLOCKED' => {
+  const lower = columnName.toLowerCase();
+  if (lower.includes('progress')) return 'IN_PROGRESS';
+  if (lower.includes('done')) return 'DONE';
+  if (lower.includes('block')) return 'BLOCKED';
+  return 'TODO';
 };
 
 interface KanbanBoardProps {
+  teamId?: number;
 }
 
-export const KanbanBoard: FC<KanbanBoardProps> = () => {
-  const [board, setBoard] = useState<Board>(initialBoard);
+export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
+  const { id } = useParams();
+  const queryClient = useQueryClient();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [activeColumnId, setActiveColumnId] = useState<number | null>(null);
+  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+  const [addTaskColumnId, setAddTaskColumnId] = useState<number | null>(null);
+  const [editTask, setEditTask] = useState<Task | null>(null);
+  const [editTaskColumnId, setEditTaskColumnId] = useState<number | null>(null);
+
+  const { data: board, isLoading } = useQuery({
+    queryKey: ['board', id],
+    queryFn: async () => {
+      if (!id) throw new Error('Board ID is required');
+      const response = await BoardControllerApiFactory().getBoardById(Number(id));
+      return response.data;
+    },
+    enabled: !!id,
+  });
+
+  const reorderColumnsMutation = useMutation({
+    mutationFn: async (orderList: ColumnOrderItem[]) => {
+      if (!id) throw new Error('Board ID is required');
+      const reorderRequest: ReorderBoardRequest = { orderList };
+      const response = await BoardControllerApiFactory().reorderColumns(Number(id), reorderRequest);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['board', id] });
+    },
+  });
+
+  // Mutation for moving a task to a different column or position
+  const moveTaskMutation = useMutation({
+    mutationFn: async (data: { task: Task; columnId: number; position: number }) => {
+      // Find the target column to get its name
+      const targetColumn = board?.columns?.find(col => col.id === data.columnId);
+      const newStatus = targetColumn ? getStatusForColumn(targetColumn.name || '') : data.task.status;
+      await TaskControllerApiFactory().updateTask(Number(data.task.id), {
+        ...data.task,
+        columnId: Number(data.columnId),
+        position: data.position,
+        status: newStatus,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['board', id] });
+    },
+  });
+
+  // Mutation for reordering tasks within the same column
+  const reorderTaskMutation = useMutation({
+    mutationFn: async (data: { task: Task; position: number }) => {
+      await TaskControllerApiFactory().updateTask(Number(data.task.id), {
+        ...data.task,
+        position: data.position,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['board', id] });
+    },
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -159,7 +122,7 @@ export const KanbanBoard: FC<KanbanBoardProps> = () => {
     if (id.startsWith('task-')) {
       const taskId = Number.parseInt(id.replace('task-', ''), 10);
 
-      for (const column of board.columns || []) {
+      for (const column of board?.columns || []) {
         const task = column.tasks?.find(t => t.id === taskId);
         if (task) {
           setActiveTask(task);
@@ -187,36 +150,11 @@ export const KanbanBoard: FC<KanbanBoardProps> = () => {
       if (activeColumnId === targetColumnId) return;
       if (!activeTask) return;
 
-      setBoard((prev: Board) => {
-        const newBoard = { ...prev };
-        const newColumns = [...(newBoard.columns || [])];
-
-        // Find source and target columns
-        const sourceColumnIndex = newColumns.findIndex(col => col.id === activeColumnId);
-        const targetColumnIndex = newColumns.findIndex(col => col.id === targetColumnId);
-
-        if (sourceColumnIndex === -1 || targetColumnIndex === -1) return prev;
-
-        // Remove from source column
-        const sourceColumn = { ...newColumns[sourceColumnIndex] };
-        sourceColumn.tasks = sourceColumn.tasks?.filter(task => task.id !== activeTask.id) || [];
-
-        // Add to target column
-        const targetColumn = { ...newColumns[targetColumnIndex] };
-        const updatedTask = {
-          ...activeTask,
-          columnId: targetColumnId,
-          position: targetColumn.tasks?.length || 0,
-        };
-        targetColumn.tasks = [...(targetColumn.tasks || []), updatedTask];
-
-        // Update columns in the board
-        newColumns[sourceColumnIndex] = sourceColumn;
-        newColumns[targetColumnIndex] = targetColumn;
-        newBoard.columns = newColumns;
-
-        setActiveColumnId(targetColumnId);
-        return newBoard;
+      // Move task to a different column
+      moveTaskMutation.mutate({
+        task: activeTask,
+        columnId: targetColumnId,
+        position: board?.columns?.find(col => col.id === targetColumnId)?.tasks?.length || 0,
       });
     }
 
@@ -229,8 +167,10 @@ export const KanbanBoard: FC<KanbanBoardProps> = () => {
       let targetTaskIndex = -1;
       let targetColumnIndex = -1;
 
-      for (let i = 0; i < (board.columns || []).length; i++) {
-        const column = board.columns![i];
+      for (let i = 0; i < (board?.columns || []).length; i++) {
+        const column = board?.columns?.[i];
+        if (!column) continue;
+        
         const taskIndex = column.tasks?.findIndex(t => t.id === targetTaskId) || -1;
 
         if (taskIndex !== -1) {
@@ -245,70 +185,16 @@ export const KanbanBoard: FC<KanbanBoardProps> = () => {
 
       // If in the same column, reorder
       if (activeColumnId === targetColumnId) {
-        setBoard((prev: Board) => {
-          const newBoard = { ...prev };
-          const newColumns = [...(newBoard.columns || [])];
-          const columnIndex = newColumns.findIndex(col => col.id === activeColumnId);
-
-          if (columnIndex === -1) return prev;
-
-          const column = { ...newColumns[columnIndex] };
-          const sourceTaskIndex = column.tasks?.findIndex(task => task.id === activeTask.id) || -1;
-
-          if (sourceTaskIndex === -1 || !column.tasks) return prev;
-
-          // Reorder tasks in the column
-          column.tasks = arrayMove(column.tasks, sourceTaskIndex, targetTaskIndex);
-
-          // Update positions
-          column.tasks = column.tasks.map((task, index) => ({
-            ...task,
-            position: index,
-          }));
-
-          newColumns[columnIndex] = column;
-          newBoard.columns = newColumns;
-
-          return newBoard;
+        reorderTaskMutation.mutate({
+          task: activeTask,
+          position: targetTaskIndex,
         });
       } else {
         // Move to different column
-        setBoard((prev: Board) => {
-          const newBoard = { ...prev };
-          const newColumns = [...(newBoard.columns || [])];
-
-          // Find source column
-          const sourceColumnIndex = newColumns.findIndex(col => col.id === activeColumnId);
-
-          if (sourceColumnIndex === -1) return prev;
-
-          // Remove from source column
-          const sourceColumn = { ...newColumns[sourceColumnIndex] };
-          sourceColumn.tasks = sourceColumn.tasks?.filter(task => task.id !== activeTask.id) || [];
-
-          // Add to target column at specific position
-          const targetColumn = { ...newColumns[targetColumnIndex] };
-          const updatedTask = {
-            ...activeTask,
-            columnId: targetColumnId,
-          };
-
-          const newTasks = [...(targetColumn.tasks || [])];
-          newTasks.splice(targetTaskIndex, 0, updatedTask);
-
-          // Update positions
-          targetColumn.tasks = newTasks.map((task, index) => ({
-            ...task,
-            position: index,
-          }));
-
-          // Update columns in the board
-          newColumns[sourceColumnIndex] = sourceColumn;
-          newColumns[targetColumnIndex] = targetColumn;
-          newBoard.columns = newColumns;
-
-          setActiveColumnId(targetColumnId);
-          return newBoard;
+        moveTaskMutation.mutate({
+          task: activeTask,
+          columnId: targetColumnId,
+          position: targetTaskIndex,
         });
       }
     }
@@ -318,6 +204,14 @@ export const KanbanBoard: FC<KanbanBoardProps> = () => {
     setActiveTask(null);
     setActiveColumnId(null);
   };
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-full">Loading board...</div>;
+  }
+
+  if (!board) {
+    return <div className="flex items-center justify-center h-full">No board found. Create a new board to get started.</div>;
+  }
 
   return (
     <DndContext
@@ -333,7 +227,16 @@ export const KanbanBoard: FC<KanbanBoardProps> = () => {
             id={column.id?.toString() || ''}
             title={column.name || ''}
             tasks={column.tasks || []}
-            colorClass={columnColors[column.id || 0] || 'bg-gray-100 border-gray-300'}
+            colorClass={getColumnColorClass(column.name)}
+            onAddTask={() => {
+              setAddTaskColumnId(column.id ?? null);
+              setShowAddTaskModal(true);
+            }}
+            onEditTask={task => {
+              setEditTask(task);
+              setEditTaskColumnId(column.id ?? null);
+            }}
+            isTaskDragging={!!activeTask}
           />
         ))}
       </div>
@@ -343,6 +246,26 @@ export const KanbanBoard: FC<KanbanBoardProps> = () => {
           <DragOverlay>{activeTask && <TaskCard task={activeTask} isDragging />}</DragOverlay>,
           document.body,
         )}
+
+      {showAddTaskModal && addTaskColumnId && board?.id && teamId && (
+        <AddTaskModal
+          columnId={addTaskColumnId}
+          boardId={board.id}
+          teamId={teamId}
+          onClose={() => setShowAddTaskModal(false)}
+        />
+      )}
+
+      {editTask && board?.id && teamId && editTaskColumnId && (
+        <AddTaskModal
+          columnId={editTaskColumnId}
+          boardId={board.id}
+          teamId={teamId}
+          onClose={() => { setEditTask(null); setEditTaskColumnId(null); }}
+          task={editTask}
+          isEdit={true}
+        />
+      )}
     </DndContext>
   );
 };
