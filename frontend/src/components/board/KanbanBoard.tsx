@@ -1,4 +1,5 @@
 import { FC, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   DndContext,
   type DragEndEvent,
@@ -25,33 +26,31 @@ const columnColors: Record<number, string> = {
   4: 'bg-green-100 border-green-300',
 };
 
-interface KanbanBoardProps {
-  projectId: number;
-}
-
-export const KanbanBoard: FC<KanbanBoardProps> = ({ projectId }) => {
+export const KanbanBoard: FC = () => {
+  const { id } = useParams();
   const queryClient = useQueryClient();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [activeColumnId, setActiveColumnId] = useState<number | null>(null);
 
-  const { data: boards, isLoading: isBoardsLoading } = useQuery({
-    queryKey: ['project-boards', projectId],
+  const { data: board, isLoading } = useQuery({
+    queryKey: ['board', id],
     queryFn: async () => {
-      const response = await BoardControllerApiFactory().getBoardsByProjectId(projectId);
+      if (!id) throw new Error('Board ID is required');
+      const response = await BoardControllerApiFactory().getBoardById(Number(id));
       return response.data;
     },
+    enabled: !!id,
   });
-
-  const board = boards?.[0]; // For now, we'll just use the first board
 
   const reorderColumnsMutation = useMutation({
     mutationFn: async (orderList: ColumnOrderItem[]) => {
+      if (!id) throw new Error('Board ID is required');
       const reorderRequest: ReorderBoardRequest = { orderList };
-      const response = await BoardControllerApiFactory().reorderColumns(board?.id!, reorderRequest);
+      const response = await BoardControllerApiFactory().reorderColumns(Number(id), reorderRequest);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['project-boards', projectId] });
+      queryClient.invalidateQueries({ queryKey: ['board', id] });
     },
   });
 
@@ -110,7 +109,7 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ projectId }) => {
           return updatedTask;
         },
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ['project-boards', projectId] });
+          queryClient.invalidateQueries({ queryKey: ['board', id] });
         },
       });
 
@@ -154,7 +153,7 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ projectId }) => {
             return updatedTask;
           },
           onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['project-boards', projectId] });
+            queryClient.invalidateQueries({ queryKey: ['board', id] });
           },
         });
 
@@ -172,7 +171,7 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ projectId }) => {
             return updatedTask;
           },
           onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['project-boards', projectId] });
+            queryClient.invalidateQueries({ queryKey: ['board', id] });
           },
         });
 
@@ -186,7 +185,7 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ projectId }) => {
     setActiveColumnId(null);
   };
 
-  if (isBoardsLoading) {
+  if (isLoading) {
     return <div className="flex items-center justify-center h-full">Loading board...</div>;
   }
 
