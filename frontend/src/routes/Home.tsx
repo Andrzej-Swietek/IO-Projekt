@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Task, TaskControllerApiFactory, Team, TeamControllerApiFactory } from '@/api';
 import { useUserProfile } from '@context/UserProfileProvider.tsx';
@@ -8,34 +8,32 @@ import { RetroButton } from '@components/common/RetroButton.tsx';
 import { FolderKanban } from 'lucide-react';
 import { RetroEntryCard } from '@components/common/RetroEntryCard.tsx';
 import { TaskCard } from '@components/task';
+import { TeamBoardsModal } from '@components/team/TeamBoardsModal';
+import { CreateTeamModal } from '@components/team/CreateTeamModal';
 
 interface HomeProps {
 }
 
 const fetchTeams = async () => {
-  const api = TeamControllerApiFactory();
-  const response = await api.getAllTeams({});
+  const response = await TeamControllerApiFactory().getAllTeams({});
   return response.data;
 };
 
-const fetchUsersTeams = async (userId: string): Promise<Team[]> => {
-  const api = TeamControllerApiFactory();
-  const response = await api.getTeamsByUserId(userId);
+const fetchUsersTeams = async (userId: string) => {
+  const response = await TeamControllerApiFactory().getTeamsByUserId(userId);
   return response.data;
 };
 
-
-const fetchUserTasks = async (userId: string): Promise<Task[]> => {
-  const api = TaskControllerApiFactory();
-  const response = await api.getTasksByUserId(userId);
+const fetchUserTasks = async (userId: string) => {
+  const response = await TaskControllerApiFactory().getTasksByUserId(userId);
   return response.data;
 };
 
 export const Home: FC<HomeProps> = () => {
   const { profile } = useUserProfile();
-
   const userId = profile?.id;
-
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
 
   const { data, error, isLoading, isError } = useQuery({
     queryKey: ['teams'],
@@ -61,13 +59,12 @@ export const Home: FC<HomeProps> = () => {
   });
 
   if (isError) {
-    return <div>Loading...</div>;
+    return <div>Error loading teams</div>;
   }
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
 
   return (
     <>
@@ -93,13 +90,13 @@ export const Home: FC<HomeProps> = () => {
             }
             {teams && teams.map(team => (
               <RetroEntryCard
-                key={window.crypto.randomUUID()}
+                key={team.id}
                 left={<>{team.name}</>}
                 right={(
                   <RetroButton
                     className="!px-4 !py-4 w-auto"
                     icon={<FolderKanban />}
-                    onClick={() => alert(`opening modal for team ${team.id}`)}
+                    onClick={() => setSelectedTeam(team)}
                   >
                     Boards
                   </RetroButton>
@@ -107,13 +104,15 @@ export const Home: FC<HomeProps> = () => {
               />
             ))}
 
-            <RetroButton className="absolute -bottom-4 right-8 !px-12 !py-4 w-1/3 text-[24px]">
+            <RetroButton 
+              className="absolute -bottom-4 right-8 !px-12 !py-4 w-1/3 text-[24px]"
+              onClick={() => setShowCreateTeamModal(true)}
+            >
               Add a new team
             </RetroButton>
           </RetroContainer>
         </main>
         <aside className="col-span-4 grid grid-cols-12 gap-y-8 relative">
-
           <div className="w-1/2 h-full min-h-[70vh] top-22 bg-blue-100 absolute -z-1 retro-shadow"></div>
           <div className="col-span-full h-[60px]">
             <ColumnTitle title="My Tasks" />
@@ -125,25 +124,25 @@ export const Home: FC<HomeProps> = () => {
           }
           {
             tasks?.map(task => (
-              <div className="col-span-full !px-8">
+              <div key={task.id} className="col-span-full !px-8">
                 <TaskCard className="col-span-full" task={task} isDragging={false} />
               </div>
-
             ))
           }
-
         </aside>
       </div>
-      <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-4xl font-bold">Welcome to the Home Page</h1>
-        <p className="mt-4 text-lg">This is the main page of our application.</p>
-        {
-          data?.data && data.data[0].name
-        }
-        {
-          isError && <>{error}</>
-        }
-      </div>
+
+      {selectedTeam && (
+        <TeamBoardsModal
+          teamId={selectedTeam.id!}
+          teamName={selectedTeam.name!}
+          onClose={() => setSelectedTeam(null)}
+        />
+      )}
+
+      {showCreateTeamModal && (
+        <CreateTeamModal onClose={() => setShowCreateTeamModal(false)} />
+      )}
     </>
   );
 };
