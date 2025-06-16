@@ -56,7 +56,7 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
       {...listeners}
       {...props}
       className={cn(
-        'bg-[var(--primary-white)] rounded-md border border-gray-200 text-sm transition-shadow !p-4 !pb-0 min-h-[15vh]',
+        'bg-[var(--primary-white)] rounded-md border border-gray-200 text-sm transition-shadow !p-4 min-h-[15vh]',
         'hover:shadow-lg retro-shadow flex flex-col gap-2',
         dragging && 'opacity-60 ring-2 ring-blue-400',
         className,
@@ -111,8 +111,8 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
 
       {/* Footer: assignees and dueDate */}
       {(task.assignees?.length || task.createdDate) && (
-        <div className="flex items-center justify-between pt-2 text-xs text-gray-500">
-          <div className="flex -space-x-2">
+        <div className="pt-2 text-xs text-gray-500">
+          <div className="flex -space-x-2 mb-4">
             {task.assignees?.map(userId => {
               const user = usersById?.[userId];
               if (!user) return null;
