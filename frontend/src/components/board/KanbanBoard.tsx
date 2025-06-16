@@ -64,6 +64,30 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
     },
   });
 
+  // Mutation for moving a task to a different column or position
+  const moveTaskMutation = useMutation({
+    mutationFn: async (data: { task: Task; columnId: number; position: number }) => {
+      // TODO: Replace with actual API call to update/move task
+      // Example: await TaskControllerApiFactory().updateTask(data.task.id, { ...data.task, columnId: data.columnId, position: data.position });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['board', id] });
+    },
+  });
+
+  // Mutation for reordering tasks within the same column
+  const reorderTaskMutation = useMutation({
+    mutationFn: async (data: { task: Task; position: number }) => {
+      // TODO: Replace with actual API call to reorder task
+      // Example: await TaskControllerApiFactory().updateTask(data.task.id, { ...data.task, position: data.position });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['board', id] });
+    },
+  });
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -107,23 +131,12 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
       if (activeColumnId === targetColumnId) return;
       if (!activeTask) return;
 
-      // Update task status in the backend
-      const taskMutation = useMutation({
-        mutationFn: async () => {
-          const updatedTask = {
-            ...activeTask,
-            columnId: targetColumnId,
-            position: board?.columns?.find(col => col.id === targetColumnId)?.tasks?.length || 0,
-          };
-          // TODO: Add task update API call
-          return updatedTask;
-        },
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ['board', id] });
-        },
+      // Move task to a different column
+      moveTaskMutation.mutate({
+        task: activeTask,
+        columnId: targetColumnId,
+        position: board?.columns?.find(col => col.id === targetColumnId)?.tasks?.length || 0,
       });
-
-      taskMutation.mutate();
     }
 
     // If over another task
@@ -153,39 +166,17 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
 
       // If in the same column, reorder
       if (activeColumnId === targetColumnId) {
-        const taskMutation = useMutation({
-          mutationFn: async () => {
-            const updatedTask = {
-              ...activeTask,
-              position: targetTaskIndex,
-            };
-            // TODO: Add task reorder API call
-            return updatedTask;
-          },
-          onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['board', id] });
-          },
+        reorderTaskMutation.mutate({
+          task: activeTask,
+          position: targetTaskIndex,
         });
-
-        taskMutation.mutate();
       } else {
         // Move to different column
-        const taskMutation = useMutation({
-          mutationFn: async () => {
-            const updatedTask = {
-              ...activeTask,
-              columnId: targetColumnId,
-              position: targetTaskIndex,
-            };
-            // TODO: Add task move API call
-            return updatedTask;
-          },
-          onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['board', id] });
-          },
+        moveTaskMutation.mutate({
+          task: activeTask,
+          columnId: targetColumnId,
+          position: targetTaskIndex,
         });
-
-        taskMutation.mutate();
       }
     }
   };
