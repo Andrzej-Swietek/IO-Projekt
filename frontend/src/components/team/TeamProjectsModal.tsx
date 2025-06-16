@@ -37,22 +37,31 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
 
   if (selectedProject) {
     return (
-      <RetroModal onClose={onClose} title={selectedProject.name || ''}>
-        <div className="flex flex-col gap-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Boards</h2>
-            <div className="flex gap-2">
-              <RetroButton onClick={() => setShowCreateBoardModal(true)}>
-                New Board
-              </RetroButton>
-              <RetroButton variant="secondary" onClick={onClose}>
-                Close
-              </RetroButton>
+      <>
+        <RetroModal onClose={onClose} title={selectedProject.name || ''}>
+          <div className="flex flex-col gap-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Boards</h2>
+              <div className="flex gap-2">
+                <RetroButton onClick={() => setShowCreateBoardModal(true)}>
+                  New Board
+                </RetroButton>
+                <RetroButton variant="secondary" onClick={onClose}>
+                  Close
+                </RetroButton>
+              </div>
             </div>
+            {selectedProject.id && <KanbanBoard projectId={selectedProject.id} />}
           </div>
-          {selectedProject.id && <KanbanBoard projectId={selectedProject.id} />}
-        </div>
-      </RetroModal>
+        </RetroModal>
+
+        {showCreateBoardModal && selectedProject.id && (
+          <CreateBoardModal
+            projectId={selectedProject.id}
+            onClose={() => setShowCreateBoardModal(false)}
+          />
+        )}
+      </>
     );
   }
 
@@ -94,13 +103,6 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
         <CreateProjectModal
           teamId={teamId}
           onClose={() => setShowCreateProjectModal(false)}
-        />
-      )}
-
-      {showCreateBoardModal && selectedProject?.id && (
-        <CreateBoardModal
-          projectId={selectedProject.id}
-          onClose={() => setShowCreateBoardModal(false)}
         />
       )}
     </>
