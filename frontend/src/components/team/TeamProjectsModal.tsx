@@ -76,7 +76,7 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
                       <RetroButton
                         size="sm"
                         className="!px-4 !py-2 w-auto"
-                        onClick={() => navigate(`/board/${board.id}`)}
+                        onClick={() => navigate(`/board/${board.id}/${teamId}`)}
                       >
                         Open Board
                       </RetroButton>

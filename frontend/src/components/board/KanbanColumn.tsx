@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Task } from '@/api';
 import { TaskCard } from '@components/task/TaskCard.tsx';
 import { FC } from 'react';
+import { RetroButton } from '@components/common/RetroButton';
 
 
 interface KanbanColumnProps {
@@ -13,9 +14,10 @@ interface KanbanColumnProps {
   title: string;
   tasks: Task[];
   colorClass: string;
+  onAddTask?: () => void;
 }
 
-export const KanbanColumn: FC<KanbanColumnProps> = ({ id, title, tasks, colorClass }) => {
+export const KanbanColumn: FC<KanbanColumnProps> = ({ id, title, tasks, colorClass, onAddTask }) => {
   const columnId = `column-${id}`;
   const taskIds = tasks.map(task => `task-${task.id}`);
 
@@ -39,7 +41,8 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({ id, title, tasks, colorCla
     >
       <div className="flex items-center justify-between border-b border-inherit !p-4">
         <h2 className="font-serif text-lg font-bold">{title}</h2>
-        <div className="flex items-center !gap-2">
+        <div className="flex items-center gap-2">
+          <RetroButton size="sm" icon={null} onClick={onAddTask}>Add Task</RetroButton>
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-medium">
             {tasks.length}
           </span>

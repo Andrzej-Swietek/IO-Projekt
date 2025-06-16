@@ -17,20 +17,30 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { KanbanColumn } from '@components/board/KanbanColumn.tsx';
 import { TaskCard } from '@components/task/TaskCard.tsx';
 import { BoardControllerApiFactory, BoardColumnControllerApiFactory, Board, BoardColumn, Task, ReorderBoardRequest, ColumnOrderItem } from '@/api';
+import { ProjectControllerApiFactory } from '@/api';
+import { AddTaskModal } from '@components/task/AddTaskModal';
 
-// Column color mapping
-const columnColors: Record<number, string> = {
-  1: 'bg-pink-100 border-pink-300',
-  2: 'bg-blue-100 border-blue-300',
-  3: 'bg-purple-100 border-purple-300',
-  4: 'bg-green-100 border-green-300',
+// Column color mapping by name (case-insensitive)
+const getColumnColorClass = (name?: string) => {
+  if (!name) return 'bg-gray-100 border-gray-300';
+  const lower = name.toLowerCase();
+  if (lower.includes('done')) return 'bg-green-100 border-green-300';
+  if (lower.includes('progress')) return 'bg-purple-100 border-purple-300';
+  if (lower.includes('to do')) return 'bg-gray-100 border-gray-300';
+  return 'bg-gray-100 border-gray-300';
 };
 
-export const KanbanBoard: FC = () => {
+interface KanbanBoardProps {
+  teamId?: number;
+}
+
+export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
   const { id } = useParams();
   const queryClient = useQueryClient();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [activeColumnId, setActiveColumnId] = useState<number | null>(null);
+  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+  const [addTaskColumnId, setAddTaskColumnId] = useState<number | null>(null);
 
   const { data: board, isLoading } = useQuery({
     queryKey: ['board', id],
@@ -207,7 +217,11 @@ export const KanbanBoard: FC = () => {
             id={column.id?.toString() || ''}
             title={column.name || ''}
             tasks={column.tasks || []}
-            colorClass={columnColors[column.id || 0] || 'bg-gray-100 border-gray-300'}
+            colorClass={getColumnColorClass(column.name)}
+            onAddTask={() => {
+              setAddTaskColumnId(column.id ?? null);
+              setShowAddTaskModal(true);
+            }}
           />
         ))}
       </div>
@@ -217,6 +231,15 @@ export const KanbanBoard: FC = () => {
           <DragOverlay>{activeTask && <TaskCard task={activeTask} isDragging />}</DragOverlay>,
           document.body,
         )}
+
+      {showAddTaskModal && addTaskColumnId && board?.id && teamId && (
+        <AddTaskModal
+          columnId={addTaskColumnId}
+          boardId={board.id}
+          teamId={teamId}
+          onClose={() => setShowAddTaskModal(false)}
+        />
+      )}
     </DndContext>
   );
 };

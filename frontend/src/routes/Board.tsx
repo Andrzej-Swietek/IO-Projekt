@@ -8,7 +8,7 @@ interface BoardPageProps {
 }
 
 export const BoardPage: FC<BoardPageProps> = () => {
-  const { id } = useParams();
+  const { id, teamId } = useParams();
 
   const { data: board, isLoading } = useQuery({
     queryKey: ['board', id],
@@ -22,7 +22,7 @@ export const BoardPage: FC<BoardPageProps> = () => {
 
   return (
     <div className="min-h-screen w-full px-8">
-      <header className="!mb-32 text-center">
+      <header className="!mb-32 text-center mt-8">
         <h1 className="mb-4 text-4xl font-bold tracking-tight text-amber-800 md:text-5xl">
           {isLoading ? 'Loading...' : board?.name || 'Board'}
         </h1>
@@ -36,7 +36,7 @@ export const BoardPage: FC<BoardPageProps> = () => {
           </button>
         </div>
       </aside>
-      <KanbanBoard />
+      <KanbanBoard teamId={teamId ? Number(teamId) : undefined} />
     </div>
   );
 };
