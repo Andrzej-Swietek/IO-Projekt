@@ -4,17 +4,17 @@ import zio.*
 import zio.config.typesafe.*
 import zio.logging.backend.SLF4J
 import zio.stream.ZStream
+
 import pl.edu.agh.sentinel.configs.AlertConfig
 import pl.edu.agh.sentinel.events.TaskEvent
+import pl.edu.agh.sentinel.kafka.{ KafkaEnv, KafkaModule, StreamSupervisor }
 import pl.edu.agh.sentinel.kafka.config.KafkaConfig
-import pl.edu.agh.sentinel.kafka.consumers.{AlertConsumer, KafkaConsumer, TaskEventConsumer}
+import pl.edu.agh.sentinel.kafka.consumers.{ AlertConsumer, KafkaConsumer, TaskEventConsumer }
 import pl.edu.agh.sentinel.kafka.producers.KafkaProducer
 import pl.edu.agh.sentinel.kafka.topics.TopicManager
-import pl.edu.agh.sentinel.kafka.{KafkaEnv, KafkaModule, StreamSupervisor}
-import pl.edu.agh.sentinel.notifications.{NotificationEnv, NotificationModule, SentinelNotifier}
-import pl.edu.agh.sentinel.processing.{AlertingEngine, SentinelAlertingEngine}
-import pl.edu.agh.sentinel.store.redis.{RedisEnv, RedisModule}
-
+import pl.edu.agh.sentinel.notifications.{ NotificationEnv, NotificationModule, SentinelNotifier }
+import pl.edu.agh.sentinel.processing.{ AlertingEngine, SentinelAlertingEngine }
+import pl.edu.agh.sentinel.store.redis.{ RedisEnv, RedisModule }
 
 type SentinelEnv = KafkaEnv & AlertingEngine & RedisEnv & NotificationEnv
 
@@ -25,11 +25,14 @@ object SentinelApp extends ZIOAppDefault {
     ) >>> Runtime.removeDefaultLoggers >>> SLF4J.slf4j
   }
 
-  def runAlertingPipeline(consumer: KafkaConsumer, engine: AlertingEngine): ZIO[KafkaEnv & AlertingEngine & NotificationEnv, Throwable, Unit] = for {
+  def runAlertingPipeline(consumer: KafkaConsumer, engine: AlertingEngine)
+    : ZIO[KafkaEnv & AlertingEngine & NotificationEnv, Throwable, Unit] = for {
     notifier <- ZIO.service[SentinelNotifier]
 
     // 1. Consume/Poll stream of task events from Kafka consumer
-    taskEventStream <- ZIO.succeed(TaskEventConsumer(consumer).run.tap(event => ZIO.logInfo(s"Incoming TaskEvent: $event")))
+    taskEventStream <- ZIO.succeed(
+      TaskEventConsumer(consumer).run.tap(event => ZIO.logInfo(s"Incoming TaskEvent: $event"))
+    )
 
     // 2. Process events through alerting engine, receiving stream of alerts
     alertEventStream = engine.process(taskEventStream)
@@ -52,7 +55,8 @@ object SentinelApp extends ZIOAppDefault {
     _ <- topicManager.ensureTopicsExist
 
     _ <- ZIO.logInfo("Starting alert consumer stream...")
-    _ <-     TaskEventConsumer(consumer).run
+    _ <- TaskEventConsumer(consumer)
+      .run
       .tap(event => ZIO.logInfo(s"Incoming TaskEvent: $event"))
       .runDrain
 

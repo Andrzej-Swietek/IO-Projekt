@@ -1,19 +1,17 @@
 package pl.edu.agh.sentinel.notifications
 
 import zio.*
-import sttp.client3.*
-import sttp.client3.quick.backend
-import sttp.model.Uri
-import zio.*
-import sttp.client3.*
-import sttp.client3.ziojson.*
-import sttp.model.Uri
-import pl.edu.agh.sentinel.events.AlertEvent
-import sttp.client3.httpclient.zio.HttpClientZioBackend
-import sttp.client3._
-import sttp.client3.ziojson._
 import zio._
 import zio.json._
+
+import pl.edu.agh.sentinel.events.AlertEvent
+import sttp.client3.*
+import sttp.client3._
+import sttp.client3.httpclient.zio.HttpClientZioBackend
+import sttp.client3.quick.backend
+import sttp.client3.ziojson.*
+import sttp.client3.ziojson._
+import sttp.model.Uri
 
 case class SlackPayload(text: String) derives JsonCodec
 

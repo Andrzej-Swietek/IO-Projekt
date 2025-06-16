@@ -1,8 +1,9 @@
 package pl.edu.agh.sentinel.kafka
 
 import zio._
-import org.apache.kafka.clients.producer.RecordMetadata
 import zio.stream.ZStream
+
+import org.apache.kafka.clients.producer.RecordMetadata
 
 trait KafkaRunner[E <: Throwable, +R] {
   def run: ZStream[Any, E, R]

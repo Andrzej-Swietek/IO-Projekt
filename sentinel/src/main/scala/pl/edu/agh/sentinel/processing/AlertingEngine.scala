@@ -36,13 +36,13 @@ final case class SentinelAlertingEngine(
   }
 
   private def updateState(event: TaskEvent, now: Instant): UIO[Unit] = event match {
-    case TaskEvent.TaskCreated(_, taskId, _, creatorId, _) =>
+    case TaskEvent.TaskCreated(_, taskId, _, _, creatorId, _) =>
       for {
         _ <- userActivityRef.update(_.updated(creatorId, now))
         _ <- taskStatusRef.update(_.updated(taskId, ("TODO", creatorId, now)))
       } yield ()
 
-    case TaskEvent.TaskMoved(_, taskId, to, movedBy, _) =>
+    case TaskEvent.TaskMoved(_, taskId, _, to, movedBy, _) =>
       for {
         _ <- userActivityRef.update(_.updated(movedBy, now))
         _ <- taskStatusRef.update(old => {
@@ -53,7 +53,7 @@ final case class SentinelAlertingEngine(
         })
       } yield ()
 
-    case TaskEvent.TaskClosed(_, taskId, closedBy, _, _) =>
+    case TaskEvent.TaskClosed(_, taskId, _, closedBy, _, _) =>
       for {
         _ <- userActivityRef.update(_.updated(closedBy, now))
         _ <- taskStatusRef.update(_ - taskId)
