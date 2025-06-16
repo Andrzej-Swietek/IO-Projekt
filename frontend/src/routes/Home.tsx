@@ -104,8 +104,9 @@ export const Home: FC<HomeProps> = () => {
               />
             ))}
 
-            <RetroButton 
-              className="absolute -bottom-4 right-8 !px-12 !py-4 w-1/3 text-[24px]"
+            <RetroButton
+              className="absolute -bottom-4 right-8 !px-8 !py-3 w-1/3 text-base md:text-lg"
+              icon={<span className="text-lg md:text-2xl">+</span>}
               onClick={() => setShowCreateTeamModal(true)}
             >
               Add a new team
