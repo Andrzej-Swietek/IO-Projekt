@@ -11,5 +11,5 @@ case class TaskStats(
   done: Int,
   closedCount: Int,
   avgTimeToClose: Option[Long], // millis
-  avgLoad: Double
+  avgLoad: Double,
 )
