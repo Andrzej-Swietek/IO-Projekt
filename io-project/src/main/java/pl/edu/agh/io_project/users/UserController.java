@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,5 +44,11 @@ public class UserController {
     @GetMapping("/{userId}/roles")
     public String getUserRoles(@PathVariable String userId) {
         return keycloakUserService.getUserRoles(userId);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> me(@AuthenticationPrincipal Jwt jwt) {
+        String userId = jwt.getSubject();
+        return ResponseEntity.ok(java.util.Map.of("userId", userId));
     }
 }
