@@ -33,6 +33,7 @@ export const UserProfileProvider: FC<UserProfileProviderProps> = ({ children }) 
       try {
         const api = UserControllerApiFactory();
         const response = await api.getUserDetails(keycloak?.tokenParsed?.sub ?? '');
+        localStorage.setItem('token', keycloak.token);
         setProfile(response.data);
         setError(null);
       } catch (err) {
@@ -48,9 +49,9 @@ export const UserProfileProvider: FC<UserProfileProviderProps> = ({ children }) 
   }, [keycloak]);
 
   return (
-    <UserProfileContext.Provider value={{ profile, loading, error }}>
-      {children}
-    </UserProfileContext.Provider>
+      <UserProfileContext.Provider value={{ profile, loading, error }}>
+        {children}
+      </UserProfileContext.Provider>
   );
 };
 
