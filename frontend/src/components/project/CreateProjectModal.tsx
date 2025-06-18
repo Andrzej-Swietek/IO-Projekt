@@ -1,7 +1,6 @@
-import { FC, useState, FormEvent, ChangeEvent } from 'react';
+import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ProjectControllerApiFactory, ProjectRequest, TeamMemberRequest, TeamMemberDTO, TeamControllerApiFactory } from '@/api';
-import { useUserProfile } from '@context/UserProfileProvider';
+import { ProjectControllerApiFactory, ProjectRequest } from '@/api';
 import { RetroModal } from '@components/common/RetroModal';
 import { RetroInput } from '@components/common/RetroInput';
 import { RetroButton } from '@components/common/RetroButton';
@@ -12,7 +11,6 @@ interface CreateProjectModalProps {
 }
 
 export const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose, teamId }) => {
-  const { profile } = useUserProfile();
   const queryClient = useQueryClient();
   const [projectName, setProjectName] = useState('');
   const [description, setDescription] = useState('');
@@ -27,7 +25,7 @@ export const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose, teamI
       const response = await ProjectControllerApiFactory().createProject(projectRequest);
       return response.data;
     },
-    onSuccess: async (project) => {
+    onSuccess: async project => {
       queryClient.invalidateQueries({ queryKey: ['team-projects', teamId] });
       onClose();
     },
@@ -64,4 +62,4 @@ export const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose, teamI
       </form>
     </RetroModal>
   );
-}; 
+};

@@ -20,8 +20,6 @@ case class KafkaConfig(
   producerProperties: Map[String, String],
 )
 
-
-
 object KafkaConfig {
 
   val config: Config[KafkaConfig] = deriveConfig[KafkaConfig].nested("kafka")

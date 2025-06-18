@@ -38,7 +38,7 @@ export const UserProfileProvider: FC<UserProfileProviderProps> = ({ children }) 
         setError(null);
       } catch (err) {
         // eslint-disable-next-line
-        console.error('Failed to fetch user profile', err);
+                console.error('Failed to fetch user profile', err);
         setError('Nie udało się pobrać profilu');
       } finally {
         setLoading(false);

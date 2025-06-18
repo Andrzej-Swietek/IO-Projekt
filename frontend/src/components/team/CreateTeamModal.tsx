@@ -1,6 +1,6 @@
-import { FC, useState, FormEvent, ChangeEvent } from 'react';
+import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { TeamControllerApiFactory, TeamMemberRequest, TeamMemberDTO } from '@/api';
+import { TeamControllerApiFactory } from '@/api';
 import { useUserProfile } from '@context/UserProfileProvider';
 import { RetroModal } from '@components/common/RetroModal';
 import { RetroInput } from '@components/common/RetroInput';
@@ -21,11 +21,11 @@ export const CreateTeamModal: FC<CreateTeamModalProps> = ({ onClose }) => {
       const response = await TeamControllerApiFactory().createTeam({
         name: teamName,
         description: description,
-        creatorId: profile?.id!,
+        creatorId: profile?.id ?? '',
       });
       return response.data;
     },
-    onSuccess: async (team) => {
+    onSuccess: async team => {
       queryClient.invalidateQueries({ queryKey: ['my-teams'] });
       onClose();
     },
@@ -62,4 +62,4 @@ export const CreateTeamModal: FC<CreateTeamModalProps> = ({ onClose }) => {
       </form>
     </RetroModal>
   );
-}; 
+};

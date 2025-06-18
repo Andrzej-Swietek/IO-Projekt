@@ -1,10 +1,11 @@
-import { FC, useState, FormEvent, ChangeEvent } from 'react';
+import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { BoardControllerApiFactory, BoardRequest } from '@/api';
 import { useUserProfile } from '@context/UserProfileProvider';
 import { RetroModal } from '@components/common/RetroModal';
 import { RetroInput } from '@components/common/RetroInput';
 import { RetroButton } from '@components/common/RetroButton';
+import { toast } from 'sonner';
 
 interface CreateBoardModalProps {
   onClose: () => void;
@@ -32,9 +33,8 @@ export const CreateBoardModal: FC<CreateBoardModalProps> = ({ onClose, projectId
       queryClient.invalidateQueries({ queryKey: ['project-boards', projectId] });
       onClose();
     },
-    onError: (error) => {
-      console.error('Failed to create board:', error);
-      // You might want to show an error message to the user here
+    onError: error => {
+      toast.error('Error creating board. Please try again. ' + error.message);
     },
   });
 
@@ -72,4 +72,4 @@ export const CreateBoardModal: FC<CreateBoardModalProps> = ({ onClose, projectId
       </form>
     </RetroModal>
   );
-}; 
+};

@@ -1,14 +1,15 @@
 package pl.edu.agh.sentinel.kafka.consumers
 
 import zio.*
-import zio.kafka.serde.{Deserializer, Serde}
+import zio.kafka.serde.{ Deserializer, Serde }
 import zio.stream.ZStream
+
 import pl.edu.agh.sentinel.events.TaskEvent
 import pl.edu.agh.sentinel.kafka.KafkaRunner
 import pl.edu.agh.sentinel.kafka.serdes.ZioJsonSerde
 import pl.edu.agh.sentinel.kafka.topics.SentinelTopics
 
-case class AlertConsumer(kafkaConsumer: KafkaConsumer) extends KafkaRunner[Throwable, TaskEvent]  {
+case class AlertConsumer(kafkaConsumer: KafkaConsumer) extends KafkaRunner[Throwable, TaskEvent] {
   given Deserializer[Any, TaskEvent] = ZioJsonSerde[TaskEvent]
   given Deserializer[Any, String] = Serde.string
 
