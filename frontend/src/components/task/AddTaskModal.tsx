@@ -1,11 +1,20 @@
-import { FC, useState, FormEvent, ChangeEvent, useEffect } from 'react';
+import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { TaskControllerApiFactory, TaskRequest, BoardControllerApiFactory, Board, Label, TeamControllerApiFactory, TeamMember, Task } from '@/api';
+import {
+  Label,
+  LabelControllerApiFactory,
+  Task,
+  TaskControllerApiFactory,
+  TaskRequest,
+  TeamControllerApiFactory,
+  TeamMember,
+} from '@/api';
 import { RetroModal } from '@components/common/RetroModal';
 import { RetroInput } from '@components/common/RetroInput';
 import { RetroButton } from '@components/common/RetroButton';
 import { useUserProfile } from '@context/UserProfileProvider';
 import { useUsersByIds } from '@/common/hooks/useUsersByIds';
+import { RetroMultiSelect } from '@components/common/RetroMultiSelect';
 
 interface AddTaskModalProps {
   onClose: () => void;
@@ -39,7 +48,7 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
   const { data: team } = useQuery({
     queryKey: ['team', teamId],
     queryFn: async () => {
-      const response = await TeamControllerApiFactory().getTeamById(teamId);
+      const response = await new TeamControllerApiFactory().getTeamById(teamId);
       return response.data;
     },
     enabled: !!teamId,
@@ -51,8 +60,8 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
   const { data: labels } = useQuery<Label[]>({
     queryKey: ['project-labels', boardId],
     queryFn: async () => {
-      // Placeholder: fetch labels for the board/project if available
-      return [];
+      const response = await new LabelControllerApiFactory().getAllLabels();
+      return response.data;
     },
     enabled: !!boardId,
   });
@@ -158,32 +167,50 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
               <option key={label.id} value={label.id}>{label.name}</option>
             ))}
           </select>
+
+          <RetroMultiSelect
+            label="Labels"
+            className="min-w-[50%] w-auto"
+            options={[
+              ...labels?.map(label => ({
+                label: label.name,
+                value: label.id,
+              })) || [],
+            ]}
+            value={labelIds}
+            onChange={selected => setLabelIds(selected.map(Number))}
+          />
         </div>
         {/* Assignees */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">Assignees</label>
-          <select
-            multiple
+          <RetroMultiSelect
+            label="Assignees"
+            className="min-w-[50%] w-auto"
+            options={[
+              ...teamMembers.map(member => {
+                const user = usersById?.[member.userId!];
+                const name = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : member.userId;
+                return {
+                  label: `${name} ${member.role ? `(${member.role})` : ''}`,
+                  value: member.userId,
+                };
+              }) || [],
+            ]}
             value={assignees}
-            onChange={handleAssigneeChange}
-            className="w-full rounded-md border border-gray-300 px-3 py-2"
-          >
-            {(teamMembers || []).map(member => {
-              const user = usersById?.[member.userId!];
-              const name = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : member.userId;
-              return (
-                <option key={member.userId} value={member.userId}>
-                  {name} {member.role ? `(${member.role})` : ''}
-                </option>
-              );
-            })}
-          </select>
+            onChange={selected => {
+              setAssignees([...selected]);
+            }}
+          />
         </div>
         <div className="flex justify-end gap-4 mt-4">
           <RetroButton size="sm" type="button" onClick={onClose} icon={null}>
             Cancel
           </RetroButton>
-          <RetroButton size="sm" type="submit" disabled={isEdit ? updateTaskMutation.isPending : createTaskMutation.isPending}>
+          <RetroButton
+            size="sm"
+            type="submit"
+            disabled={isEdit ? updateTaskMutation.isPending : createTaskMutation.isPending}
+          >
             {isEdit
               ? (updateTaskMutation.isPending ? 'Saving...' : 'Save Changes')
               : (createTaskMutation.isPending ? 'Creating...' : 'Add Task')}
@@ -192,4 +219,4 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
       </form>
     </RetroModal>
   );
-}; 
+};

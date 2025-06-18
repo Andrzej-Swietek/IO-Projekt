@@ -33,11 +33,12 @@ export const UserProfileProvider: FC<UserProfileProviderProps> = ({ children }) 
       try {
         const api = UserControllerApiFactory();
         const response = await api.getUserDetails(keycloak?.tokenParsed?.sub ?? '');
+        localStorage.setItem('token', keycloak.token);
         setProfile(response.data);
         setError(null);
       } catch (err) {
         // eslint-disable-next-line
-        console.error('Failed to fetch user profile', err);
+                console.error('Failed to fetch user profile', err);
         setError('Nie udało się pobrać profilu');
       } finally {
         setLoading(false);

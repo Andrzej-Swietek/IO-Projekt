@@ -1,6 +1,6 @@
-import { FC, useState, FormEvent } from 'react';
+import { FC, FormEvent, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { TeamControllerApiFactory, TeamMemberRequest, TeamMemberDTO, TeamMemberDTORoleEnum, UserControllerApiFactory, UserRepresentation, Team } from '@/api';
+import { TeamControllerApiFactory, TeamMemberDTORoleEnum, TeamMemberRequest, UserControllerApiFactory } from '@/api';
 import { RetroModal } from '@components/common/RetroModal';
 import { RetroSelect } from '@components/common/RetroSelect';
 import { RetroButton } from '@components/common/RetroButton';
@@ -10,7 +10,10 @@ interface AddMemberModalProps {
   teamId: number;
 }
 
-export const AddMemberModal: FC<AddMemberModalProps> = ({ onClose, teamId }) => {
+export const AddMemberModal: FC<AddMemberModalProps> = ({
+  onClose,
+  teamId,
+}) => {
   const queryClient = useQueryClient();
   const [selectedUserId, setSelectedUserId] = useState('');
   const [role, setRole] = useState<TeamMemberDTORoleEnum>(TeamMemberDTORoleEnum.Member);
@@ -21,7 +24,7 @@ export const AddMemberModal: FC<AddMemberModalProps> = ({ onClose, teamId }) => 
     queryFn: async () => {
       const response = await TeamControllerApiFactory().getTeamById(teamId);
       return response.data;
-    }
+    },
   });
 
   // Fetch all users
@@ -30,7 +33,7 @@ export const AddMemberModal: FC<AddMemberModalProps> = ({ onClose, teamId }) => 
     queryFn: async () => {
       const response = await UserControllerApiFactory().getAllUsers();
       return response.data;
-    }
+    },
   });
 
   const addMemberMutation = useMutation({
@@ -39,8 +42,8 @@ export const AddMemberModal: FC<AddMemberModalProps> = ({ onClose, teamId }) => 
         teamId: teamId,
         teamMember: {
           userId: selectedUserId,
-          role: role
-        }
+          role: role,
+        },
       };
       const response = await TeamControllerApiFactory().addTeamMember(teamMemberRequest);
       return response.data;
@@ -65,7 +68,7 @@ export const AddMemberModal: FC<AddMemberModalProps> = ({ onClose, teamId }) => 
 
   const userOptions = availableUsers.map(user => ({
     value: user.id!,
-    label: `${user.firstName || ''} ${user.lastName || ''} (${user.email || user.username || ''})`
+    label: `${user.firstName || ''} ${user.lastName || ''} (${user.email || user.username || ''})`,
   }));
 
   const isLoading = isLoadingUsers || isLoadingTeam;
@@ -76,30 +79,34 @@ export const AddMemberModal: FC<AddMemberModalProps> = ({ onClose, teamId }) => 
         <RetroSelect
           label="User"
           value={selectedUserId}
-          onChange={(e) => setSelectedUserId(e.target.value)}
+          onChange={e => setSelectedUserId(e.target.value)}
           options={userOptions}
           required
         />
         <RetroSelect
           label="Role"
           value={role}
-          onChange={(e) => setRole(e.target.value as TeamMemberDTORoleEnum)}
+          onChange={e => setRole(e.target.value as TeamMemberDTORoleEnum)}
           options={[
             { value: TeamMemberDTORoleEnum.Member, label: 'Member' },
             { value: TeamMemberDTORoleEnum.Manager, label: 'Manager' },
             { value: TeamMemberDTORoleEnum.Admin, label: 'Admin' },
-            { value: TeamMemberDTORoleEnum.Owner, label: 'Owner' }
+            { value: TeamMemberDTORoleEnum.Owner, label: 'Owner' },
           ]}
         />
         <div className="flex justify-end gap-4 mt-4">
           <RetroButton size="sm" type="button" onClick={onClose} variant="secondary" icon={null}>
             Cancel
           </RetroButton>
-          <RetroButton size="sm" type="submit" disabled={addMemberMutation.isPending || isLoading || userOptions.length === 0}>
+          <RetroButton
+            size="sm"
+            type="submit"
+            disabled={addMemberMutation.isPending || isLoading || userOptions.length === 0}
+          >
             {addMemberMutation.isPending ? 'Adding...' : 'Add Member'}
           </RetroButton>
         </div>
       </form>
     </RetroModal>
   );
-}; 
+};

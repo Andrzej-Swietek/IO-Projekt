@@ -1,9 +1,8 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Task } from '@/api';
+import { Task, TaskControllerApiFactory } from '@/api';
 import { AlertCircle, Flame, GripVertical, Pencil, Trash2 } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { TaskControllerApiFactory } from '@/api';
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -74,7 +73,7 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
         {...listeners}
         {...props}
         className={cn(
-          'bg-[var(--primary-white)] rounded-md border border-gray-200 text-sm transition-shadow !p-4 min-h-[15vh]',
+          'bg-[var(--primary-white)] border border-gray-200 text-sm transition-shadow !p-4 min-h-[15vh]',
           'hover:shadow-lg retro-shadow flex flex-col gap-2',
           dragging && 'opacity-60 ring-2 ring-blue-400',
           className,
@@ -86,7 +85,10 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
           <div className="flex gap-1 items-center">
             <button
               className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-              onClick={e => { e.stopPropagation(); onEdit?.(task); }}
+              onClick={e => {
+                e.stopPropagation();
+                onEdit?.(task);
+              }}
               title="Edit Task"
               type="button"
             >
@@ -94,7 +96,10 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
             </button>
             <button
               className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-red-600"
-              onClick={e => { e.stopPropagation(); setShowDeleteModal(true); }}
+              onClick={e => {
+                e.stopPropagation();
+                setShowDeleteModal(true);
+              }}
               title="Delete Task"
               type="button"
             >
@@ -145,7 +150,9 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
 
                 return (
                   <Link to={`/user/${userId}`} key={userId}>
-                    <div className="w-auto flex row nowrap items-center justify-around gap-4 border-2 rounded-sm !px-4 !py-2">
+                    <div
+                      className="w-auto flex row nowrap items-center justify-around gap-4 border-2 rounded-sm !px-4 !py-2"
+                    >
                       <img
                         src={avatarUrl(user.email!)}
                         title={user.firstName}
