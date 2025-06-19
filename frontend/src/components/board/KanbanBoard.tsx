@@ -239,6 +239,7 @@ export const KanbanBoard: FC<KanbanBoardProps> = ({ teamId }) => {
           {(board.columns || []).map((column: BoardColumn) => (
             <KanbanColumn
               key={column.id}
+              boardId={board.id}
               id={column.id?.toString() || ''}
               title={column.name || ''}
               tasks={column.tasks || []}

@@ -5,10 +5,10 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @RestController
@@ -47,8 +47,12 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> me(@AuthenticationPrincipal Jwt jwt) {
-        String userId = jwt.getSubject();
-        return ResponseEntity.ok(java.util.Map.of("userId", userId));
+    public ResponseEntity<?> me(@AuthenticationPrincipal UserPrincipal user) {
+        return ResponseEntity.ok(Map.of(
+                "User ID", user.getUserId(),
+                "User Name", user.getFirstName(),
+                "Last Name", user.getLastName(),
+                "Email", user.getEmail()
+        ));
     }
 }

@@ -6,6 +6,7 @@ import { KanbanBoard } from '@components/board/KanbanBoard.tsx';
 import { RetroButton } from '@components/common/RetroButton.tsx';
 import { AddMemberModal } from '@components/team/AddMemberModal.tsx';
 import { AddColumnModal, GenerateWithAIBox } from '@components/board';
+import { UserPlus } from 'lucide-react';
 
 interface BoardPageProps {
 }
@@ -45,6 +46,7 @@ export const BoardPage: FC<BoardPageProps> = () => {
             </RetroButton>
             <RetroButton
               className="px-4 py-2 cursor-pointer"
+              icon={<UserPlus />}
               onClick={() => setShowAddMemberModal(true)}
             >
               Add Member

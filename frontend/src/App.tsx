@@ -10,6 +10,7 @@ import { Register } from '@routes/auth/Register.tsx';
 import { OtherUserProfile } from '@routes/user/OtherUserProfile.tsx';
 import { BoardPage } from '@routes/Board.tsx';
 import { UserProfileTab } from '@routes/user/UserProfile.tsx';
+import { MyBoards } from '@routes/user/MyBoards.tsx';
 
 interface Props {
 }
@@ -44,6 +45,7 @@ const router = createBrowserRouter([
         element: <Outlet />,
         children: [
           { path: 'my-profile', element: <UserProfileTab /> },
+          { path: 'my-boards', element: <MyBoards /> },
           { path: ':id', element: <OtherUserProfile /> },
         ],
       },

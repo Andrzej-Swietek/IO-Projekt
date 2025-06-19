@@ -51,12 +51,14 @@ export const CreateBoardModal: FC<CreateBoardModalProps> = ({ onClose, projectId
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <RetroInput
           label="Board Name"
+          inputColor="bg-yellow-50"
           value={boardName}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setBoardName(e.target.value)}
           required
         />
         <RetroInput
           label="Description"
+          inputColor="bg-yellow-50"
           value={description}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
           required

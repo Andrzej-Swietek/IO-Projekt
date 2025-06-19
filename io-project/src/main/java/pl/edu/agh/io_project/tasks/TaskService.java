@@ -17,6 +17,8 @@ public interface TaskService {
 
     void assignUserToTask(Long taskId, String userId);
 
+    void addLabelsToTask(Long taskId, List<Long> labels);
+
     void reorderTasks(Long columnId, List<Long> taskIds);
 
     List<Task> getTasksByUserId(String userId);

@@ -1,5 +1,6 @@
 import { createContext, FC, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import Keycloak from 'keycloak-js';
+import { toast } from 'sonner';
 
 interface KeycloakContextType {
   keycloak: Keycloak | null;
@@ -35,8 +36,9 @@ export const KeycloakProvider: FC<KeycloakProviderProps> = ({ children }) => {
         setAuthenticated(isAuthenticated);
       })
       .catch(err => {
+        toast.error('Error during Keycloak initialization. Please try again later.');
         // eslint-disable-next-line
-        console.error('Keycloak init error', err);
+                console.error('Keycloak init error', err);
       });
   }, []);
 

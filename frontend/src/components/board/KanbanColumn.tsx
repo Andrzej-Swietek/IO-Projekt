@@ -1,7 +1,7 @@
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Trash2 } from 'lucide-react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { FC, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { BoardColumnControllerApiFactory, Task } from '@/api';
@@ -13,6 +13,7 @@ interface KanbanColumnProps {
   id: string;
   title: string;
   tasks: Task[];
+  boardId: number;
   colorClass: string;
   onAddTask?: () => void;
   onEditTask?: (task: Task) => void;
@@ -23,6 +24,7 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({
   id,
   title,
   tasks,
+  boardId,
   colorClass,
   onAddTask,
   onEditTask,
@@ -30,12 +32,13 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({
 }) => {
   const columnId = `column-${id}`;
   const taskIds = tasks.map(task => `task-${task.id}`);
+  const queryClient = useQueryClient();
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const deleteColumnMutation = useMutation({
     mutationFn: async (deletedColumnId: number) => {
-      await new BoardColumnControllerApiFactory().deleteColumn(deletedColumnId);
+      await BoardColumnControllerApiFactory().deleteColumn(deletedColumnId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['board', boardId] });
@@ -59,10 +62,13 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({
       <div
         ref={setNodeRef}
         style={style}
-        className={cn('flex flex-col border-2 shadow-md', colorClass, isDragging ? 'opacity-50' : '')}
+        className={cn('flex flex-col border-2 retro-shadow', colorClass, isDragging ? 'opacity-50' : '')}
       >
-        <div className="flex items-center justify-between border-b border-inherit !p-4">
-          <h2 className="font-serif text-lg font-bold">{title}</h2>
+        <div
+          className="flex items-center justify-between border-b border-inherit
+          !p-4 relative w-full h-[60px] bg-[#83BDFF] shadow-[8px_8px_0px_#000000]"
+        >
+          <h2 className="text-lg upercase font-bold">{title}</h2>
           <div className="flex items-center gap-2">
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-medium">
               {tasks.length}
@@ -88,7 +94,7 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({
             </button>
           </div>
         </div>
-        <div className="px-4 pt-2">
+        <div className="px-4 pt-2 mt-8">
           <RetroButton
             size="sm"
             icon={null}

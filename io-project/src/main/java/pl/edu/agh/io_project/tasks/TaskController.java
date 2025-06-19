@@ -73,6 +73,12 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/add-labels/{taskId}")
+    public ResponseEntity<Void> addLabelsToTask(@PathVariable Long taskId, @RequestBody List<Long> labels) {
+        taskService.addLabelsToTask(taskId, labels);
+        return ResponseEntity.ok().build();
+    }
+
     @PatchMapping("/reorder-tasks/{columnId}")
     public ResponseEntity<Void> reorderTasks(
             @PathVariable Long columnId,

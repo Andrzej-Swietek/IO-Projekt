@@ -61,7 +61,11 @@ export const RetroNavbar: FC<RetroNavbarProps> = () => {
                 }
               </NavLink>
             </DropdownMenuItem>
-            <DropdownMenuItem className="!px-8 !py-6">My Boards</DropdownMenuItem>
+            <DropdownMenuItem className="!px-8 !py-6">
+              <NavLink to="/user/my-boards">
+                My Boards
+              </NavLink>
+            </DropdownMenuItem>
             <DropdownMenuItem className="!px-8 !py-6">Settings</DropdownMenuItem>
             <DropdownMenuItem className="!px-8 !py-6">Help</DropdownMenuItem>
             {

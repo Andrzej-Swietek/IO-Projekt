@@ -5,7 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.io_project.boards.columns.BoardColumn;
 import pl.edu.agh.io_project.boards.columns.BoardColumnRepository;
+import pl.edu.agh.io_project.tasks.label.Label;
+import pl.edu.agh.io_project.tasks.label.LabelRepository;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,6 +21,7 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final BoardColumnRepository columnRepository;
+    private final LabelRepository labelRepository;
 
     @Override
     public List<Task> getAllTasks() {
@@ -67,6 +71,11 @@ public class TaskServiceImpl implements TaskService {
         task.setPosition(taskDTO.position());
         task.setAssignees(taskDTO.assignees());
 
+        if (taskDTO.labelIds() != null) {
+            var labels = new HashSet<>(labelRepository.findAllById(taskDTO.labelIds()));
+            task.setLabels(labels);
+        }
+
         return taskRepository.save(task);
     }
 
@@ -112,6 +121,18 @@ public class TaskServiceImpl implements TaskService {
                 });
 
         taskRepository.saveAll(tasks);
+    }
+
+    @Override
+    @Transactional
+    public void addLabelsToTask(Long taskId, List<Long> labelIds) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+
+        List<Label> labels = labelRepository.findAllById(labelIds);
+        task.getLabels().addAll(labels);
+
+        taskRepository.save(task);
     }
 
     @Override

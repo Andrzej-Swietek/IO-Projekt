@@ -40,6 +40,7 @@ export const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose, teamI
     <RetroModal onClose={onClose} title="Create New Project">
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <RetroInput
+          inputColor="bg-yellow-50"
           label="Project Name"
           value={projectName}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setProjectName(e.target.value)}
@@ -47,6 +48,7 @@ export const CreateProjectModal: FC<CreateProjectModalProps> = ({ onClose, teamI
         />
         <RetroInput
           label="Description"
+          inputColor="bg-yellow-50"
           value={description}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
           required
