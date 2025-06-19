@@ -5,13 +5,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.io_project.boards.columns.BoardColumn;
 import pl.edu.agh.io_project.boards.columns.BoardColumnRepository;
-import org.springframework.context.ApplicationEventPublisher;
 import pl.edu.agh.io_project.tasks.events.TaskUpdatedEvent;
-import pl.edu.agh.io_project.users.KeycloakAuthService;
+import pl.edu.agh.io_project.tasks.taskHistory.TaskHistoryRepository;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -22,6 +23,7 @@ import java.util.stream.IntStream;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+    private final TaskHistoryRepository taskHistoryRepository;
     private final BoardColumnRepository columnRepository;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -88,17 +90,11 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
         Task copy = deepCopy(task);
-        taskRepository.delete(task);
         eventPublisher.publishEvent(new TaskUpdatedEvent(copy, null, getCurrentUserId()));
-    }
+        taskHistoryRepository.deleteByTaskId(taskId);
 
-//    @Transactional
-//    public void deleteTask(Long taskId) {
-//        if (!taskRepository.existsById(taskId)) {
-//            throw new IllegalArgumentException("Task not found");
-//        }
-//        taskRepository.deleteById(taskId);
-//    }
+        taskRepository.delete(task);
+    }
 
     @Transactional
     public void changeTaskStatus(Long taskId, TaskStatus status) {
@@ -170,6 +166,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private String getCurrentUserId() {
-        return "user_id"; // TODO: Keycloak integration
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        return jwt.getSubject();
     }
 }
