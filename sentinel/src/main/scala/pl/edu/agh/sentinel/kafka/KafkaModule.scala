@@ -17,22 +17,24 @@ object KafkaModule {
 
   val kafkaScope: ZLayer[KafkaConfig, Nothing, Scope.Closeable] = ZLayer.fromZIO {
     for {
-        config <- ZIO.service[KafkaConfig]
-        _ <- ZIO.logInfo(s"Kafka Config: ${config.toString}")
-        _ <- ZIO.logInfo("Kafka Module initialized")
+      config <- ZIO.service[KafkaConfig]
+      _ <- ZIO.logInfo(s"Kafka Config: ${config.toString}")
+      _ <- ZIO.logInfo("Kafka Module initialized")
       scope <- Scope.make
     } yield scope
   }
 
   val live: ZLayer[Any, Throwable, KafkaEnv] = {
-    ZLayer.make[KafkaEnv](
-      kafkaScope,
-      KafkaConfig.layer,
-      KafkaProducer.layerFromConfig(),
-      KafkaConsumer.layerFromConfig(Earliest),
-      TopicManager.layer
-    ).mapError { e =>
-      new RuntimeException(s"Failed to create Kafka layer: ${e.getMessage}", e)
-    }
+    ZLayer
+      .make[KafkaEnv](
+        kafkaScope,
+        KafkaConfig.layer,
+        KafkaProducer.layerFromConfig(),
+        KafkaConsumer.layerFromConfig(Earliest),
+        TopicManager.layer,
+      )
+      .mapError { e =>
+        new RuntimeException(s"Failed to create Kafka layer: ${e.getMessage}", e)
+      }
   }
 }

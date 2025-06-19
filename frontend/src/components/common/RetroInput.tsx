@@ -6,14 +6,15 @@ interface RetroInputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const RetroInput: FC<RetroInputProps> = ({ label, ...props }) => {
   return (
-    <div>
+    <div className={props.className}>
       <label htmlFor={props.id} className="mb-2 block text-sm font-medium text-gray-700">
         {label}
       </label>
       <input
         {...props}
-        className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+        className="w-full rounded-md border border-gray-300 px-3 py-2
+        focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
       />
     </div>
   );
-}; 
+};

@@ -1,5 +1,5 @@
+import sbt.Keys.*
 import sbt.{Def, *}
-import Keys.*
 
 object SentinelTasks {
   lazy val benchmarkKafka = taskKey[Unit]("Run only Kafka benchmark tests")

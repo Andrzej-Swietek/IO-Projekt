@@ -5,20 +5,19 @@ import zio.kafka.serde.*
 import zio.stream.ZStream
 import zio.test.*
 
-import pl.edu.agh.sentinel.configs.{DiscordConfig, EmailConfig, NotificationConfig, SlackConfig}
-import pl.edu.agh.sentinel.events.{AlertEvent, TaskEvent}
+import java.time.Instant
+
+import pl.edu.agh.sentinel.configs.{ DiscordConfig, EmailConfig, NotificationConfig, SlackConfig }
+import pl.edu.agh.sentinel.events.{ AlertEvent, TaskEvent }
 import pl.edu.agh.sentinel.kafka.*
 import pl.edu.agh.sentinel.kafka.config.KafkaConfig
+import pl.edu.agh.sentinel.kafka.consumers.{ ConsumingStrategy, KafkaConsumer, TaskEventConsumer }
 import pl.edu.agh.sentinel.kafka.consumers.ConsumingStrategy.Earliest
-import pl.edu.agh.sentinel.kafka.consumers.{ConsumingStrategy, KafkaConsumer, TaskEventConsumer}
 import pl.edu.agh.sentinel.kafka.producers.KafkaProducer
 import pl.edu.agh.sentinel.kafka.serdes.ZioJsonSerde
-import pl.edu.agh.sentinel.kafka.topics.{KafkaTopic, TopicManager}
-import pl.edu.agh.sentinel.notifications.{Notifier, SentinelNotifier}
+import pl.edu.agh.sentinel.kafka.topics.{ KafkaTopic, TopicManager }
+import pl.edu.agh.sentinel.notifications.{ Notifier, SentinelNotifier }
 import pl.edu.agh.sentinel.processing.AlertingEngine
-
-
-import java.time.Instant
 
 object AlertingPipelineFunctionTest extends ZIOSpecDefault {
   given Serializer[Any, String] = Serde.string
@@ -77,7 +76,8 @@ object AlertingPipelineFunctionTest extends ZIOSpecDefault {
     // Simulate the consumer stream
     taskEventStream = ZStream.fromQueue(queue)
     // Simulate the alerting pipeline
-    fiber <- engine.process(taskEventStream)
+    fiber <- engine
+      .process(taskEventStream)
       .tap(alert => notifier.send(alert))
       .runDrain
       .fork
@@ -131,7 +131,6 @@ object AlertingPipelineFunctionTest extends ZIOSpecDefault {
 //    } @@ TestAspect.diagnose(3.seconds),
 
     test("should emit AlertEvent based on TaskEvent")(inMemoryTest)
-
   ).provideLayer(
     Scope.default >+>
       testLayers
@@ -151,11 +150,13 @@ object NotifierTestSupport {
 }
 
 object TestUtils {
-  def eventually[R, E, A](effect: ZIO[R, E, Boolean], retries: Int = 20, delay: Duration = 100.millis): ZIO[R, E, Boolean] =
+  def eventually[R, E, A](effect: ZIO[R, E, Boolean], retries: Int = 20, delay: Duration = 100.millis)
+    : ZIO[R, E, Boolean] = {
     effect.flatMap {
-      case true  => ZIO.succeed(true)
+      case true => ZIO.succeed(true)
       case false =>
         if (retries <= 0) ZIO.succeed(false)
         else ZIO.sleep(delay) *> eventually(effect, retries - 1, delay)
     }
+  }
 }

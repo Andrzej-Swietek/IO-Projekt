@@ -1,6 +1,6 @@
 package pl.edu.agh.sentinel.configs
 
-import zio.{Config, ZIO, ZLayer}
+import zio.{ Config, ZIO, ZLayer }
 import zio.config.magnolia.deriveConfig
 import zio.json.JsonCodec
 

@@ -1,23 +1,23 @@
 package pl.edu.agh.sentinel.notifications
 
-import pl.edu.agh.sentinel.configs.EmailConfig
-import pl.edu.agh.sentinel.events.AlertEvent
 import zio.*
-import sttp.client3.*
-import sttp.client3.quick.backend
-import sttp.model.Uri
 
 import java.util.Properties
 import javax.mail.*
 import javax.mail.internet.*
 
+import pl.edu.agh.sentinel.configs.EmailConfig
+import pl.edu.agh.sentinel.events.AlertEvent
+import sttp.client3.*
+import sttp.client3.quick.backend
+import sttp.model.Uri
 
 final case class EmailNotifier(config: EmailConfig) extends Notifier {
   def send(event: AlertEvent): Task[Unit] = ZIO.attemptBlocking {
     if (config.enabled && config.smtpServer.isDefined && config.fromAddress.isDefined) {
       val props = new Properties()
       props.put("mail.smtp.host", config.smtpServer)
-      props.put("mail.smtp.port",  config.smtpPort.toString)
+      props.put("mail.smtp.port", config.smtpPort.toString)
       val session = Session.getInstance(props, null)
 
       val message = new MimeMessage(session)

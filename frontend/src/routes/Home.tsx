@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { Task, TaskControllerApiFactory, Team, TeamControllerApiFactory } from '@/api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { TaskControllerApiFactory, Team, TeamControllerApiFactory } from '@/api';
 import { useUserProfile } from '@context/UserProfileProvider.tsx';
 import { ColumnTitle } from '@components/board';
 import { RetroContainer } from '@components/common/RetroContainer.tsx';
@@ -45,7 +45,7 @@ export const Home: FC<HomeProps> = () => {
     },
   });
 
-  const { data, error, isLoading, isError } = useQuery({
+  const { isLoading, isError } = useQuery({
     queryKey: ['teams'],
     queryFn: fetchTeams,
   });
@@ -100,12 +100,13 @@ export const Home: FC<HomeProps> = () => {
             }
             {teams && teams.map(team => (
               <RetroEntryCard
+                className="mb-6"
                 key={team.id}
                 left={<>{team.name}</>}
                 right={(
                   <div className="flex gap-2 items-center">
                     <RetroButton
-                      className="!px-4 !py-4 w-auto"
+                      className="!px-4 !py-4 mr-8 w-auto"
                       icon={<FolderKanban />}
                       onClick={() => setSelectedTeam(team)}
                     >
@@ -120,8 +121,9 @@ export const Home: FC<HomeProps> = () => {
                           deleteTeamMutation.mutate(team.id!);
                         }
                       }}
+                      children=""
                     >
-                      {''}
+
                     </RetroButton>
                   </div>
                 )}

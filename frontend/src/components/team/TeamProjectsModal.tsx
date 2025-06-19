@@ -1,7 +1,14 @@
 import { FC, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { ProjectControllerApiFactory, Project, BoardControllerApiFactory, Board, TeamControllerApiFactory, Team } from '@/api';
+import {
+  Board,
+  BoardControllerApiFactory,
+  Project,
+  ProjectControllerApiFactory,
+  Team,
+  TeamControllerApiFactory,
+} from '@/api';
 import { RetroModal } from '@components/common/RetroModal';
 import { RetroButton } from '@components/common/RetroButton';
 import { RetroEntryCard } from '@components/common/RetroEntryCard';
@@ -91,43 +98,51 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              {isBoardsLoading ? (
-                <div className="flex items-center justify-center h-32">Loading boards...</div>
-              ) : boards?.length === 0 ? (
-                <div className="text-center text-gray-500 py-4">No boards found. Create a new board to get started.</div>
-              ) : (
-                boards?.map((board) => (
-                  <RetroEntryCard
-                    key={board.id}
-                    left={<>{board.name}</>}
-                    right={(
-                      <div className="flex gap-2 items-center">
-                        <RetroButton
-                          size="sm"
-                          className="!px-4 !py-2 w-auto"
-                          onClick={() => navigate(`/board/${board.id}/${teamId}`)}
-                          icon={null}
-                        >
-                          Open Board
-                        </RetroButton>
-                        <RetroButton
-                          size="sm"
-                          className="!px-2 !py-2 w-auto"
-                          icon={<Trash2 className="text-red-500" />}
-                          variant="secondary"
-                          onClick={() => {
-                            if (window.confirm(`Are you sure you want to delete board '${board.name}'?`)) {
-                              deleteBoardMutation.mutate(board.id!);
-                            }
-                          }}
-                        >
-                          {''}
-                        </RetroButton>
-                      </div>
-                    )}
-                  />
-                ))
-              )}
+              {isBoardsLoading
+                ? (
+                  <div className="flex items-center justify-center h-32">Loading boards...</div>
+                )
+                : boards?.length === 0
+                  ? (
+                    <div className="text-center text-gray-500 py-4">
+                      No boards found. Create a new board to
+                      get started.
+                    </div>
+                  )
+                  : (
+                    boards?.map(board => (
+                      <RetroEntryCard
+                        key={board.id}
+                        left={<>{board.name}</>}
+                        right={(
+                          <div className="flex gap-2 items-center">
+                            <RetroButton
+                              size="sm"
+                              className="!px-4 !py-2 w-auto mr-8"
+                              onClick={() => navigate(`/board/${board.id}/${teamId}`)}
+                              icon={null}
+                            >
+                              Open Board
+                            </RetroButton>
+                            <RetroButton
+                              size="sm"
+                              className="!px-2 !py-2 w-auto"
+                              icon={<Trash2 className="text-red-500" />}
+                              variant="secondary"
+                              onClick={() => {
+                                if (window.confirm(`Are you sure you want to delete board '${board.name}'?`)) {
+                                  deleteBoardMutation.mutate(board.id!);
+                                }
+                              }}
+                              children=""
+                            >
+
+                            </RetroButton>
+                          </div>
+                        )}
+                      />
+                    ))
+                  )}
             </div>
           </div>
         </RetroModal>
@@ -145,7 +160,7 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
   return (
     <>
       <RetroModal onClose={onClose} title={teamName} subtitle={team?.description}>
-        <div className="flex flex-col gap-4 pt-2">
+        <div className="flex flex-col gap-4 pt-6">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">Projects</h2>
             <div className="flex gap-2">
@@ -157,7 +172,7 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
               </RetroButton>
             </div>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-6">
             {projects?.map((project: Project) => (
               <RetroEntryCard
                 key={project.id || 'temp-id'}
@@ -166,7 +181,7 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
                   <div className="flex gap-2 items-center">
                     <RetroButton
                       size="sm"
-                      className="!px-4 !py-2 w-auto"
+                      className="!px-4 !py-2 w-auto mr-8"
                       onClick={() => setSelectedProject(project)}
                       icon={null}
                     >
@@ -182,8 +197,9 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
                           deleteProjectMutation.mutate(project.id!);
                         }
                       }}
+                      children=""
                     >
-                      {''}
+
                     </RetroButton>
                   </div>
                 )}
@@ -201,4 +217,4 @@ export const TeamProjectsModal: FC<TeamProjectsModalProps> = ({ teamId, teamName
       )}
     </>
   );
-}; 
+};
