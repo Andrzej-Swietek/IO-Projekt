@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { Task, TaskControllerApiFactory } from '@/api';
 import { AlertCircle, Flame, GripVertical, Pencil, Trash2 } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-
+import { TaskDetailsSheet } from './TaskSheet';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { FC, HTMLAttributes, useState } from 'react';
@@ -34,6 +34,8 @@ const priorityIcons = {
 export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, className, onEdit, ...props }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const queryClient = useQueryClient();
+
+  const [showSheet, setShowSheet] = useState(false);
 
   const deleteTaskMutation = useMutation({
     mutationFn: async () => {
@@ -78,10 +80,13 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
           dragging && 'opacity-60 ring-2 ring-blue-400',
           className,
         )}
+        onClick={_ => {
+          if (!isDragging) setShowSheet(true);
+        }}
       >
         {/* Top Row: Title + Drag Handle + Edit Button */}
         <div className="flex justify-between items-start">
-          <h3 className="font-semibold text-gray-800">{task.title}</h3>
+          <h3 className="mb-2 block font-bold text-md uppercase tracking-wider text-black">{task.title}</h3>
           <div className="flex gap-1 items-center">
             <button
               className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
@@ -116,7 +121,7 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
 
         {/* Description */}
         {task.description && (
-          <div className="text-gray-600 !text-[14px]">{task.description}</div>
+          <div className="font-thin text-sm tracking-wider text-black">{task.description}</div>
         )}
 
         {/* Badges: status, labels, priority */}
@@ -132,8 +137,18 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
             <Badge
               key={label.id}
               variant="outline"
-              className="px-2 font-normal"
-              style={{ backgroundColor: label.color, color: 'white' }}
+              className={cn(
+                'px-2 py-0.5 rounded-full text-xs font-bold tracking-wide shadow border',
+                'border-gray-200',
+                'transition-all duration-150 flex items-center px-4 uppercase',
+              )}
+              style={{
+                backgroundColor: label.color,
+                color: '#fff',
+                textShadow: '0 1px 2px rgba(0,0,0,0.15)',
+                letterSpacing: '0.05em',
+              }}
+              title={label.name}
             >
               {label.name}
             </Badge>
@@ -143,36 +158,43 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
         {/* Footer: assignees and dueDate */}
         {(task.assignees?.length || task.createdDate) && (
           <div className="pt-2 text-xs text-gray-500">
-            <div className="flex -space-x-2 mb-4">
+            <div className="flex items-center gap-2 mb-2">
               {task.assignees?.map(userId => {
                 const user = usersById?.[userId];
                 if (!user) return null;
-
                 return (
-                  <Link to={`/user/${userId}`} key={userId}>
-                    <div
-                      className="w-auto flex row nowrap items-center justify-around gap-4 border-2 rounded-sm !px-4 !py-2"
-                    >
-                      <img
-                        src={avatarUrl(user.email!)}
-                        title={user.firstName}
-                        className="h-6 w-6 rounded-full object-cover"
-                        alt="user avatar"
-                        loading="lazy"
-                      />
-                      <span>
-                        {user.firstName}
-                        {' '}
-                        {user.lastName}
-                      </span>
-                    </div>
+                  <Link
+                    to={`/user/${userId}`}
+                    key={userId}
+                    title={`${user.firstName} ${user.lastName}`}
+                  >
+                    <img
+                      src={avatarUrl(user.email!)}
+                      alt={user.firstName}
+                      className="h-7 w-7 rounded-full object-cover border-2 border-white -ml-2 first:ml-0 shadow"
+                      loading="lazy"
+                    />
                   </Link>
                 );
               })}
+              {task.assignees?.length === 0 && <span>No assignees</span>}
             </div>
+            {task.createdDate && (
+              <div className="text-gray-400">
+                Created:
+                {' '}
+                {new Date(task.createdDate).toLocaleDateString()}
+              </div>
+            )}
           </div>
         )}
       </div>
+
+      <TaskDetailsSheet
+        task={task}
+        open={showSheet}
+        onOpenChange={setShowSheet}
+      />
 
       {showDeleteModal && (
         <DeleteTaskModal

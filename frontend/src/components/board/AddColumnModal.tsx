@@ -4,6 +4,7 @@ import { BoardColumnControllerApi, BoardColumnRequest } from '@/api';
 import { RetroModal } from '@components/common/RetroModal';
 import { RetroInput } from '@components/common/RetroInput';
 import { RetroButton } from '@components/common/RetroButton';
+import { toast } from 'sonner';
 
 interface CreateColumnModalProps {
   onClose?: () => void;
@@ -50,12 +51,14 @@ export const AddColumnModal: FC<CreateColumnModalProps> = ({ onClose, boardId, p
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <RetroInput
           label="Column Name"
+          inputColor="bg-yellow-50"
           value={columnName}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setColumnName(e.target.value)}
           required
         />
         <RetroInput
           label="Description"
+          inputColor="bg-yellow-50"
           value={description}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
         />

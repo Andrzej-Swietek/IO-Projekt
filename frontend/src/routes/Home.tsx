@@ -1,4 +1,5 @@
 import { FC, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TaskControllerApiFactory, Team, TeamControllerApiFactory } from '@/api';
 import { useUserProfile } from '@context/UserProfileProvider.tsx';
@@ -10,6 +11,7 @@ import { RetroEntryCard } from '@components/common/RetroEntryCard.tsx';
 import { TaskCard } from '@components/task';
 import { TeamProjectsModal } from '@components/team/TeamProjectsModal';
 import { CreateTeamModal } from '@components/team/CreateTeamModal';
+import { Loading } from '@components/common/Loading.tsx';
 
 interface HomeProps {
 }
@@ -31,6 +33,8 @@ const fetchUserTasks = async (userId: string) => {
 
 export const Home: FC<HomeProps> = () => {
   const { profile } = useUserProfile();
+  const navigate = useNavigate();
+
   const userId = profile?.id;
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
@@ -68,12 +72,16 @@ export const Home: FC<HomeProps> = () => {
     enabled: !!userId,
   });
 
+  if (!isLoading && !userId) {
+    navigate('/auth/login');
+  }
+
   if (isError) {
     return <div>Error loading teams</div>;
   }
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading className="h-screen"></Loading>;
   }
 
   return (

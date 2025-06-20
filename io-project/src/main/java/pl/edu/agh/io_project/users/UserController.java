@@ -48,7 +48,17 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> me(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<?> me(@AuthenticationPrincipal UserPrincipal user) {
+        return ResponseEntity.ok(Map.of(
+                "User ID", user.getUserId(),
+                "User Name", user.getFirstName(),
+                "Last Name", user.getLastName(),
+                "Email", user.getEmail()
+        ));
+    }
+
+    @GetMapping("/me-jwt")
+    public ResponseEntity<?> meJwt(@AuthenticationPrincipal Jwt jwt) {
         String userId = jwt.getSubject();
         return ResponseEntity.ok(Map.of("userId", userId));
     }

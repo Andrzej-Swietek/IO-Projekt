@@ -33,7 +33,7 @@ export const UserProfileProvider: FC<UserProfileProviderProps> = ({ children }) 
       try {
         const api = UserControllerApiFactory();
         const response = await api.getUserDetails(keycloak?.tokenParsed?.sub ?? '');
-        localStorage.setItem('token', keycloak.token);
+        localStorage.setItem('kanban_app_token', keycloak.token);
         setProfile(response.data);
         setError(null);
       } catch (err) {
@@ -44,14 +44,28 @@ export const UserProfileProvider: FC<UserProfileProviderProps> = ({ children }) 
         setLoading(false);
       }
     };
-
+    if (!keycloak) return;
+    const interval = setInterval(() => {
+      keycloak.updateToken(60).catch(() => {
+        keycloak.login();
+      });
+    }, 60000);
     fetchProfile();
+    keycloak.onTokenExpired = () => {
+      localStorage.removeItem('kanban_app_token');
+      keycloak.logout();
+    };
+
+    keycloak.onAuthLogout = () => {
+      localStorage.removeItem('kanban_app_token');
+    };
+    return () => clearInterval(interval);
   }, [keycloak]);
 
   return (
-      <UserProfileContext.Provider value={{ profile, loading, error }}>
-        {children}
-      </UserProfileContext.Provider>
+    <UserProfileContext.Provider value={{ profile, loading, error }}>
+      {children}
+    </UserProfileContext.Provider>
   );
 };
 

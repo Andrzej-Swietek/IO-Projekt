@@ -53,7 +53,7 @@ export class BaseAPI {
     constructor(configuration?: Configuration, protected basePath: string = BASE_PATH, protected axios: AxiosInstance = globalAxios) {
         if (configuration) {
             this.configuration = configuration;
-            this.configuration.accessToken = localStorage.getItem('token') || undefined;
+            this.configuration.accessToken = localStorage.getItem('kanban_app_token') || undefined;
             this.basePath = configuration.basePath ?? basePath;
         }
     }

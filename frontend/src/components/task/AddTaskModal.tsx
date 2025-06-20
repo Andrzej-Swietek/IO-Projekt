@@ -139,35 +139,26 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
         <RetroInput
           label="Title"
           value={title}
+          inputColor="bg-yellow-50"
           onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
           required
         />
         <RetroInput
           label="Description"
           value={description}
+          inputColor="bg-yellow-50"
           onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
           required
         />
         <RetroInput
           label="Priority"
           type="number"
+          inputColor="bg-yellow-50"
           value={priority}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setPriority(Number(e.target.value))}
         />
         {/* Labels (placeholder) */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">Labels</label>
-          <select
-            multiple
-            value={labelIds.map(String)}
-            onChange={e => setLabelIds(Array.from(e.target.selectedOptions, o => Number(o.value)))}
-            className="w-full rounded-md border border-gray-300 px-3 py-2"
-          >
-            {(labels || []).map(label => (
-              <option key={label.id} value={label.id}>{label.name}</option>
-            ))}
-          </select>
-
           <RetroMultiSelect
             label="Labels"
             className="min-w-[50%] w-auto"

@@ -1,8 +1,11 @@
-import { ChangeEvent, FC, FormEvent, useState } from 'react';
+import { FC, FormEvent, useMemo, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Board, TaskControllerApiFactory } from '@/api';
 import { RetroInput } from '@components/common/RetroInput';
 import { RetroButton } from '@components/common/RetroButton';
+import { RetroSelect } from '@components/common/RetroSelect';
+import { RetroTextArea } from '@components/common/RetroTextArea';
+import { Zap } from 'lucide-react';
 
 interface GenerateWithAIBoxProps {
   board: Board;
@@ -14,10 +17,25 @@ export const GenerateWithAIBox: FC<GenerateWithAIBoxProps> = ({
   onNew,
 }) => {
   const queryClient = useQueryClient();
-  const [columnId, setColumnId] = useState<number>(board.columns[0]?.id ?? 0);
+  const [columnId, setColumnId] = useState<number>(board?.columns?.[0]?.id ?? 0);
   const [description, setDescription] = useState('');
   const [mode, setMode] = useState<'single' | 'multiple'>('single');
   const [count, setCount] = useState(2);
+
+  // Prepare options for RetroSelect
+  const columnOptions = useMemo(
+    () =>
+      (board?.columns || []).map(col => ({
+        value: col.id?.toString() ?? '',
+        label: col.name ?? '',
+      })),
+    [board?.columns],
+  );
+
+  const modeOptions = [
+    { value: 'single', label: 'Single' },
+    { value: 'multiple', label: 'Multiple' },
+  ];
 
   const generateTaskMutation = useMutation({
     mutationFn: async () => {
@@ -59,53 +77,37 @@ export const GenerateWithAIBox: FC<GenerateWithAIBoxProps> = ({
     }
   };
 
+  // Handle empty columns edge case
+  if (!board?.columns?.length) {
+    return (
+      <section
+        className="w-full min-h-[15vh] bg-yellow-50 border-4 p-8 mb-8 retro-shadow font-mono flex items-center justify-center"
+      >
+        <span className="text-black font-mono">No columns available.</span>
+      </section>
+    );
+  }
+
   return (
-    <section
-      style={{
-        width: '100%',
-        minHeight: '15vh',
-        background: '#f8fafc',
-        borderRadius: '8px',
-        padding: '2rem',
-        marginBottom: '2rem',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-      }}
-      className="flex flex-col justify-center"
-    >
+    <section className="w-full min-h-[15vh] bg-yellow-50 border-4 p-8 mb-8 retro-shadow font-mono">
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col md:flex-row items-center justify-between gap-4 w-full"
+        className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end"
       >
-        <label className="flex flex-col">
-          Column
-          <select
-            className="retro-input"
-            value={columnId}
-            onChange={e => setColumnId(Number(e.target.value))}
-            required
-          >
-            {board.columns.map(col => (
-              <option key={col.id} value={col.id}>{col.name}</option>
-            ))}
-          </select>
-        </label>
-        <RetroInput
-          label="Description"
-          value={description}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
+        <RetroSelect
+          label="Column"
+          value={columnId.toString()}
+          onChange={e => setColumnId(Number(e.target.value))}
+          options={columnOptions}
           required
         />
-        <label className="flex flex-col ">
-          Mode
-          <select
-            className="retro-input"
-            value={mode}
-            onChange={e => setMode(e.target.value as 'single' | 'multiple')}
-          >
-            <option value="single">Single</option>
-            <option value="multiple">Multiple</option>
-          </select>
-        </label>
+        <RetroSelect
+          label="Mode"
+          value={mode}
+          onChange={e => setMode(e.target.value as 'single' | 'multiple')}
+          options={modeOptions}
+          required
+        />
         {mode === 'multiple' && (
           <RetroInput
             label="How many?"
@@ -116,16 +118,26 @@ export const GenerateWithAIBox: FC<GenerateWithAIBoxProps> = ({
             required
           />
         )}
-        <div className="flex gap-2 mt-4 md:mt-0">
+        <div className="flex gap-2">
           <RetroButton
             size="sm"
             type="submit"
+            icon={<Zap className="w-4 h-4" />}
             disabled={generateTaskMutation.isPending || generateMultipleTasksMutation.isPending}
           >
             {(generateTaskMutation.isPending || generateMultipleTasksMutation.isPending)
               ? 'Generating...'
               : 'Generate'}
           </RetroButton>
+        </div>
+        <div className="w-full col-span-3 mt-8">
+          <RetroTextArea
+            label="Description"
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            required
+            rows={3}
+          />
         </div>
       </form>
     </section>
