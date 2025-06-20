@@ -5,17 +5,23 @@ import zio.config.typesafe.*
 import zio.logging.backend.SLF4J
 import zio.redis.Redis
 import zio.stream.ZStream
+
 import pl.edu.agh.sentinel.configs.AlertConfig
 import pl.edu.agh.sentinel.events.TaskEvent
-import pl.edu.agh.sentinel.kafka.{KafkaEnv, KafkaModule, StreamSupervisor}
+import pl.edu.agh.sentinel.kafka.{ KafkaEnv, KafkaModule, StreamSupervisor }
 import pl.edu.agh.sentinel.kafka.config.KafkaConfig
-import pl.edu.agh.sentinel.kafka.consumers.{AlertConsumer, KafkaConsumer, TaskEventConsumer}
-import pl.edu.agh.sentinel.kafka.producers.{AlertEventProducer, KafkaProducer, StatsProducer, UserStatsProducer}
+import pl.edu.agh.sentinel.kafka.consumers.{ AlertConsumer, KafkaConsumer, TaskEventConsumer }
+import pl.edu.agh.sentinel.kafka.producers.{ AlertEventProducer, KafkaProducer, StatsProducer, UserStatsProducer }
 import pl.edu.agh.sentinel.kafka.topics.TopicManager
-import pl.edu.agh.sentinel.notifications.{NotificationEnv, NotificationModule, SentinelNotifier}
-import pl.edu.agh.sentinel.processing.{AlertingEngine, SentinelAlertingEngine, StatsProcessorLive, StatsPublisher}
-import pl.edu.agh.sentinel.store.redis.{RedisEnv, RedisModule}
-import pl.edu.agh.sentinel.store.repositories.{StatsRepository, StatsRepositoryLive, TeamStatsRepository, UserStatsRepository}
+import pl.edu.agh.sentinel.notifications.{ NotificationEnv, NotificationModule, SentinelNotifier }
+import pl.edu.agh.sentinel.processing.{ AlertingEngine, SentinelAlertingEngine, StatsProcessorLive, StatsPublisher }
+import pl.edu.agh.sentinel.store.redis.{ RedisEnv, RedisModule }
+import pl.edu.agh.sentinel.store.repositories.{
+  StatsRepository,
+  StatsRepositoryLive,
+  TeamStatsRepository,
+  UserStatsRepository,
+}
 
 type SentinelEnv = KafkaEnv & AlertingEngine & RedisEnv & NotificationEnv & StatsRepository
 
@@ -50,15 +56,17 @@ object SentinelApp extends ZIOAppDefault {
   ): ZIO[KafkaEnv & StatsRepository, Throwable, Unit] = for {
     repository <- ZIO.service[StatsRepository]
     statsProcessor = StatsProcessorLive(repository)
-    
+
     statsPublisher = StatsPublisher(
       UserStatsProducer(producer),
-      StatsProducer(producer)
+      StatsProducer(producer),
     )
-    processedStatsStream = statsProcessor.process(taskEventStream)
+    processedStatsStream = statsProcessor
+      .process(taskEventStream)
+      .tap(element => ZIO.logInfo(s"Processed stats: $element"))
 
-    _ = statsPublisher.publish(processedStatsStream).runDrain.forkDaemon
-  } yield ZIO.unit
+    _ <- statsPublisher.publish(processedStatsStream).runDrain.forkDaemon
+  } yield ()
 
   private val workflow: ZIO[SentinelEnv, Throwable, Unit] = for {
     _ <- ZIO.logInfo("Starting Sentinel...")

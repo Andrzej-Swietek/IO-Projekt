@@ -28,6 +28,7 @@ public class TaskChangeListener {
         Task before = event.getBefore();
         Task after = event.getAfter();
         String userId = event.getUserId();
+        String teamId = after.getColumn().getBoard().getProject().getTeam().getId().toString();
 
         List<TaskHistory> historyEntries = new ArrayList<>();
 
@@ -37,6 +38,7 @@ public class TaskChangeListener {
             taskEventProducer.sendTaskEvent(new TaskCreated(
                     after.getId().toString(),
                     after.getTitle(),
+                    teamId,
                     after.getColumn().getId().toString(),
                     userId,
                     Instant.now()
@@ -47,6 +49,7 @@ public class TaskChangeListener {
             taskEventProducer.sendTaskEvent(new TaskClosed(
                     before.getId().toString(),
                     before.getTitle(),
+                    teamId,
                     before.getColumn().getId().toString(),
                     userId,
                     Instant.now()
@@ -75,6 +78,7 @@ public class TaskChangeListener {
                     taskEventProducer.sendTaskEvent(new TaskClosed(
                             after.getId().toString(),
                             after.getTitle(),
+                            teamId,
                             after.getColumn().getId().toString(),
                             userId,
                             Instant.now()
@@ -87,6 +91,7 @@ public class TaskChangeListener {
                         "Moved to column: " + after.getColumn().getName()));
                 taskEventProducer.sendTaskMoved(new TaskMoved(
                         after.getId().toString(),
+                        teamId,
                         before.getColumn().getId().toString(),
                         after.getColumn().getId().toString(),
                         userId,
@@ -101,7 +106,7 @@ public class TaskChangeListener {
                     taskEventProducer.sendTaskEvent(new TaskAssigned(
                             after.getId().toString(),
                             added,
-                            after.getColumn().getBoard().getProject().getTeam().getId().toString(),
+                            teamId,
                             after.getColumn().getBoard().getProject().getId().toString(),
                             Instant.now()
                     ));

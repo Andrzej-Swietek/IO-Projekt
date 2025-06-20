@@ -7,6 +7,7 @@ import java.time.Instant;
 @JsonTypeName("TaskMoved")
 public record TaskMoved(
         String taskId,
+        String teamId,
         String fromColumnId,
         String toColumnId,
         String movedBy,

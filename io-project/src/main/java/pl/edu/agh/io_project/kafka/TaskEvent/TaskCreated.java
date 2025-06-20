@@ -8,6 +8,7 @@ import java.time.Instant;
 public record TaskCreated(
         String taskId,
         String title,
+        String teamId,
         String columnId,
         String creatorId,
         Instant timestamp
