@@ -5,25 +5,24 @@ import zio.kafka.serde.{ Serde, Serializer }
 import zio.stream.ZStream
 
 import org.apache.kafka.clients.producer.RecordMetadata
+import pl.edu.agh.sentinel.events.AlertEvent
 import pl.edu.agh.sentinel.kafka.KafkaProducerRunner
 import pl.edu.agh.sentinel.kafka.RetryPolicy
 import pl.edu.agh.sentinel.kafka.serdes.ZioJsonSerde
 import pl.edu.agh.sentinel.kafka.topics.SentinelTopics
-import pl.edu.agh.sentinel.processing.stats.{ TeamStats, UserStats }
 
-final case class StatsProducer(kafkaProducer: KafkaProducer) extends KafkaProducerRunner[Throwable, TeamStats] {
-
-  given Serializer[Any, TeamStats] = ZioJsonSerde[TeamStats]
+final case class AlertEventProducer(kafkaProducer: KafkaProducer) extends KafkaProducerRunner[Throwable, AlertEvent] {
+  given Serializer[Any, AlertEvent] = ZioJsonSerde[AlertEvent]
   given Serializer[Any, String] = Serde.string
 
   final private val topic: SentinelTopics = SentinelTopics.TeamStats
   final val retryPolicy = RetryPolicy.Spaced3sForever
 
-  override def name: String = "TeamStatsProducer"
+  override def name: String = "AlertEventProducer"
 
-  override def produce(key: String, value: TeamStats): ZIO[Any, Throwable, RecordMetadata] = {
+  override def produce(key: String, value: AlertEvent): ZIO[Any, Throwable, RecordMetadata] = {
     kafkaProducer
-      .produce[String, TeamStats](topic.topicName, key, value)
+      .produce[String, AlertEvent](topic.topicName, key, value)
       .retry(retryPolicy.getSchedule)
       .tapBoth(
         err => ZIO.logError(s"Production failed: $err"),
@@ -31,7 +30,7 @@ final case class StatsProducer(kafkaProducer: KafkaProducer) extends KafkaProduc
       )
   }
 
-  override def produceMany(key: String, values: ZStream[Any, Throwable, TeamStats])
+  override def produceMany(key: String, values: ZStream[Any, Throwable, AlertEvent])
     : ZStream[Any, Throwable, RecordMetadata] = {
     values.mapZIO { value =>
       produce(key, value)

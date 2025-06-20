@@ -1,6 +1,8 @@
 package pl.edu.agh.sentinel
 package processing.stats
 
+import zio.json.JsonCodec
+
 import java.time.Instant
 
 case class ProjectStats(projectId: String, tasksByState: Map[String, Int])
@@ -12,4 +14,4 @@ case class TaskStats(
   closedCount: Int,
   avgTimeToClose: Option[Long], // millis
   avgLoad: Double,
-)
+) derives JsonCodec

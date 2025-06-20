@@ -2,12 +2,15 @@ package pl.edu.agh.sentinel.store.repositories
 
 import zio.*
 import zio.redis
+import zio.redis.Redis
 import zio.schema
+import zio.schema.{ DeriveSchema, Schema }
 import zio.schema.codec.BinaryCodec
 import zio.schema.codec.DecodeError
 import zio.stream.ZStream
 
 import pl.edu.agh.sentinel.processing.stats.{ TeamStats, UserStats }
+import pl.edu.agh.sentinel.store.redis.ProtobufCodecSupplier
 
 trait StatsRepository {
   def saveTeamStats(stats: TeamStats): UIO[Unit]
@@ -36,4 +39,25 @@ class StatsRepositoryLive(
 
   override def clean(): UIO[Unit] =
     (teamRepo.getAll *> userRepo.getAll).unit.orDie
+}
+
+object StatsRepositoryLive {
+  val live: ZLayer[
+    Redis & ProtobufCodecSupplier.type,
+    Nothing,
+    StatsRepository,
+  ] = ZLayer {
+    for {
+      redis <- ZIO.service[Redis]
+      codecSupplier <- ZIO.service[ProtobufCodecSupplier.type]
+
+      given Schema[TeamStats] = DeriveSchema.gen[TeamStats]
+      given Schema[UserStats] = DeriveSchema.gen[UserStats]
+
+      teamCodec = codecSupplier.get[TeamStats]
+      userCodec = codecSupplier.get[UserStats]
+      teamRepo = new TeamStatsRepositoryLive(teamCodec, redis)
+      userRepo = UserStatsRepositoryLive(userCodec, redis)
+    } yield new StatsRepositoryLive(teamRepo, userRepo)
+  }
 }
