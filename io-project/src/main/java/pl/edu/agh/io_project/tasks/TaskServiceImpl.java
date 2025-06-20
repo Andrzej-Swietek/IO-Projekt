@@ -1,17 +1,16 @@
 package pl.edu.agh.io_project.tasks;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.agh.io_project.boards.columns.BoardColumn;
 import pl.edu.agh.io_project.boards.columns.BoardColumnRepository;
+import pl.edu.agh.io_project.tasks.events.TaskUpdatedEvent;
 import pl.edu.agh.io_project.tasks.label.Label;
 import pl.edu.agh.io_project.tasks.label.LabelRepository;
-import pl.edu.agh.io_project.tasks.events.TaskUpdatedEvent;
 import pl.edu.agh.io_project.tasks.taskHistory.TaskHistoryRepository;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
+import pl.edu.agh.io_project.users.UserPrincipal;
 
 import java.util.HashSet;
 import java.util.List;
@@ -42,7 +41,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Transactional
-    public Task createTask(TaskRequest taskDTO) {
+    public Task createTask(TaskRequest taskDTO, UserPrincipal userDetails) {
         BoardColumn column = columnRepository.findById(taskDTO.columnId())
                 .orElseThrow(() -> new IllegalArgumentException("Column not found"));
 
@@ -62,12 +61,12 @@ public class TaskServiceImpl implements TaskService {
                 .build();
 
         Task saved = taskRepository.save(task);
-        eventPublisher.publishEvent(new TaskUpdatedEvent(null, saved, getCurrentUserId()));
+        eventPublisher.publishEvent(new TaskUpdatedEvent(null, saved, userDetails.getUserId()));
         return saved;
     }
 
     @Transactional
-    public Task updateTask(Long taskId, TaskRequest taskDTO) {
+    public Task updateTask(Long taskId, TaskRequest taskDTO, UserPrincipal userDetails) {
         Task before = taskRepository.findById(taskId)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
 
@@ -88,46 +87,46 @@ public class TaskServiceImpl implements TaskService {
             before.setLabels(labels);
         }
         Task saved = taskRepository.save(before);
-        eventPublisher.publishEvent(new TaskUpdatedEvent(previousCopy, saved, getCurrentUserId()));
+        eventPublisher.publishEvent(new TaskUpdatedEvent(previousCopy, saved, userDetails.getUserId()));
 
         return saved;
     }
 
     @Transactional
-    public void deleteTask(Long taskId) {
+    public void deleteTask(Long taskId, UserPrincipal userDetails) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
         Task copy = deepCopy(task);
-        eventPublisher.publishEvent(new TaskUpdatedEvent(copy, null, getCurrentUserId()));
+        eventPublisher.publishEvent(new TaskUpdatedEvent(copy, null, userDetails.getUserId()));
         taskHistoryRepository.deleteByTaskId(taskId);
 
         taskRepository.delete(task);
     }
 
     @Transactional
-    public void changeTaskStatus(Long taskId, TaskStatus status) {
+    public void changeTaskStatus(Long taskId, TaskStatus status, UserPrincipal userDetails) {
         Task before = taskRepository.findById(taskId)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
         Task copy = deepCopy(before);
 
         before.setStatus(status);
         Task saved = taskRepository.save(before);
-        eventPublisher.publishEvent(new TaskUpdatedEvent(copy, saved, getCurrentUserId()));
+        eventPublisher.publishEvent(new TaskUpdatedEvent(copy, saved, userDetails.getUserId()));
     }
 
     @Transactional
-    public void assignUserToTask(Long taskId, String userId) {
+    public void assignUserToTask(Long taskId, String userId, UserPrincipal userDetails) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
 
         Task before = deepCopy(task);
         task.getAssignees().add(userId);
         Task saved = taskRepository.save(task);
-        eventPublisher.publishEvent(new TaskUpdatedEvent(before, saved, getCurrentUserId()));
+        eventPublisher.publishEvent(new TaskUpdatedEvent(before, saved, userDetails.getUserId()));
     }
 
     @Transactional
-    public void reorderTasks(Long columnId, List<Long> taskIds) {
+    public void reorderTasks(Long columnId, List<Long> taskIds, UserPrincipal userDetails) {
         List<Task> tasks = taskRepository.findByColumnIdOrderByPosition(columnId);
         if (tasks.size() != taskIds.size()) {
             throw new IllegalArgumentException("Task list size mismatch");
@@ -142,7 +141,7 @@ public class TaskServiceImpl implements TaskService {
                     if (task != null && task.getPosition() != i) {
                         Task before = deepCopy(task);
                         task.setPosition(i);
-                        eventPublisher.publishEvent(new TaskUpdatedEvent(before, task, getCurrentUserId()));
+                        eventPublisher.publishEvent(new TaskUpdatedEvent(before, task, userDetails.getUserId()));
                     }
                     return task;
                 }).collect(Collectors.toList());
@@ -152,7 +151,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public void addLabelsToTask(Long taskId, List<Long> labelIds) {
+    public void addLabelsToTask(Long taskId, List<Long> labelIds, UserPrincipal userDetails) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
 
@@ -183,13 +182,5 @@ public class TaskServiceImpl implements TaskService {
                 .assignees(List.copyOf(original.getAssignees()))
                 .labels(Set.copyOf(original.getLabels()))
                 .build();
-    }
-
-    private String getCurrentUserId() {
-        Jwt jwt = (Jwt) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
-
-        return jwt.getSubject();
     }
 }

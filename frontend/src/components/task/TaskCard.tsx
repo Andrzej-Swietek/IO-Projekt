@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { Task, TaskControllerApiFactory } from '@/api';
 import { AlertCircle, Flame, GripVertical, Pencil, Trash2 } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-
+import { TaskDetailsSheet } from './TaskSheet';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { FC, HTMLAttributes, useState } from 'react';
@@ -34,6 +34,8 @@ const priorityIcons = {
 export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, className, onEdit, ...props }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const queryClient = useQueryClient();
+
+  const [showSheet, setShowSheet] = useState(false);
 
   const deleteTaskMutation = useMutation({
     mutationFn: async () => {
@@ -78,6 +80,9 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
           dragging && 'opacity-60 ring-2 ring-blue-400',
           className,
         )}
+        onClick={_ => {
+          if (!isDragging) setShowSheet(true);
+        }}
       >
         {/* Top Row: Title + Drag Handle + Edit Button */}
         <div className="flex justify-between items-start">
@@ -184,6 +189,12 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
           </div>
         )}
       </div>
+
+      <TaskDetailsSheet
+        task={task}
+        open={showSheet}
+        onOpenChange={setShowSheet}
+      />
 
       {showDeleteModal && (
         <DeleteTaskModal

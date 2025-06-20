@@ -1,4 +1,3 @@
-
 import type { ButtonHTMLAttributes } from 'react';
 import { FC, ReactNode } from 'react';
 import { Plus } from 'lucide-react';
@@ -31,7 +30,9 @@ export const RetroButton: FC<RetroButtonProps> = ({
     <button
       className={cn(
         "relative flex items-center gap-2 font-['Josefin_Sans',_sans-serif] font-black shadow-[4px_4px_0px_#000000] "
-        + 'transition-all hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-[3px_3px_0px_#000000] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[2px_2px_0px_#000000] cursor-pointer',
+        + 'transition-all hover:translate-y-[1px] hover:translate-x-[1px]'
+        + 'hover:shadow-[3px_3px_0px_#000000] active:translate-y-[2px] '
+        + 'active:translate-x-[2px] active:shadow-[2px_2px_0px_#000000] cursor-pointer',
         sizeClasses[size],
         variant === 'primary'
           ? 'bg-pink-200 hover:bg-pink-300 text-black'

@@ -2,6 +2,7 @@ package pl.edu.agh.io_project.tasks;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.io_project.ai.EstimateRequest;
 import pl.edu.agh.io_project.ai.MultiTaskGenerationRequest;
@@ -9,6 +10,7 @@ import pl.edu.agh.io_project.ai.TaskGenerationRequest;
 import pl.edu.agh.io_project.ai.ports.AiEstimatorPort;
 import pl.edu.agh.io_project.ai.ports.AiTaskGeneratorPort;
 import pl.edu.agh.io_project.tasks.estimate.Estimate;
+import pl.edu.agh.io_project.users.UserPrincipal;
 
 import java.util.List;
 
@@ -44,47 +46,70 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody TaskRequest taskRequest) {
-        Task task = taskService.createTask(taskRequest);
+    public ResponseEntity<Task> createTask(
+            @AuthenticationPrincipal UserPrincipal user,
+            @RequestBody TaskRequest taskRequest
+    ) {
+        Task task = taskService.createTask(taskRequest, user);
         return ResponseEntity.ok(task);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody TaskRequest taskRequest) {
-        Task task = taskService.updateTask(id, taskRequest);
+    public ResponseEntity<Task> updateTask(
+            @AuthenticationPrincipal UserPrincipal user,
+            @PathVariable Long id,
+            @RequestBody TaskRequest taskRequest
+    ) {
+        Task task = taskService.updateTask(id, taskRequest, user);
         return ResponseEntity.ok(task);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
-        taskService.deleteTask(id);
+    public ResponseEntity<Void> deleteTask(
+            @AuthenticationPrincipal UserPrincipal user,
+            @PathVariable Long id
+    ) {
+        taskService.deleteTask(id, user);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> changeTaskStatus(@PathVariable Long id, @RequestBody TaskStatus status) {
-        taskService.changeTaskStatus(id, status);
+    public ResponseEntity<Void> changeTaskStatus(
+            @AuthenticationPrincipal UserPrincipal user,
+            @PathVariable Long id,
+            @RequestBody TaskStatus status
+    ) {
+        taskService.changeTaskStatus(id, status, user);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}/assign")
-    public ResponseEntity<Void> assignUserToTask(@PathVariable Long id, @RequestParam String userId) {
-        taskService.assignUserToTask(id, userId);
+    public ResponseEntity<Void> assignUserToTask(
+            @AuthenticationPrincipal UserPrincipal user,
+            @PathVariable Long id,
+            @RequestParam String userId
+    ) {
+        taskService.assignUserToTask(id, userId, user);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/add-labels/{taskId}")
-    public ResponseEntity<Void> addLabelsToTask(@PathVariable Long taskId, @RequestBody List<Long> labels) {
-        taskService.addLabelsToTask(taskId, labels);
+    public ResponseEntity<Void> addLabelsToTask(
+            @AuthenticationPrincipal UserPrincipal user,
+            @PathVariable Long taskId,
+            @RequestBody List<Long> labels
+    ) {
+        taskService.addLabelsToTask(taskId, labels, user);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/reorder-tasks/{columnId}")
     public ResponseEntity<Void> reorderTasks(
+            @AuthenticationPrincipal UserPrincipal user,
             @PathVariable Long columnId,
             @RequestBody List<Long> taskIdsInNewOrder
     ) {
-        taskService.reorderTasks(columnId, taskIdsInNewOrder);
+        taskService.reorderTasks(columnId, taskIdsInNewOrder, user);
         return ResponseEntity.ok().build();
     }
 
