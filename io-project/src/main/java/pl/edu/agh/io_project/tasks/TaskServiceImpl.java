@@ -51,6 +51,11 @@ public class TaskServiceImpl implements TaskService {
                 .max()
                 .orElse(-1) + 1;
 
+        Set<Label> labels = new HashSet<>();
+        if (taskDTO.labelIds() != null && !taskDTO.labelIds().isEmpty()) {
+            labels.addAll(labelRepository.findAllById(taskDTO.labelIds()));
+        }
+
         Task task = Task.builder()
                 .title(taskDTO.title())
                 .description(taskDTO.description())
@@ -58,6 +63,7 @@ public class TaskServiceImpl implements TaskService {
                 .column(column)
                 .position(lastPosition)
                 .assignees(taskDTO.assignees())
+                .labels(labels)
                 .build();
 
         Task saved = taskRepository.save(task);
