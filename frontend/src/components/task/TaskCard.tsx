@@ -31,7 +31,7 @@ const priorityIcons = {
   CRITICAL: <AlertCircle className="h-4 w-4 text-red-600" />,
 };
 
-export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, className, onEdit, ...props }) => {
+export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, className, onEdit, isEditable = true, ...props }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const queryClient = useQueryClient();
 
@@ -88,17 +88,19 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
         <div className="flex justify-between items-start">
           <h3 className="mb-2 block font-bold text-md uppercase tracking-wider text-black">{task.title}</h3>
           <div className="flex gap-1 items-center">
-            <button
-              className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-              onClick={e => {
-                e.stopPropagation();
-                onEdit?.(task);
-              }}
-              title="Edit Task"
-              type="button"
-            >
-              <Pencil className="h-4 w-4" />
-            </button>
+            {
+              isEditable && <button
+                className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                onClick={e => {
+                  e.stopPropagation();
+                  onEdit?.(task);
+                }}
+                title="Edit Task"
+                type="button"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+            }
             <button
               className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-red-600"
               onClick={e => {
@@ -164,7 +166,7 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
                 if (!user) return null;
                 return (
                   <Link
-                    to={`/user/${userId}`}
+                    to={`/user/userId}`}
                     key={userId}
                     title={`${user.firstName} ${user.lastName}`}
                   >
