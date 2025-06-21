@@ -36,7 +36,7 @@ object SentinelApp extends ZIOAppDefault {
     // 1. Consume TaskEvent stream from hub
     // 2. Process events through alerting engine, receiving stream of alerts
     alertEventProducer = AlertEventProducer(producer)
-    alertEventStream = engine.process(taskEventStream)
+    alertEventStream = engine.process(taskEventStream).tap(alert => ZIO.logInfo(s"Processed alert: $alert"))
     _ <- alertEventStream
       .tap(alert => notifier.send(alert))
       .tap(alert => alertEventProducer.produce("", alert))

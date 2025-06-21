@@ -1,7 +1,7 @@
 package pl.edu.agh.sentinel
 package processing
 
-import zio.*
+import zio._
 import zio.stream.ZStream
 
 import pl.edu.agh.sentinel.events.TaskEvent
