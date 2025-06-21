@@ -9,7 +9,7 @@ public record UserStatsEvent(
         String userId,
         int assignments,
         int closed,
-        Instant lastActive,
+        String lastActive,
         Map<String, Integer> statusCounts,
         double avgCloseTimeSeconds
 ) {
@@ -18,7 +18,7 @@ public record UserStatsEvent(
                 .userId(userId)
                 .assignments(assignments)
                 .closed(closed)
-                .lastActive(lastActive)
+                .lastActive(Instant.parse(lastActive))
                 .statusCounts(statusCounts)
                 .avgCloseTimeSeconds(avgCloseTimeSeconds)
                 .build();

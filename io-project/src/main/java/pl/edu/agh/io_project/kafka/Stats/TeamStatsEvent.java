@@ -15,7 +15,7 @@ public record TeamStatsEvent(
         Map<String, TaskStats> memberStats,
         Map<String, Integer> dailyTaskIncome,
         Set<String> activeUsers,
-        Instant updatedAt,
+        String updatedAt,
         int createdCount,
         int assignedCount,
         int closedCount,
@@ -31,7 +31,7 @@ public record TeamStatsEvent(
                 .memberStatsJson(memberStatsToJson())
                 .dailyTaskIncome(dailyTaskIncome)
                 .activeUsers(activeUsers)
-                .updatedAt(updatedAt)
+                .updatedAt(Instant.parse(updatedAt))
                 .createdCount(createdCount)
                 .assignedCount(assignedCount)
                 .closedCount(closedCount)
