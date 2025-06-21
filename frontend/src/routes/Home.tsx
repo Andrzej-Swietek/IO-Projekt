@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { TaskControllerApiFactory, Team, TeamControllerApiFactory } from '@/api';
+import {TaskControllerApiFactory, Team, TeamControllerApiFactory} from '@/api';
 import { useUserProfile } from '@context/UserProfileProvider.tsx';
 import { ColumnTitle } from '@components/board';
 import { RetroContainer } from '@components/common/RetroContainer.tsx';
@@ -160,7 +160,7 @@ export const Home: FC<HomeProps> = () => {
           {
             tasks?.map(task => (
               <div key={task.id} className="col-span-full !px-8">
-                <TaskCard className="col-span-full" task={task} isDragging={false} />
+                <TaskCard className="col-span-full" task={task} isDragging={false} isEditable={false} />
               </div>
             ))
           }
