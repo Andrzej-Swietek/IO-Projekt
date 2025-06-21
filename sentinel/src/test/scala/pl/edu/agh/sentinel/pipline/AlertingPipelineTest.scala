@@ -82,7 +82,7 @@ object AlertingPipelineFunctionTest extends ZIOSpecDefault {
       .runDrain
       .fork
     // Simulate producing an event
-    event = TaskEvent.TaskCreated("task-123", "Important", "col-1", "user-1", Instant.now().nn)
+    event = TaskEvent.TaskCreated("task-123", "Important", "team-1", "col-1", "user-1", Instant.now().nn)
     _ <- queue.offer(event)
     _ <- TestClock.adjust(2.seconds)
     alerts <- alertRef.get

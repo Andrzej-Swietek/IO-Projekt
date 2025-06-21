@@ -1,5 +1,7 @@
 package pl.edu.agh.io_project.kafka.AlertEvent;
 
+import pl.edu.agh.io_project.alerts.entities.AlertOverloadedTeamEntity;
+
 import java.time.Instant;
 import java.util.Set;
 
@@ -12,4 +14,17 @@ public record AlertOverloadedTeam(
         String message,
         AlertSeverity severity,
         Instant timestamp
-) implements AlertEvent {}
+) implements AlertEvent {
+    public AlertOverloadedTeamEntity toEntity() {
+        return new AlertOverloadedTeamEntity(
+                alertId,
+                message,
+                severity,
+                timestamp,
+                teamId,
+                projectId,
+                overloadedMembers,
+                maxRecommended
+        );
+    }
+}

@@ -19,18 +19,20 @@ final case class SentinelAlertingEngine(
   config: AlertConfig,
   userActivityRef: Ref.Synchronized[Map[String, Instant]],
   taskStatusRef: Ref.Synchronized[Map[String, (String, String, Instant)]],
-  teamTasksRef: Ref.Synchronized[Map[(String, String), Set[String]]],
+  teamTasksRef: Ref.Synchronized[Map[(String, String), Map[String, Int]]],
   now: UIO[Instant] = Clock.instant,
 ) extends AlertingEngine {
 
   override def process(events: ZStream[Any, Throwable, TaskEvent]): ZStream[Any, Throwable, AlertEvent] = {
     events
-      .mapZIO { event =>
+      .tap(event => ZIO.logDebug(s"Processing event: $event"))
+      .groupedWithin(1000, 5.seconds)
+      .mapZIO { batch =>
         for {
           now <- this.now
-          _ <- updateState(event, now)
-          alerts <- detectAlerts(event, now)
-        } yield alerts
+          _ <- ZIO.foreachDiscard(batch)(event => updateState(event, now))
+          alerts <- ZIO.foreach(batch)(event => detectAlerts(event, now))
+        } yield alerts.flatten
       }
       .mapConcat(identity)
   }
@@ -60,11 +62,15 @@ final case class SentinelAlertingEngine(
       } yield ()
 
     case TaskEvent.TaskAssigned(_, taskId, assigneeId, teamId, projectId) =>
-      teamTasksRef.update(old => {
+      teamTasksRef.update { old =>
         val key = (teamId, projectId.toString)
-        val current = old.getOrElse(key, Set.empty)
-        old.updated(key, current + assigneeId)
-      })
+        val currentTeamMap = old.getOrElse(key, Map.empty)
+        val updatedUserTasks = currentTeamMap.updatedWith(assigneeId) {
+          case Some(count) => Some(count + 1)
+          case None => Some(1)
+        }
+        old.updated(key, updatedUserTasks)
+      }
   }
 
   private def detectAlerts(event: TaskEvent, now: Instant): UIO[List[AlertEvent]] = {
@@ -101,16 +107,10 @@ final case class SentinelAlertingEngine(
     val checkOverloadedTeams = teamTasksRef
       .get
       .map(_.collect {
-        case ((teamId, projectId), members) =>
-          val overloaded = {
-            members
-              .groupBy(identity)
-              .view
-              .mapValues(_.size)
-              .filter(_._2 > config.maxTasksInProgressPerUser)
-              .keySet
-              .toSet
-          }
+        case ((teamId, projectId), userTaskCounts) =>
+          val overloaded = userTaskCounts.filter {
+            case (_, count) => count > config.maxTasksInProgressPerUser
+          }.keySet
           if overloaded.nonEmpty then
             Some(
               AlertEvent.AlertOverloadedTeam(
@@ -139,7 +139,6 @@ final case class SentinelAlertingEngine(
 }
 
 object SentinelAlertingEngine {
-
   val layer: ZLayer[AlertConfig, Nothing, AlertingEngine] = {
     ZLayer.scoped {
       for {
@@ -147,8 +146,7 @@ object SentinelAlertingEngine {
         config <- ZIO.service[AlertConfig]
         userActivityRef <- Ref.Synchronized.make(Map.empty[String, Instant])
         taskStatusRef <- Ref.Synchronized.make(Map.empty[String, (String, String, Instant)])
-        teamTasksRef <- Ref.Synchronized.make(Map.empty[(String, String), Set[String]])
-
+        teamTasksRef <- Ref.Synchronized.make(Map.empty[(String, String), Map[String, Int]])
       } yield SentinelAlertingEngine(config, userActivityRef, taskStatusRef, teamTasksRef)
     }
   }

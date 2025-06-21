@@ -53,7 +53,8 @@ export const UserProfileProvider: FC<UserProfileProviderProps> = ({ children }) 
     fetchProfile();
     keycloak.onTokenExpired = () => {
       localStorage.removeItem('kanban_app_token');
-      keycloak.logout();
+      keycloak.updateToken();
+      // Keycloak.logout();
     };
 
     keycloak.onAuthLogout = () => {

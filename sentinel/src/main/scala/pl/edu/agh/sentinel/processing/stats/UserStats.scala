@@ -1,6 +1,8 @@
 package pl.edu.agh.sentinel
 package processing.stats
 
+import zio.json.JsonCodec
+
 import java.time.Instant
 
 case class UserStats(
@@ -9,5 +11,5 @@ case class UserStats(
   closed: Int = 0,
   lastActive: Instant = Instant.EPOCH.nn,
   statusCounts: Map[String, Int] = Map.empty,
-  avgCloseTimeSeconds: Double = 0.0
-)
+  avgCloseTimeSeconds: Double = 0.0,
+) derives JsonCodec

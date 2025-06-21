@@ -7,14 +7,18 @@ import { RetroButton } from '@components/common/RetroButton.tsx';
 import { AddMemberModal } from '@components/team/AddMemberModal.tsx';
 import { AddColumnModal, GenerateWithAIBox } from '@components/board';
 import { UserPlus } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { useUserProfile } from '@context/UserProfileProvider.tsx';
 
 interface BoardPageProps {
 }
 
 export const BoardPage: FC<BoardPageProps> = () => {
   const { id, teamId } = useParams();
+  const { profile } = useUserProfile();
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [showAddColumnModal, setShowAddColumnModal] = useState(false);
+  const navigate = useNavigate();
 
   const { data: board, isLoading } = useQuery({
     queryKey: ['board', id],
@@ -25,6 +29,11 @@ export const BoardPage: FC<BoardPageProps> = () => {
     },
     enabled: !!id,
   });
+
+
+  if (!isLoading && !profile?.id) {
+    navigate('/auth/login');
+  }
 
   return (
     <div className="min-h-screen w-full px-8 mb-8">

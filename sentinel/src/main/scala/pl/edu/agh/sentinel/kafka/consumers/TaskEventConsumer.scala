@@ -25,6 +25,7 @@ final case class TaskEventConsumer(kafkaConsumer: KafkaConsumer) extends KafkaRu
     kafkaConsumer
       .stream[String, String](SentinelTopics.TaskEvents.topicName)
       .mapZIO { record =>
+        ZIO.logInfo(record.value)
         record.value.fromJson[TaskEvent] match {
           case Right(event) =>
             record.offset.commit.as(Some(event))

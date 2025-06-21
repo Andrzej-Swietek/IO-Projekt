@@ -40,11 +40,11 @@ export const RetroMultiSelect: FC<RetroMultiSelectProps> = ({
 
   return (
     <div
-      className={cn('relative w-auto font-mono', className)}
+      className={cn('relative w-auto', className)}
     >
       {label && (
         <label
-          className="mb-2 px-2 block font-bold text-md uppercase tracking-wider text-black"
+          className="mb-1 block font-bold text-md uppercase tracking-wider text-black"
         >
           {label}
         </label>

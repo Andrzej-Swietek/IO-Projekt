@@ -127,9 +127,9 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
         {/* Badges: status, labels, priority */}
         <div className="flex flex-wrap gap-2">
           {task.status && (
-            <Badge className={cn('!px-4 !py-2 font-normal', statusStyles[task.status])}>
+            <Badge className={cn('!px-4 !py-2 font-normal uppercase', statusStyles[task.status])}>
               {task.status && priorityIcons[task.status as keyof typeof priorityIcons]}
-              {task.status}
+              {STATUS_TO_DISPLAY[task.status]}
             </Badge>
           )}
 
@@ -210,3 +210,10 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
     </>
   );
 };
+
+const STATUS_TO_DISPLAY: Record<string, string> = {
+  TODO: 'To Do',
+  IN_PROGRESS: 'In Progress',
+  DONE: 'Done',
+  BLOCKED: 'Blocked',
+} as const;

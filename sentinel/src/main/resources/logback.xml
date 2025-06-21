@@ -4,6 +4,20 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
+    <logger name="org.apache.kafka" level="WARN"/>
+    <logger name="org.apache.kafka.clients.consumer" level="WARN"/>
+    <logger name="org.apache.kafka.clients.producer" level="WARN"/>
+    <logger name="org.apache.kafka.common.metrics" level="ERROR"/>
+    <logger name="org.springframework.kafka" level="WARN"/>
+
+    <!-- ZIO Kafka -->
+    <logger name="zio.kafka" level="WARN"/>
+    <logger name="zio.kafka.consumer.internal.Runloop" level="WARN"/>
+    <logger name="zio.kafka.consumer.internal.LiveCommitter" level="WARN"/>
+
+    <!-- Twoje -->
+    <logger name="pl.edu.agh" level="DEBUG"/>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} %highlight(%-5level) [%thread] %cyan(%logger{36}) %msg%n</pattern>

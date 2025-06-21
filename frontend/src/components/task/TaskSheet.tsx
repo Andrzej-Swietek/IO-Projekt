@@ -1,16 +1,81 @@
-import { useQuery } from '@tanstack/react-query';
-import { FC } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { FC, useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Estimate, EstimateControllerApiFactory, Task, TaskHistoryControllerApiFactory } from '@/api';
+import {
+  Estimate,
+  EstimateControllerApiFactory,
+  Task,
+  TaskControllerApiFactory,
+  TaskHistoryControllerApiFactory,
+} from '@/api';
 import { AddCommentRetro } from '@components/task/AddCommentRetro.tsx';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router';
 import { useUsersByIds } from '@hooks/useUsersByIds.ts';
 import { TaskHistoryTimeline } from '@components/task/TaskHistoryTimeline.tsx';
+import { cn } from '@/lib/utils.ts';
+import { AlertCircle, Flame, Zap } from 'lucide-react';
+import { RetroButton } from '@components/common/RetroButton.tsx';
+import { UpdateStatusModal } from './UpdateStatusModal';
+import { toast } from 'sonner';
+
 
 export const TaskDetailsSheet: FC<{
   task: Task; open: boolean; onOpenChange: (v: boolean) => void;
 }> = ({ task, open, onOpenChange }) => {
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const queryClient = useQueryClient();
+
+  const updateStatusMutation = useMutation({
+    mutationFn: async (newStatus: string) => {
+      const api = TaskControllerApiFactory();
+      const response = await api.changeTaskStatus(task.id!, newStatus || 'TODO');
+      if (response.status === 200) {
+        toast.success('Task status updated successfully');
+        return response.data;
+      } else {
+        toast.error('Failed to update task status');
+        return response.data;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['board'] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      setShowStatusModal(false);
+    },
+  });
+
+  const estimateTaskMutation = useMutation({
+    mutationFn: async () => {
+      const api = TaskControllerApiFactory();
+      const response = await api.estimateTask({
+        taskId: task.id,
+        taskTitle: task.title,
+        taskDescription: task.description,
+      });
+      if (response.status === 200) {
+        toast.success('Task estimated successfully');
+        return response.data;
+      } else {
+        toast.error('Failed to estimate task');
+        return response.data;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['board'] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['taskEstimate', task.id] });
+    },
+  });
+
+  const handleUpdateStatus = (newStatus: string) => {
+    updateStatusMutation.mutate(newStatus);
+  };
+
+  const handleEstimateTask = () => {
+    estimateTaskMutation.mutate();
+  };
+
   const { data: taskHistory } = useQuery({
     queryKey: ['taskHistory', task.id],
     queryFn: async () => {
@@ -44,12 +109,46 @@ export const TaskDetailsSheet: FC<{
           <div className="text-sm text-gray-500">
             <p>
               Created:
+              {' '}
               {task.createdDate}
             </p>
             <p>
               Last Modified:
+              {' '}
               {task.lastModifiedDate}
             </p>
+          </div>
+          <div className="text-sm text-gray-500 mt-2 flex flex-row items-center gap-4">
+            <div
+              className="flex flex-row items-center gap-2 font-bold text-md uppercase tracking-wider "
+            >
+              <span>Status:</span>
+            </div>
+            {task.status && (
+              <Badge
+                className={cn('!px-8 !py-2 h-full font-normal flex justify-center items-center uppercase', statusStyles[task.status])}
+              >
+                {task.status && priorityIcons[task.status as keyof typeof priorityIcons]}
+                {STATUS_TO_DISPLAY[task.status]}
+              </Badge>
+            )}
+            <RetroButton
+              size="sm"
+              onClick={() => setShowStatusModal(true)}
+              icon={<Zap className="w-4 h-4" />}
+              className="ml-auto"
+            >
+              Update Status
+            </RetroButton>
+            <UpdateStatusModal
+              open={showStatusModal}
+              onClose={() => setShowStatusModal(false)}
+              currentStatus={task.status!}
+              onUpdate={handleUpdateStatus}
+            />
+            <RetroButton onClick={() => handleEstimateTask()} size="sm" icon={<Zap className="w-4 h-4" />}>
+              Estimate
+            </RetroButton>
           </div>
         </SheetHeader>
 
@@ -163,6 +262,8 @@ export const EstimateList: FC<{ estimates: Estimate[] }> = ({ estimates }) => (
             <span className="font-semibold">Estimated:</span>
             {' '}
             {estimate.estimatedTime ?? <span className="text-gray-400">N/A</span>}
+            {' '}
+            man-hours
           </div>
           <div className="flex-1 text-gray-700">
             <span className="font-semibold">Actual:</span>
@@ -174,3 +275,24 @@ export const EstimateList: FC<{ estimates: Estimate[] }> = ({ estimates }) => (
     </div>
   </section>
 );
+
+const statusStyles = {
+  TODO: 'bg-gray-100 text-gray-800 hover:bg-gray-200',
+  IN_PROGRESS: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
+  DONE: 'bg-green-100 text-green-800 hover:bg-green-200',
+  BLOCKED: 'bg-red-100 text-red-800 hover:bg-red-200',
+} as const;
+
+const priorityIcons = {
+  TODO: null,
+  IN_PROGRESS: <Flame className="h-6 w-6 text-yellow-500" />,
+  DONE: <Flame className="h-4 w-4 text-green-600" />,
+  BLOCKED: <AlertCircle className="h-4 w-4 text-red-600" />,
+};
+
+const STATUS_TO_DISPLAY: Record<string, string> = {
+  TODO: 'To Do',
+  IN_PROGRESS: 'In Progress',
+  DONE: 'Done',
+  BLOCKED: 'Blocked',
+} as const;
