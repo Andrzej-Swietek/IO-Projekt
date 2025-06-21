@@ -44,10 +44,12 @@ export const TaskDetailsSheet: FC<{
           <div className="text-sm text-gray-500">
             <p>
               Created:
+              {' '}
               {task.createdDate}
             </p>
             <p>
               Last Modified:
+              {' '}
               {task.lastModifiedDate}
             </p>
           </div>
