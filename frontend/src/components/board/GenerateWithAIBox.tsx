@@ -48,6 +48,8 @@ export const GenerateWithAIBox: FC<GenerateWithAIBoxProps> = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['board', board.id] });
+      queryClient.invalidateQueries({ queryKey: ['board'] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
       onNew?.();
     },
   });

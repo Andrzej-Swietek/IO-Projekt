@@ -8,20 +8,15 @@ import zio.stream.ZStream
 
 import pl.edu.agh.sentinel.configs.AlertConfig
 import pl.edu.agh.sentinel.events.TaskEvent
-import pl.edu.agh.sentinel.kafka.{ KafkaEnv, KafkaModule, StreamSupervisor }
+import pl.edu.agh.sentinel.kafka.{ KafkaEnv, KafkaModule }
 import pl.edu.agh.sentinel.kafka.config.KafkaConfig
-import pl.edu.agh.sentinel.kafka.consumers.{ AlertConsumer, KafkaConsumer, TaskEventConsumer }
+import pl.edu.agh.sentinel.kafka.consumers.{ KafkaConsumer, TaskEventConsumer }
 import pl.edu.agh.sentinel.kafka.producers.{ AlertEventProducer, KafkaProducer, StatsProducer, UserStatsProducer }
 import pl.edu.agh.sentinel.kafka.topics.TopicManager
 import pl.edu.agh.sentinel.notifications.{ NotificationEnv, NotificationModule, SentinelNotifier }
 import pl.edu.agh.sentinel.processing.{ AlertingEngine, SentinelAlertingEngine, StatsProcessorLive, StatsPublisher }
 import pl.edu.agh.sentinel.store.redis.{ RedisEnv, RedisModule }
-import pl.edu.agh.sentinel.store.repositories.{
-  StatsRepository,
-  StatsRepositoryLive,
-  TeamStatsRepository,
-  UserStatsRepository,
-}
+import pl.edu.agh.sentinel.store.repositories.{ StatsRepository, StatsRepositoryLive }
 
 type SentinelEnv = KafkaEnv & AlertingEngine & RedisEnv & NotificationEnv & StatsRepository
 
