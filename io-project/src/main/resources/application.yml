@@ -57,7 +57,7 @@ springdoc:
 
 storage:
   local:
-    base-path: classpath:storage/
+    base-path: storage/
 
 server:
   port: 8080
