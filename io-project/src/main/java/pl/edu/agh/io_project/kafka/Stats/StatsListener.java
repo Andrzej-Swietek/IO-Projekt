@@ -17,15 +17,18 @@ public class StatsListener {
 
 
     @KafkaListener(topics = "user-stats", groupId = "stats-consumer-group")
-    public void listenUserStats(UserStatsEvent userStatsEvent) {
-        log.info("Received UserStatsEvent: {}", userStatsEvent);
-        statsService.saveUserStats(userStatsEvent.toEntity());
-
+    public void listenUserStats(String message) {
+        try {
+            UserStatsEvent userStatsEvent = objectMapper.readValue(message, UserStatsEvent.class);
+            log.info("Received UserStatsEvent: {}", userStatsEvent);
+            statsService.saveUserStats(userStatsEvent.toEntity());
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
     }
 
     @KafkaListener(topics = "team-stats", groupId = "stats-consumer-group")
     public void listenTeamStats(String message) {
-
         try {
             TeamStatsEvent event = objectMapper.readValue(message, TeamStatsEvent.class);
             log.info("Received TeamStatsEvent: {}", event);
