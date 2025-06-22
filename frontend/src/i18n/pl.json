@@ -1,0 +1,130 @@
+{
+  "generate": {
+    "mode": {
+      "single": "Pojedynczy",
+      "multiple": "Wiele"
+    },
+    "noColumns": "Brak dostępnych kolumn.",
+    "selectColumn": "Kolumna",
+    "selectMode": "Tryb",
+    "howMany": "Ile?",
+    "generating": "Generowanie...",
+    "generate": "Generuj",
+    "description": "Opis"
+  },
+  "kanban": {
+    "deleteColumn": "Usuń kolumnę",
+    "dragColumn": "Przenieś kolumnę",
+    "addTask": "Dodaj zadanie",
+    "dropTasks": "Upuść zadania tutaj",
+    "deleteConfirm": "Czy na pewno chcesz usunąć kolumnę \"{{column}}\"? Ta operacja nie może być cofnięta."
+  },
+  "common": {
+    "cancel": "Przerwij",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "drag": "Przenieś, aby zmienić kolejność"
+  },
+  "navbar": {
+    "logoLeft": "retro",
+    "logoRight": "Board",
+    "myBoards": "Moje tablice",
+    "settings": "Ustawienia",
+    "help": "Pomoc",
+    "signOut": "Wyloguj",
+    "signIn": "Zaloguj"
+  },
+  "taskDetails": {
+    "statusValues": {
+      "TODO": "Do zrobienia",
+      "IN_PROGRESS": "W trakcie",
+      "DONE": "Zrobione",
+      "BLOCKED": "Zablokowane"
+    },
+    "noAssignees": "Brak przypisanych osób",
+    "created": "Utworzono",
+    "lastModified": "Ostatnia modyfikacja",
+    "status": "Status",
+    "updateStatus": "Zaktualizuj status",
+    "estimate": "Estymacja",
+    "labels": "Etykiety",
+    "assignees": "Przypisani",
+    "description": "Opis",
+    "noDescription": "Brak opisu",
+    "comments": "Komentarze",
+    "noComments": "Brak komentarzy.",
+    "noEstimates": "Brak estymacji",
+    "estimated": "Estymowane",
+    "na": "Brak danych",
+    "actual": "Rzeczywiste"
+  },
+  "taskHistory": {
+    "title": "Historia zadania",
+    "system": "System",
+    "actions": {
+      "FALLBACK": "Akcja",
+      "CREATED": "Utworzono zadanie",
+      "UPDATED_TITLE": "Zaktualizowano tytuł",
+      "UPDATED_DESCRIPTION": "Zaktualizowano opis",
+      "UPDATED_STATUS": "Zmieniono status",
+      "UPDATED_POSITION": "Zmieniono pozycję",
+      "UPDATED_COLUMN": "Przeniesiono do innej kolumny",
+      "ADDED_ASSIGNEE": "Dodano przypisanego użytkownika",
+      "DELETED_ASSIGNEE": "Usunięto przypisanego użytkownika",
+      "ADDED_LABEL": "Dodano etykietę",
+      "DELETED_LABEL": "Usunięto etykietę",
+      "ADDED_COMMENT": "Dodano komentarz",
+      "EDITED_COMMENT": "Edytowano komentarz",
+      "DELETED_COMMENT": "Usunięto komentarz",
+      "CLOSED": "Zamknięto zadanie",
+      "TASK_DELETED": "Usunięto zadanie"
+    }
+  },
+  "board": {
+    "loading": "Ładowanie...",
+    "untitled": "Tablica bez tytułu",
+    "noDescription": "Opis nie jest dostępny",
+    "teamSectionTitle": "Zespół",
+    "addColumn": "Dodaj kolumnę",
+    "addMember": "Dodaj członka"
+  },
+  "home": {
+    "greeting": "Cześć {{firstName}} {{lastName}}",
+    "myTeams": "Moje zespoły",
+    "loadingTeams": "Ładowanie zespołów...",
+    "projects": "Projekty",
+    "confirmDeleteTeam": "Czy na pewno chcesz usunąć zespół '{{name}}'?",
+    "addTeam": "Dodaj nowy zespół",
+    "myTasks": "Moje zadania",
+    "loadingTasks": "Ładowanie zadań..."
+  },
+  "labels": {
+    "management": "Zarządzanie etykietami",
+    "filterLabel": "Filtruj etykiety",
+    "searchPlaceholder": "Szukaj etykiet...",
+    "add": "Dodaj etykietę",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "confirmDelete": "Czy na pewno chcesz usunąć etykietę"
+  },
+  "settings": {
+    "hello": "Cześć",
+    "title": "Ustawienia",
+    "keycloak": "Zarządzanie kontem Keycloak:",
+    "manageAccount": "Zarządzaj kontem",
+    "labels": "Etykiety:",
+    "manageLabels": "Zarządzaj etykietami",
+    "theme": "Motyw:",
+    "light": "Jasny",
+    "dark": "Ciemny",
+    "primaryColor": "Kolor główny:",
+    "language": "Język:"
+  },
+  "myBoards": {
+    "hello": "Witaj",
+    "myTeamsBoards": "MOJE ZESPOŁY I TABLICE",
+    "loadingTeams": "Ładowanie zespołów...",
+    "myTasks": "Moje zadania",
+    "loadingTasks": "Ładowanie zadań..."
+  }
+}

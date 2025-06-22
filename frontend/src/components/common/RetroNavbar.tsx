@@ -10,6 +10,7 @@ import {
 import { useKeycloak } from '@/context';
 import { NavLink } from 'react-router-dom';
 import { useUserProfile } from '@context/UserProfileProvider.tsx';
+import { useTranslation } from 'react-i18next';
 
 interface RetroNavbarProps {
 }
@@ -17,6 +18,7 @@ interface RetroNavbarProps {
 export const RetroNavbar: FC<RetroNavbarProps> = () => {
   const { keycloak, authenticated } = useKeycloak();
   const { profile, loading, error } = useUserProfile();
+  const { t } = useTranslation();
 
   const logout = () => {
     keycloak?.logout();
@@ -26,7 +28,6 @@ export const RetroNavbar: FC<RetroNavbarProps> = () => {
     <header
       className="bg-yellow-300 border-b border-yellow-400 h-[80px] w-full !px-8 !py-3 flex justify-between items-center"
     >
-
       {/* Logo */}
       <div className="flex items-center gap-2 px-8">
         <NavLink to="/">
@@ -35,8 +36,8 @@ export const RetroNavbar: FC<RetroNavbarProps> = () => {
           </div>
         </NavLink>
         <NavLink to="/">
-          <span className="text-3xl font-normal text-black">retro</span>
-          <span className="text-4xl font-bold text-black">Board</span>
+          <span className="text-3xl font-normal text-black">{t('navbar.logoLeft')}</span>
+          <span className="text-4xl font-bold text-black">{t('navbar.logoRight')}</span>
         </NavLink>
       </div>
 
@@ -56,38 +57,27 @@ export const RetroNavbar: FC<RetroNavbarProps> = () => {
           <DropdownMenuContent align="end">
             <DropdownMenuItem className="!px-8 !py-6">
               <NavLink to="/user/my-profile">
-                {
-                  !loading && !error && profile?.email
-                }
+                {!loading && !error && profile?.email}
               </NavLink>
             </DropdownMenuItem>
             <DropdownMenuItem className="!px-8 !py-6">
-              <NavLink to="/user/my-boards">
-                My Boards
-              </NavLink>
+              <NavLink to="/user/my-boards">{t('navbar.myBoards')}</NavLink>
             </DropdownMenuItem>
             <DropdownMenuItem className="!px-8 !py-6">
-              <NavLink to="/user/settings">
-                Settings
-              </NavLink>
+              <NavLink to="/user/settings">{t('navbar.settings')}</NavLink>
             </DropdownMenuItem>
-            <DropdownMenuItem className="!px-8 !py-6">Help</DropdownMenuItem>
-            {
-              authenticated
-                ? (
-                  <DropdownMenuItem className="!px-8 !py-6" onClick={() => logout()}>
-                    Sign
-                    out
-                  </DropdownMenuItem>
-                )
-                : (
-                  <DropdownMenuItem className="!px-8 !py-6">
-                    <NavLink to="/auth/login">
-                      Sign In
-                    </NavLink>
-                  </DropdownMenuItem>
-                )
-            }
+            <DropdownMenuItem className="!px-8 !py-6">{t('navbar.help')}</DropdownMenuItem>
+            {authenticated
+              ? (
+                <DropdownMenuItem className="!px-8 !py-6" onClick={logout}>
+                  {t('navbar.signOut')}
+                </DropdownMenuItem>
+              )
+              : (
+                <DropdownMenuItem className="!px-8 !py-6">
+                  <NavLink to="/auth/login">{t('navbar.signIn')}</NavLink>
+                </DropdownMenuItem>
+              )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

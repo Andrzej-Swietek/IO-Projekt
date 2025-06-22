@@ -18,11 +18,14 @@ import { AlertCircle, Flame, Zap } from 'lucide-react';
 import { RetroButton } from '@components/common/RetroButton.tsx';
 import { UpdateStatusModal } from './UpdateStatusModal';
 import { toast } from 'sonner';
-
+import { useTranslation } from 'react-i18next';
 
 export const TaskDetailsSheet: FC<{
-  task: Task; open: boolean; onOpenChange: (v: boolean) => void;
+  task: Task;
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
 }> = ({ task, open, onOpenChange }) => {
+  const { t } = useTranslation();
   const [showStatusModal, setShowStatusModal] = useState(false);
   const queryClient = useQueryClient();
 
@@ -85,6 +88,7 @@ export const TaskDetailsSheet: FC<{
     },
     enabled: !!task.id,
   });
+
   const { data: estimates } = useQuery({
     queryKey: ['taskEstimate', task.id],
     queryFn: async () => {
@@ -99,6 +103,13 @@ export const TaskDetailsSheet: FC<{
     `https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=${encodeURIComponent(email)}`;
   const { data: usersById } = useUsersByIds(task.assignees ?? []);
 
+  const STATUS_TO_DISPLAY: Record<string, string> = {
+    TODO: t('taskDetails.statusValues.TODO'),
+    IN_PROGRESS: t('taskDetails.statusValues.IN_PROGRESS'),
+    DONE: t('taskDetails.statusValues.DONE'),
+    BLOCKED: t('taskDetails.statusValues.BLOCKED'),
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="min-w-1/2 max-w-none p-8 retro-shadow overflow-auto">
@@ -108,21 +119,24 @@ export const TaskDetailsSheet: FC<{
           </SheetTitle>
           <div className="text-sm text-gray-500">
             <p>
-              Created:
+              {t('taskDetails.created')}
+              :
               {' '}
               {task.createdDate}
             </p>
             <p>
-              Last Modified:
+              {t('taskDetails.lastModified')}
+              :
               {' '}
               {task.lastModifiedDate}
             </p>
           </div>
           <div className="text-sm text-gray-500 mt-2 flex flex-row items-center gap-4">
-            <div
-              className="flex flex-row items-center gap-2 font-bold text-md uppercase tracking-wider "
-            >
-              <span>Status:</span>
+            <div className="flex flex-row items-center gap-2 font-bold text-md uppercase tracking-wider">
+              <span>
+                {t('taskDetails.status')}
+                :
+              </span>
             </div>
             {task.status && (
               <Badge
@@ -138,7 +152,7 @@ export const TaskDetailsSheet: FC<{
               icon={<Zap className="w-4 h-4" />}
               className="ml-auto"
             >
-              Update Status
+              {t('taskDetails.updateStatus')}
             </RetroButton>
             <UpdateStatusModal
               open={showStatusModal}
@@ -146,15 +160,15 @@ export const TaskDetailsSheet: FC<{
               currentStatus={task.status!}
               onUpdate={handleUpdateStatus}
             />
-            <RetroButton onClick={() => handleEstimateTask()} size="sm" icon={<Zap className="w-4 h-4" />}>
-              Estimate
+            <RetroButton onClick={handleEstimateTask} size="sm" icon={<Zap className="w-4 h-4" />}>
+              {t('taskDetails.estimate')}
             </RetroButton>
           </div>
         </SheetHeader>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
           <section className="my-4">
-            <h3 className="font-bold text-md mb-6 uppercase tracking-wider text-black">Labels</h3>
+            <h3 className="font-bold text-md mb-6 uppercase tracking-wider text-black">{t('taskDetails.labels')}</h3>
             {Array.from(task.labels ?? []).map(label => (
               <Badge
                 className="px-6 py-4 text-md font-semibold mr-2 mb-2"
@@ -167,7 +181,7 @@ export const TaskDetailsSheet: FC<{
           </section>
 
           <section className="my-4">
-            <h3 className="font-bold text-md mb-4 uppercase tracking-wider text-black">Assignees</h3>
+            <h3 className="font-bold text-md mb-4 uppercase tracking-wider text-black">{t('taskDetails.assignees')}</h3>
             <div className="pt-2 text-md text-gray-500">
               <div className="flex items-center gap-2 mb-2">
                 {task.assignees?.map(userId => {
@@ -178,8 +192,7 @@ export const TaskDetailsSheet: FC<{
                       to={`/user/${userId}`}
                       key={userId}
                       title={`${user.firstName} ${user.lastName}`}
-                      className="flex flex-row items-center gap-4 justify-between bg-gray-100
-                      hover:bg-gray-200 transition-colors duration-200 rounded-lg px-6 py-4"
+                      className="flex flex-row items-center gap-4 justify-between bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-lg px-6 py-4"
                     >
                       <img
                         src={avatarUrl(user.email!)}
@@ -187,94 +200,89 @@ export const TaskDetailsSheet: FC<{
                         className="h-7 w-7 rounded-full object-cover border-2 border-white -ml-2 first:ml-0 shadow"
                         loading="lazy"
                       />
-                      {
-                        user.firstName && user.lastName
-                          ? ` ${user.firstName} ${user.lastName}`
-                          : ''
-                      }
+                      {user.firstName && user.lastName ? ` ${user.firstName} ${user.lastName}` : ''}
                     </Link>
                   );
                 })}
-                {task.assignees?.length === 0 && <span>No assignees</span>}
+                {task.assignees?.length === 0 && <span>{t('taskDetails.noAssignees')}</span>}
               </div>
             </div>
           </section>
         </div>
 
-
         <section className="my-4">
-          <h3 className="font-bold text-md mb-4 uppercase tracking-wider text-black">Description</h3>
+          <h3 className="font-bold text-md mb-4 uppercase tracking-wider text-black">{t('taskDetails.description')}</h3>
           <div
             className="bg-white/80 border border-black/10 retro-shadow p-8 text-gray-800 shadow-inner min-h-[80px]"
-            dangerouslySetInnerHTML={{ __html: task.description ?? '<em>No description</em>' }}
+            dangerouslySetInnerHTML={{ __html: task.description ?? `<em>${t('taskDetails.noDescription')}</em>` }}
           />
         </section>
 
-        {estimates && (
-          <EstimateList estimates={estimates} />
-        )}
+        {estimates && <EstimateList estimates={estimates} />}
 
         <section className="my-4">
-          <h3 className="font-bold text-md mb-4 uppercase tracking-wider text-black">Comments</h3>
+          <h3 className="font-bold text-md mb-4 uppercase tracking-wider text-black">{t('taskDetails.comments')}</h3>
           {(task.comments ?? []).map(comment => (
             <div key={comment.id} className="text-gray-400 retro-shadow px-8 py-6 border mt-4 mb-8">
               <p className="text-xs text-gray-500 mt-4">
                 {comment.authorId || 'Unknown'}
                 {' '}
-                on
+                {t('taskDetails.created')}
                 {' '}
                 {new Date(comment.createdDate!).toLocaleString()}
               </p>
               <p className="px-8 py-4">{comment.content}</p>
             </div>
           ))}
-
-          {
-            (task.comments?.length ?? 0) === 0 && (
-              <p className="text-gray-400 italic retro-shadow px-8 py-6 border mt-4 mb-8">No comments yet.</p>
-            )
-          }
-
+          {(task.comments?.length ?? 0) === 0 && (
+            <p className="text-gray-400 italic retro-shadow px-8 py-6 border mt-4 mb-8">{t('taskDetails.noComments')}</p>
+          )}
           <AddCommentRetro taskId={task.id!} />
         </section>
 
         <TaskHistoryTimeline history={taskHistory || []} />
-
       </SheetContent>
     </Sheet>
   );
 };
 
-
-export const EstimateList: FC<{ estimates: Estimate[] }> = ({ estimates }) => (
-  <section className="my-4">
-    <h3 className="font-bold text-md uppercase tracking-wider text-black mb-4">Estimate</h3>
-    <div className="border border-gray-300 bg-white/90 shadow-inner retro-shadow p-4 flex flex-col gap-2">
-      {estimates.length === 0 && (
-        <span className="text-gray-400 italic">No estimates</span>
-      )}
-      {estimates.map((estimate, idx) => (
-        <div
-          className="flex items-center gap-8 text-sm border-b border-gray-200 last:border-b-0 px-2 py-2"
-          key={idx}
-        >
-          <div className="flex-1 text-gray-700">
-            <span className="font-semibold">Estimated:</span>
-            {' '}
-            {estimate.estimatedTime ?? <span className="text-gray-400">N/A</span>}
-            {' '}
-            man-hours
+export const EstimateList: FC<{ estimates: Estimate[] }> = ({ estimates }) => {
+  const { t } = useTranslation();
+  return (
+    <section className="my-4">
+      <h3 className="font-bold text-md uppercase tracking-wider text-black mb-4">{t('taskDetails.estimate')}</h3>
+      <div className="border border-gray-300 bg-white/90 shadow-inner retro-shadow p-4 flex flex-col gap-2">
+        {estimates.length === 0 && <span className="text-gray-400 italic">{t('taskDetails.noEstimates')}</span>}
+        {estimates.map((estimate, idx) => (
+          <div
+            className="flex items-center gap-8 text-sm border-b border-gray-200 last:border-b-0 px-2 py-2"
+            key={idx}
+          >
+            <div className="flex-1 text-gray-700">
+              <span className="font-semibold">
+                {t('taskDetails.estimated')}
+                :
+              </span>
+              {' '}
+              {estimate.estimatedTime
+                ?? <span className="text-gray-400">{t('taskDetails.na')}</span>}
+              {' '}
+              man-hours
+            </div>
+            <div className="flex-1 text-gray-700">
+              <span className="font-semibold">
+                {t('taskDetails.actual')}
+                :
+              </span>
+              {' '}
+              {estimate.actualTime ?? <span className="text-gray-400">{t('taskDetails.na')}</span>}
+            </div>
           </div>
-          <div className="flex-1 text-gray-700">
-            <span className="font-semibold">Actual:</span>
-            {' '}
-            {estimate.actualTime ?? <span className="text-gray-400">N/A</span>}
-          </div>
-        </div>
-      ))}
-    </div>
-  </section>
-);
+        ))}
+      </div>
+    </section>
+  );
+};
 
 const statusStyles = {
   TODO: 'bg-gray-100 text-gray-800 hover:bg-gray-200',
@@ -289,10 +297,3 @@ const priorityIcons = {
   DONE: <Flame className="h-4 w-4 text-green-600" />,
   BLOCKED: <AlertCircle className="h-4 w-4 text-red-600" />,
 };
-
-const STATUS_TO_DISPLAY: Record<string, string> = {
-  TODO: 'To Do',
-  IN_PROGRESS: 'In Progress',
-  DONE: 'Done',
-  BLOCKED: 'Blocked',
-} as const;

@@ -9,6 +9,9 @@ import { Pen, X } from 'lucide-react';
 import { LabelControllerApiFactory } from '@/api';
 import { toast } from 'sonner';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { Loading } from '@components/common/Loading.tsx';
+
 
 const fetchLabels = async (filter: string) => {
   const api = LabelControllerApiFactory();
@@ -16,6 +19,8 @@ const fetchLabels = async (filter: string) => {
     const response = await api.getAllLabels(filter);
     return response.data;
   } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     toast.error('Error fetching labels:', error);
     return [];
   }
@@ -39,6 +44,8 @@ const editLabel = async ({ id, name, color }: { id: number; name: string; color:
 };
 
 export const LabelsManagement: FC = () => {
+  const { t } = useTranslation();
+
   const [filter, setFilter] = useState<string>('');
   const queryClient = useQueryClient();
 
@@ -61,7 +68,7 @@ export const LabelsManagement: FC = () => {
     onSuccess: () => {
       toast.success('Label deleted');
       queryClient.invalidateQueries({ queryKey: ['labels'] });
-      setDeleteId(null);
+      setDeleteData(undefined);
     },
     onError: () => {
       toast.error('Failed to delete label');
@@ -100,7 +107,7 @@ export const LabelsManagement: FC = () => {
 
   const handleConfirmDelete = () => {
     if (deleteData?.id !== null) {
-      deleteLabelMutation.mutate(deleteData?.id);
+      deleteLabelMutation.mutate(deleteData!.id!);
     }
   };
 
@@ -109,11 +116,15 @@ export const LabelsManagement: FC = () => {
     setShowEditModal(true);
   };
 
+  if (isLoading || isError) {
+    return <Loading className="h-screen"></Loading>;
+  }
+
   return (
     <>
       <div className="w-full h-[125px] !px-32 !pt-12 !pb-8 border-b">
         <h1 className="font-[Josefin_Sans] font-normal text-[36px] leading-[100%] tracking-[0%] align-bottom text-[var(--primary-black)]">
-          Labels Management
+          {t('labels.management')}
         </h1>
       </div>
       <div className="flex flex-col items-center justify-start min-h-[80vh] my-16">
@@ -121,10 +132,10 @@ export const LabelsManagement: FC = () => {
           <div className="w-full  flex justify-between items-center gap-4 mb-4">
             <div className="w-full">
               <RetroInput
-                label="Filter Labels"
+                label={t('labels.filterLabel')}
                 value={filter}
                 onChange={e => setFilter(e.target.value)}
-                placeholder="Search labels..."
+                placeholder={t('labels.searchPlaceholder')}
                 className=""
               />
             </div>
@@ -133,7 +144,7 @@ export const LabelsManagement: FC = () => {
                 className="w-full mt-8"
                 onClick={() => setShowAddModal(true)}
               >
-                Add Label
+                {t('labels.add')}
               </RetroButton>
             </div>
           </div>
@@ -165,13 +176,13 @@ export const LabelsManagement: FC = () => {
                       icon={<Pen className="w-4 h-4" />}
                       onClick={() => handleEditClick(label)}
                     >
-                      Edit
+                      {t('labels.edit')}
                     </RetroButton>
                     <RetroButton
                       icon={<X className="w-4 h-4" />}
                       onClick={() => handleDeleteClick(label.id, label.name)}
                     >
-                      Delete
+                      {t('labels.delete')}
                     </RetroButton>
                   </div>
                 )}
@@ -222,13 +233,17 @@ const ConfirmDeleteModal: FC<{
   onClose: () => void;
   onConfirm: () => void;
   labelName: string;
-}> = ({ open, onClose, onConfirm, labelName }) => (
-  <ConfirmModal open={open} onClose={onClose} onConfirm={onConfirm}>
-    <div>
-      Are you sure you want to delete label
-      {' '}
-      <span className="text-[var(--primary-red)]">{labelName}</span>
-      ?
-    </div>
-  </ConfirmModal>
-);
+}> = ({ open, onClose, onConfirm, labelName }) => {
+  const { t } = useTranslation(); // ← DODAJ TO TU
+
+  return (
+    <ConfirmModal open={open} onClose={onClose} onConfirm={onConfirm}>
+      <div>
+        {t('labels.confirmDelete')}
+        {' '}
+        <span className="text-[var(--primary-red)]">{labelName}</span>
+        ?
+      </div>
+    </ConfirmModal>
+  );
+};

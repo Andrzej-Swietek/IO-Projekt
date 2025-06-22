@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router';
 import { FC, useState } from 'react';
 import { Loading } from '@components/common/Loading.tsx';
 import { FileText, Folder, FolderOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const fetchUserTasks = async (userId: string) => {
   const response = await TaskControllerApiFactory().getTasksByUserId(userId);
@@ -18,17 +19,14 @@ const fetchUsersTeams = async (userId: string) => {
   return response.data;
 };
 
-interface MyBoardsProps {
-}
-
-export const MyBoards: FC<MyBoardsProps> = () => {
+export const MyBoards: FC = () => {
+  const { t } = useTranslation();
   const { profile } = useUserProfile();
   const userId = profile?.id;
   const navigate = useNavigate();
 
   const [expandedTeams, setExpandedTeams] = useState<Record<string, boolean>>({});
   const [expandedProjects, setExpandedProjects] = useState<Record<string, boolean>>({});
-
 
   const {
     data: tasks,
@@ -68,7 +66,7 @@ export const MyBoards: FC<MyBoardsProps> = () => {
     <>
       <div className="w-full h-[125px] px-32 pt-12 pb-8 border-b">
         <h1 className="font-[Josefin_Sans] font-normal text-[36px] text-[var(--primary-black)]">
-          Hello
+          {t('myBoards.hello')}
           {' '}
           {profile?.firstName}
           {' '}
@@ -79,10 +77,7 @@ export const MyBoards: FC<MyBoardsProps> = () => {
         <main className="col-span-8">
           <div className="bg-[var(--primary-yellow)] p-6 retro-shadow mb-6">
             <h2 className="font-bold text-2xl text-[var(--primary-black)] font-[Josefin_Sans] tracking-wide">
-              MY
-              TEAMS
-              &
-              BOARDS
+              {t('myBoards.myTeamsBoards')}
             </h2>
           </div>
 
@@ -90,7 +85,7 @@ export const MyBoards: FC<MyBoardsProps> = () => {
             <div
               className="bg-[var(--secondary-yellow)] p-4 retro-shadow mt-4 text-[var(--primary-black)] font-mono"
             >
-              Loading teams...
+              {t('myBoards.loadingTeams')}
             </div>
           )}
 
@@ -131,11 +126,7 @@ export const MyBoards: FC<MyBoardsProps> = () => {
                             ? <FolderOpen className="inline mr-2 w-5 h-5" />
                             : <Folder className="inline mr-2 w-5 h-5" />}
                         </span>
-                        <span
-                          className="font-semibold"
-                        >
-                          {project.name}
-                        </span>
+                        <span className="font-semibold">{project.name}</span>
                       </div>
 
                       {expandedProjects[project.id!] && (
@@ -170,9 +161,9 @@ export const MyBoards: FC<MyBoardsProps> = () => {
         <aside className="col-span-4 grid grid-cols-12 gap-y-8 relative">
           <div className="w-1/2 h-full min-h-[70vh] top-22 bg-blue-100 absolute -z-1 retro-shadow"></div>
           <div className="col-span-full h-[60px]">
-            <ColumnTitle title="My Tasks" />
+            <ColumnTitle title={t('myBoards.myTasks')} />
           </div>
-          {isTasksLoading && <div>Loading Tasks...</div>}
+          {isTasksLoading && <div>{t('myBoards.loadingTasks')}</div>}
           {tasks?.map(task => (
             <div key={task.id} className="col-span-full px-8">
               <TaskCard task={task} isDragging={false} />
