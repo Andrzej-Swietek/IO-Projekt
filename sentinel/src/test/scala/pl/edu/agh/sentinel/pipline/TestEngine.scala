@@ -14,11 +14,11 @@ class TestEngine extends AlertingEngine {
         alertId = java.util.UUID.randomUUID().toString,
         taskId = te.taskId,
         title = te match {
-          case TaskEvent.TaskCreated(_, title, _, _, _) => title
+          case TaskEvent.TaskCreated(_, title, _, _, _, _) => title
           case _ => "Unknown"
         },
         userId = te match {
-          case TaskEvent.TaskCreated(_, _, _, creatorId, _) => creatorId
+          case TaskEvent.TaskCreated(_, _, _, creatorId, _, _) => creatorId
           case TaskEvent.TaskAssigned(_, assigneeId, _, _, _) => assigneeId
           case _ => "system"
         },
