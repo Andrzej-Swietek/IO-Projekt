@@ -175,7 +175,7 @@ export const MyBoards: FC<MyBoardsProps> = () => {
           {isTasksLoading && <div>Loading Tasks...</div>}
           {tasks?.map(task => (
             <div key={task.id} className="col-span-full px-8">
-              <TaskCard task={task} isDragging={false} />
+              <TaskCard task={task} isDragging={false} isEditable={false} />
             </div>
           ))}
         </aside>

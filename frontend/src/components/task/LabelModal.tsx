@@ -60,6 +60,7 @@ export const LabelModal: FC<LabelModalProps> = ({
                 type="button"
                 onClick={onClose}
                 disabled={loading}
+                icon={null}
               >
                 Cancel
               </RetroButton>

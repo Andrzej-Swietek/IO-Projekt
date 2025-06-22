@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { RetroModal } from '@components/common/RetroModal';
 import { RetroButton } from '@components/common/RetroButton';
+import {Trash2} from "lucide-react";
 
 interface DeleteTaskModalProps {
   onClose: () => void;
@@ -20,7 +21,7 @@ export const DeleteTaskModal: FC<DeleteTaskModalProps> = ({ onClose, onConfirm, 
           <RetroButton size="sm" type="button" onClick={onClose} variant="secondary" icon={null}>
             Cancel
           </RetroButton>
-          <RetroButton size="sm" type="button" onClick={onConfirm} disabled={isDeleting}>
+          <RetroButton size="sm" type="button" onClick={onConfirm} disabled={isDeleting} icon={<Trash2 className="h-4 w-4" />}>
             {isDeleting ? 'Deleting...' : 'Delete Task'}
           </RetroButton>
         </div>
