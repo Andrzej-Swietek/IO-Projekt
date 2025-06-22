@@ -128,12 +128,12 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
       const req: LabelRequest = {
         name: newLabelName,
         color: newLabelColor,
-        // taskId: task?.id
+        // TaskId: task?.id
       };
       const response = await api.createLabel(req);
       return response.data;
     },
-    onSuccess: (createdLabel) => {
+    onSuccess: createdLabel => {
       setShowAddLabel(false);
       setNewLabelName('');
       setNewLabelColor('#000000');
@@ -189,48 +189,65 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
           onChange={(e: ChangeEvent<HTMLInputElement>) => setPriority(Number(e.target.value))}
         />
 
-      <div className="flex items-start gap-4">
+        <div className="flex items-start gap-4">
           <div className="flex-1">
             <RetroMultiSelect
-                label="Labels"
-                className="min-w-[50%] w-auto"
-                options={labels?.map(label => ({
-                  label: label.name,
-                  value: label.id,
-                })) || []}
-                value={labelIds}
-                onChange={selected => setLabelIds(selected.map(Number))}
+              label="Labels"
+              className="min-w-[50%] w-auto"
+              options={labels?.map(label => ({
+                label: label.name,
+                value: label.id,
+              })) || []}
+              value={labelIds}
+              onChange={selected => setLabelIds(selected.map(Number))}
             />
           </div>
           <div className="self-end">
-          <RetroButton variant="secondary" className="retro-shadow" type="button" size="md" onClick={() => setShowAddLabel(!showAddLabel)}>
-            New
-          </RetroButton>
+            <RetroButton
+              variant="secondary"
+              className="retro-shadow"
+              type="button"
+              size="md"
+              onClick={() => setShowAddLabel(!showAddLabel)}
+            >
+              New
+            </RetroButton>
           </div>
         </div>
 
         {showAddLabel && (
-            <div className="border border-black bg-white/90 p-4 space-y-4 retro-shadow">
-              <RetroInput
-                  label="New Label Name"
-                  inputColor="bg-yellow-50"
-                  value={newLabelName}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setNewLabelName(e.target.value)}
-              />
-              <RetroColorPicker
-                  label="Color"
-                  value={newLabelColor}
-                  onChange={(e) => setNewLabelColor(e.target.value)}
-              />
-              <div className="flex gap-2">
-                <RetroButton variant="secondary" size="sm" type="button" onClick={() => addLabelMutation.mutate()}>
-                  Save
-                </RetroButton>
-                <RetroButton variant="secondary" size="sm" type="button" icon={null} onClick={() => setShowAddLabel(false)}>
-                  Cancel
-                </RetroButton>
-              </div>
+          <div className="border border-black bg-white/90 p-4 space-y-4 retro-shadow">
+            <RetroInput
+              label="New Label Name"
+              inputColor="bg-yellow-50"
+              value={newLabelName}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setNewLabelName(e.target.value)}
+            />
+            <RetroColorPicker
+              label="Color"
+              value={newLabelColor}
+              onChange={e => setNewLabelColor(e.target.value)}
+            />
+            <div className="flex gap-2">
+              <RetroButton
+                variant="secondary"
+                size="sm"
+                type="button"
+                onClick={() => addLabelMutation.mutate()}
+              >
+                Save
+              </RetroButton>
+              <RetroButton
+                variant="secondary"
+                size="sm"
+                type="button"
+                icon={null}
+                onClick={() => setShowAddLabel(false)}
+              >
+                Cancel
+              </RetroButton>
             </div>
+          </div>
         )}
         {/* Assignees */}
         <div>

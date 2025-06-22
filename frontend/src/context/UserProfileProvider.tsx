@@ -26,6 +26,22 @@ export const UserProfileProvider: FC<UserProfileProviderProps> = ({ children }) 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const refreshToken = async () => {
+    try {
+      await keycloak.updateToken(60 * 5); // Refresh token every 60 seconds
+    } catch {
+      keycloak.login();
+    }
+  };
+
+  const syncToken = () => {
+    if (keycloak.token) {
+      localStorage.setItem('kanban_app_token', keycloak.token);
+    } else {
+      localStorage.removeItem('kanban_app_token');
+    }
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       if (!keycloak?.authenticated || !keycloak.token) return;
@@ -56,6 +72,17 @@ export const UserProfileProvider: FC<UserProfileProviderProps> = ({ children }) 
       keycloak.updateToken();
       // Keycloak.logout();
     };
+
+    keycloak.onTokenExpired = async () => {
+      localStorage.removeItem('kanban_app_token');
+      try {
+        await keycloak.updateToken();
+      } catch {
+        keycloak.login();
+      }
+    };
+
+    keycloak.onAuthRefreshSuccess = syncToken;
 
     keycloak.onAuthLogout = () => {
       localStorage.removeItem('kanban_app_token');

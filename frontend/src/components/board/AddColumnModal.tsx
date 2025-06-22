@@ -30,6 +30,7 @@ export const AddColumnModal: FC<CreateColumnModalProps> = ({ onClose, boardId, p
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ['board-columns', boardId] });
       queryClient.refetchQueries({ queryKey: ['board', boardId] });
+      queryClient.refetchQueries({ queryKey: ['board'] });
       if (onClose) {
         onClose();
       }

@@ -37,4 +37,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     Optional<Estimate> findEstimateByTaskId(@Param("taskId") Long taskId);
 
     int countByColumnId(Long columnId);
+
+    List<Task> findByLabelsId(Long labelId);
 }

@@ -42,6 +42,7 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+      queryClient.invalidateQueries({ queryKey: ['board'] });
     },
   });
 
