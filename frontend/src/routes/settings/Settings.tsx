@@ -4,6 +4,7 @@ import { RetroButton } from '@components/common/RetroButton';
 import { useUserProfile } from '@context/UserProfileProvider';
 import { Moon, Sun, UserRoundPen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const THEME_KEY = 'kanban_theme';
 const COLOR_KEY = 'kanban_primary_color';
@@ -16,13 +17,11 @@ const PALETTE = [
   { name: 'Orange', value: '#f59e42' },
 ];
 
-
-interface SettingsProps {
-}
-
-export const Settings: FC<SettingsProps> = () => {
+export const Settings: FC = () => {
   const { profile } = useUserProfile();
   const navigate = useNavigate();
+  const { i18n, t } = useTranslation();
+
   const [theme, setTheme] = useState<'light' | 'dark'>(
     (localStorage.getItem(THEME_KEY) as 'light' | 'dark') || 'light',
   );
@@ -40,12 +39,15 @@ export const Settings: FC<SettingsProps> = () => {
 
   const keycloakAccountUrl = `${import.meta.env.VITE_KEYCLOAK_URL}/realms/${import.meta.env.VITE_KEYCLOAK_REALM}/account`;
 
+  const handleChangeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
+  };
 
   return (
     <>
       <div className="w-full h-[125px] !px-32 !pt-12 !pb-8 border-b">
         <h1 className="font-[Josefin_Sans] font-normal text-[36px] leading-[100%] tracking-[0%] align-bottom text-[var(--primary-black)]">
-          Hello
+          {t('settings.hello')}
           {' '}
           {profile?.firstName}
           {' '}
@@ -54,38 +56,37 @@ export const Settings: FC<SettingsProps> = () => {
       </div>
       <div className="flex flex-col items-center justify-center min-h-[80vh]">
         <RetroContainer className="w-full lg:w-[80%] !px-12 !py-10 flex flex-col gap-8">
-          <h2 className="text-2xl font-bold mb-4">Settings</h2>
+          <h2 className="text-2xl font-bold mb-4">{t('settings.title')}</h2>
           <div className="flex flex-col gap-4">
             <SettingRow>
               <>
                 <div
-                  className="h-full font-bold text-md uppercase tracking-wider text-black flex items-center justify-center"
+                  className="font-bold text-md uppercase tracking-wider text-black flex items-center justify-center"
                 >
-                  Keycloak
-                  Account:
+                  {t('settings.keycloak')}
                 </div>
                 <RetroButton
                   className="ml-4"
                   icon={<UserRoundPen />}
                   onClick={() => window.open(keycloakAccountUrl, '_blank')}
                 >
-                  Manage Account
+                  {t('settings.manageAccount')}
                 </RetroButton>
               </>
             </SettingRow>
             <SettingRow>
               <>
                 <div
-                  className="h-full font-bold text-md uppercase tracking-wider text-black flex items-center justify-center"
+                  className="font-bold text-md uppercase tracking-wider text-black flex items-center justify-center"
                 >
-                  Labels Management:
+                  {t('settings.labels')}
                 </div>
                 <RetroButton
                   className="ml-4"
                   icon={<UserRoundPen />}
                   onClick={() => navigate('/management/labels')}
                 >
-                  Manage Labels
+                  {t('settings.manageLabels')}
                 </RetroButton>
               </>
             </SettingRow>
@@ -94,7 +95,7 @@ export const Settings: FC<SettingsProps> = () => {
                 <span
                   className="font-bold text-md uppercase tracking-wider text-black flex items-center justify-center"
                 >
-                  Theme:
+                  {t('settings.theme')}
                 </span>
                 <div className="inline-flex ml-4 gap-2">
                   <RetroButton
@@ -102,14 +103,14 @@ export const Settings: FC<SettingsProps> = () => {
                     variant={theme === 'light' ? 'primary' : 'secondary'}
                     onClick={() => setTheme('light')}
                   >
-                    Light
+                    {t('settings.light')}
                   </RetroButton>
                   <RetroButton
                     icon={<Moon />}
                     variant={theme === 'dark' ? 'primary' : 'secondary'}
                     onClick={() => setTheme('dark')}
                   >
-                    Dark
+                    {t('settings.dark')}
                   </RetroButton>
                 </div>
               </>
@@ -119,7 +120,7 @@ export const Settings: FC<SettingsProps> = () => {
                 <span
                   className="font-bold text-md mb-2 mt-2 uppercase tracking-wider text-black flex items-center justify-center"
                 >
-                  Primary Color:
+                  {t('settings.primaryColor')}
                 </span>
                 <div className="inline-flex ml-4 gap-2">
                   {PALETTE.map(color => (
@@ -139,11 +140,33 @@ export const Settings: FC<SettingsProps> = () => {
                 </div>
               </>
             </SettingRow>
+            <SettingRow>
+              <>
+                <span
+                  className="font-bold text-md uppercase tracking-wider text-black flex items-center justify-center"
+                >
+                  {t('settings.language')}
+                </span>
+                <div className="inline-flex ml-4 gap-2">
+                  <RetroButton
+                    onClick={() => handleChangeLanguage('en')}
+                    variant={i18n.language === 'en' ? 'primary' : 'secondary'}
+                  >
+                    EN
+                  </RetroButton>
+                  <RetroButton
+                    onClick={() => handleChangeLanguage('pl')}
+                    variant={i18n.language === 'pl' ? 'primary' : 'secondary'}
+                  >
+                    PL
+                  </RetroButton>
+                </div>
+              </>
+            </SettingRow>
           </div>
         </RetroContainer>
       </div>
     </>
-
   );
 };
 

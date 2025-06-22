@@ -8,6 +8,7 @@ import { BoardColumnControllerApiFactory, Task } from '@/api';
 import { TaskCard } from '@components/task/TaskCard.tsx';
 import { RetroButton } from '@components/common/RetroButton';
 import { RetroModal } from '@components/common/RetroModal';
+import { useTranslation } from 'react-i18next';
 
 interface KanbanColumnProps {
   id: string;
@@ -30,10 +31,10 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({
   onEditTask,
   isTaskDragging,
 }) => {
+  const { t } = useTranslation();
   const columnId = `column-${id}`;
   const taskIds = tasks.map(task => `task-${task.id}`);
   const queryClient = useQueryClient();
-
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const deleteColumnMutation = useMutation({
@@ -80,7 +81,7 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({
                 e.stopPropagation();
                 setShowDeleteModal(true);
               }}
-              title="Delete Column"
+              title={t('kanban.deleteColumn')}
               type="button"
             >
               <Trash2 className="h-4 w-4" />
@@ -91,7 +92,7 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({
               className="cursor-grab rounded !p-2 hover:bg-black/5 active:cursor-grabbing"
             >
               <GripVertical className="h-6 w-6" />
-              <span className="sr-only">Drag column</span>
+              <span className="sr-only">{t('kanban.dragColumn')}</span>
             </button>
           </div>
         </div>
@@ -102,7 +103,7 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({
             onClick={onAddTask}
             className="w-full py-8 text-sm"
           >
-            Add Task
+            {t('kanban.addTask')}
           </RetroButton>
         </div>
 
@@ -119,38 +120,37 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({
                 border-2 border-dashed border-blue-400 bg-blue-50/60 p-4 text-center text-sm text-blue-700 mt-2"
                   style={{ minHeight: 48 }}
                 >
-                  Drop tasks here
+                  {t('kanban.dropTasks')}
                 </div>
               )}
             </div>
           </SortableContext>
         </div>
       </div>
+
       {showDeleteModal && (
         <RetroModal
-          title="Delete Column"
-          subtitle={`Are you sure you want to delete the column "${title}"? This action cannot be undone.`}
-          children={(
-            <div className="h-[10vh] flex items-center justify-end gap-4">
-              <RetroButton
-                variant="secondary"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                Cancel
-              </RetroButton>
-              <RetroButton
-                onClick={() => {
-                  deleteColumnMutation.mutate(+id);
-                  setShowDeleteModal(false);
-                }}
-              >
-                Delete
-              </RetroButton>
-            </div>
-          )}
-        />
+          title={t('kanban.deleteColumn')}
+          subtitle={t('kanban.deleteConfirm', { column: title })}
+        >
+          <div className="h-[10vh] flex items-center justify-end gap-4">
+            <RetroButton
+              variant="secondary"
+              onClick={() => setShowDeleteModal(false)}
+            >
+              {t('common.cancel')}
+            </RetroButton>
+            <RetroButton
+              onClick={() => {
+                deleteColumnMutation.mutate(+id);
+                setShowDeleteModal(false);
+              }}
+            >
+              {t('common.delete')}
+            </RetroButton>
+          </div>
+        </RetroModal>
       )}
     </>
   );
 };
-

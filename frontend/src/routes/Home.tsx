@@ -12,6 +12,7 @@ import { TaskCard } from '@components/task';
 import { TeamProjectsModal } from '@components/team/TeamProjectsModal';
 import { CreateTeamModal } from '@components/team/CreateTeamModal';
 import { Loading } from '@components/common/Loading.tsx';
+import { useTranslation } from 'react-i18next';
 
 interface HomeProps {
 }
@@ -34,6 +35,8 @@ const fetchUserTasks = async (userId: string) => {
 export const Home: FC<HomeProps> = () => {
   const { profile } = useUserProfile();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
 
   const userId = profile?.id;
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
@@ -88,22 +91,20 @@ export const Home: FC<HomeProps> = () => {
     <>
       <div className="w-full h-[125px] !px-32 !pt-12 !pb-8 border-b">
         <h1 className="font-[Josefin_Sans] font-normal text-[36px] leading-[100%] tracking-[0%] align-bottom text-[var(--primary-black)]">
-          Hello
-          {' '}
-          {profile?.firstName}
-          {' '}
-          {profile?.lastName}
+          {t('home.greeting', { firstName: profile?.firstName, lastName: profile?.lastName })}
         </h1>
       </div>
       <div className="grid grid-cols-12 gap-8 min-h-[80vh] grid-rows-[auto_1fr] items-start !p-8">
         <main className="col-span-8 grid grid-cols-12 gap-y-8">
           <div className="col-span-full !h-[60px]">
-            <ColumnTitle title="My Teams" />
+            <ColumnTitle title={t('home.myTeams')} />
           </div>
           <RetroContainer shadowSize="lg" className="col-span-full h-full min-h-[40vh] !px-8 !py-4">
             {
               isTeamsLoading && (
-                <div>Loading Teams ... </div>
+                <div>
+                  {t('home.loadingTeams')}
+                </div>
               )
             }
             {teams && teams.map(team => (
@@ -118,14 +119,14 @@ export const Home: FC<HomeProps> = () => {
                       icon={<FolderKanban />}
                       onClick={() => setSelectedTeam(team)}
                     >
-                      Projects
+                      {t('home.projects')}
                     </RetroButton>
                     <RetroButton
                       className="!px-2 !py-2 w-auto"
                       icon={<Trash2 className="text-red-500" />}
                       variant="secondary"
                       onClick={() => {
-                        if (window.confirm(`Are you sure you want to delete team '${team.name}'?`)) {
+                        if (window.confirm(t('home.confirmDeleteTeam', { name: team.name }))) {
                           deleteTeamMutation.mutate(team.id!);
                         }
                       }}
@@ -143,18 +144,18 @@ export const Home: FC<HomeProps> = () => {
               icon={<span className="text-lg md:text-2xl">+</span>}
               onClick={() => setShowCreateTeamModal(true)}
             >
-              Add a new team
+              {t('home.addTeam')}
             </RetroButton>
           </RetroContainer>
         </main>
         <aside className="col-span-4 grid grid-cols-12 gap-y-8 relative">
           <div className="w-1/2 h-full min-h-[70vh] top-22 bg-blue-100 absolute -z-1 retro-shadow"></div>
           <div className="col-span-full h-[60px]">
-            <ColumnTitle title="My Tasks" />
+            <ColumnTitle title={t('home.myTasks')} />
           </div>
           {
             isTasksLoading && (
-              <div>Loading Tasks ... </div>
+              <div>{t('home.loadingTasks')}</div>
             )
           }
           {

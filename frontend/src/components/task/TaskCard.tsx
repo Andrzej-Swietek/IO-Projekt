@@ -10,6 +10,7 @@ import { FC, HTMLAttributes, useState } from 'react';
 import { useUsersByIds } from '@hooks/useUsersByIds.ts';
 import { Link } from 'react-router';
 import { DeleteTaskModal } from './DeleteTaskModal';
+import { useTranslation } from 'react-i18next';
 
 interface TaskCardProps extends HTMLAttributes<HTMLDivElement> {
   task: Task;
@@ -32,9 +33,9 @@ const priorityIcons = {
 };
 
 export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, className, onEdit, ...props }) => {
+  const { t } = useTranslation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const queryClient = useQueryClient();
-
   const [showSheet, setShowSheet] = useState(false);
 
   const deleteTaskMutation = useMutation({
@@ -66,6 +67,13 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
   const taskLabels = Array.from(task.labels ?? []);
   const { data: usersById } = useUsersByIds(task.assignees ?? []);
 
+  const statusToDisplay = {
+    TODO: t('taskDetails.statusValues.TODO'),
+    IN_PROGRESS: t('taskDetails.statusValues.IN_PROGRESS'),
+    DONE: t('taskDetails.statusValues.DONE'),
+    BLOCKED: t('taskDetails.statusValues.BLOCKED'),
+  } as Record<string, string>;
+
   return (
     <>
       <div
@@ -84,7 +92,6 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
           if (!isDragging) setShowSheet(true);
         }}
       >
-        {/* Top Row: Title + Drag Handle + Edit Button */}
         <div className="flex justify-between items-start">
           <h3 className="mb-2 block font-bold text-md uppercase tracking-wider text-black">{task.title}</h3>
           <div className="flex gap-1 items-center">
@@ -94,7 +101,7 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
                 e.stopPropagation();
                 onEdit?.(task);
               }}
-              title="Edit Task"
+              title={t('common.edit')}
               type="button"
             >
               <Pencil className="h-4 w-4" />
@@ -105,7 +112,7 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
                 e.stopPropagation();
                 setShowDeleteModal(true);
               }}
-              title="Delete Task"
+              title={t('common.delete')}
               type="button"
             >
               <Trash2 className="h-4 w-4" />
@@ -114,22 +121,20 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
               className="cursor-grab rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 active:cursor-grabbing"
             >
               <GripVertical className="h-4 w-4" />
-              <span className="sr-only">Drag</span>
+              <span className="sr-only">{t('common.drag')}</span>
             </button>
           </div>
         </div>
 
-        {/* Description */}
         {task.description && (
           <div className="font-thin text-sm tracking-wider text-black">{task.description}</div>
         )}
 
-        {/* Badges: status, labels, priority */}
         <div className="flex flex-wrap gap-2">
           {task.status && (
             <Badge className={cn('!px-4 !py-2 font-normal uppercase', statusStyles[task.status])}>
               {task.status && priorityIcons[task.status as keyof typeof priorityIcons]}
-              {STATUS_TO_DISPLAY[task.status]}
+              {statusToDisplay[task.status]}
             </Badge>
           )}
 
@@ -155,7 +160,6 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
           ))}
         </div>
 
-        {/* Footer: assignees and dueDate */}
         {(task.assignees?.length || task.createdDate) && (
           <div className="pt-2 text-xs text-gray-500">
             <div className="flex items-center gap-2 mb-2">
@@ -177,11 +181,12 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
                   </Link>
                 );
               })}
-              {task.assignees?.length === 0 && <span>No assignees</span>}
+              {task.assignees?.length === 0 && <span>{t('taskDetails.noAssignees')}</span>}
             </div>
             {task.createdDate && (
               <div className="text-gray-400">
-                Created:
+                {t('taskDetails.created')}
+                :
                 {' '}
                 {new Date(task.createdDate).toLocaleDateString()}
               </div>
@@ -190,11 +195,7 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
         )}
       </div>
 
-      <TaskDetailsSheet
-        task={task}
-        open={showSheet}
-        onOpenChange={setShowSheet}
-      />
+      <TaskDetailsSheet task={task} open={showSheet} onOpenChange={setShowSheet} />
 
       {showDeleteModal && (
         <DeleteTaskModal
@@ -210,10 +211,3 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
     </>
   );
 };
-
-const STATUS_TO_DISPLAY: Record<string, string> = {
-  TODO: 'To Do',
-  IN_PROGRESS: 'In Progress',
-  DONE: 'Done',
-  BLOCKED: 'Blocked',
-} as const;
