@@ -11,6 +11,8 @@ import { OtherUserProfile } from '@routes/user/OtherUserProfile.tsx';
 import { BoardPage } from '@routes/Board.tsx';
 import { UserProfileTab } from '@routes/user/UserProfile.tsx';
 import { MyBoards } from '@routes/user/MyBoards.tsx';
+import { Settings } from '@routes/settings/Settings.tsx';
+import { LabelsManagement } from '@routes/settings/labels/LabelsManagement.tsx';
 
 interface Props {
 }
@@ -46,9 +48,11 @@ const router = createBrowserRouter([
         children: [
           { path: 'my-profile', element: <UserProfileTab /> },
           { path: 'my-boards', element: <MyBoards /> },
+          { path: 'settings', element: <Settings /> },
           { path: ':id', element: <OtherUserProfile /> },
         ],
       },
+      { path: 'management/labels', element: <LabelsManagement /> },
       {
         path: 'board/:id',
         element: <BoardPage />,

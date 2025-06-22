@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.edu.agh.io_project.tasks.Task;
 import pl.edu.agh.io_project.tasks.TaskRepository;
 
 import java.util.List;
@@ -53,8 +54,18 @@ public class LabelServiceImpl implements LabelService {
         return this.labelRepository.save(label);
     }
 
+    @Transactional
     @Override
     public void deleteLabel(Integer labelId) {
+        Label label = labelRepository.findById(labelId.longValue())
+                .orElseThrow(() -> new EntityNotFoundException("Label not found"));
+
+        List<Task> tasksWithLabel = taskRepository.findByLabelsId(labelId.longValue());
+        for (Task task : tasksWithLabel) {
+            task.getLabels().remove(label);
+        }
+        taskRepository.saveAll(tasksWithLabel);
+
         this.labelRepository.deleteById(labelId.longValue());
     }
 
