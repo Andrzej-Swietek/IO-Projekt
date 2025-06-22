@@ -80,6 +80,9 @@
       "TASK_DELETED": "Usunięto zadanie"
     }
   },
+  "alerts": {
+    "title": "Powiadomienia"
+  },
   "board": {
     "loading": "Ładowanie...",
     "untitled": "Tablica bez tytułu",

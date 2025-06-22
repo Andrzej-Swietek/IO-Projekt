@@ -13,11 +13,11 @@
     "description": "Description"
   },
   "kanban": {
-    "addTask": "Add Task",
     "deleteColumn": "Delete Column",
-    "deleteConfirm": "Are you sure you want to delete the column \"{{column}}\"? This action cannot be undone.",
     "dragColumn": "Drag column",
-    "dropTasks": "Drop tasks here"
+    "addTask": "Add Task",
+    "dropTasks": "Drop tasks here",
+    "deleteConfirm": "Are you sure you want to delete the column \"{{column}}\"? This action cannot be undone."
   },
   "common": {
     "cancel": "Cancel",
@@ -79,6 +79,9 @@
       "CLOSED": "Task closed",
       "TASK_DELETED": "Task deleted"
     }
+  },
+  "alerts": {
+    "title": "Alerts"
   },
   "board": {
     "loading": "Loading...",

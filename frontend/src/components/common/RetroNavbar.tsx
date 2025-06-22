@@ -1,4 +1,4 @@
-import { MoreVertical, User } from 'lucide-react';
+import { MoreVertical, TriangleAlert, User } from 'lucide-react';
 import { Button } from '@components/ui/button.tsx';
 import { FC } from 'react';
 import {
@@ -43,6 +43,11 @@ export const RetroNavbar: FC<RetroNavbarProps> = () => {
 
       {/* User Actions */}
       <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon" className="hover:bg-yellow-400 w-12 h-12">
+          <NavLink to="/alerts">
+            <TriangleAlert className="!w-8 !h-8 text-black" />
+          </NavLink>
+        </Button>
         <Button variant="ghost" size="icon" className="hover:bg-yellow-400 w-12 h-12">
           <NavLink to="/user/my-profile">
             <User className="!w-8 !h-8 text-black" />
