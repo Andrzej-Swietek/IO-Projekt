@@ -85,7 +85,7 @@ public class ReportGenerator {
                     document.add(new Paragraph("No tasks found.", normalFont));
                 } else {
                     for (Task task : tasks) {
-                        document.add(new Paragraph("Title: " + task.getTitle(), normalFont));
+                        document.add(new Paragraph("• Title: " + task.getTitle(), normalFont));
                         document.add(new Paragraph("  Description: " + task.getDescription(), normalFont));
                         document.add(new Paragraph("  Status: " + task.getStatus(), normalFont));
                         document.add(new Paragraph("  Column: " + (task.getColumn() != null ? task.getColumn().getName() : "N/A"), normalFont));
