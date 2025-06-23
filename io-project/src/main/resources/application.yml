@@ -57,8 +57,7 @@ springdoc:
 
 storage:
   local:
-    base-path: storage/
-
+    base-path: store/
 server:
   port: 8080
   compression:

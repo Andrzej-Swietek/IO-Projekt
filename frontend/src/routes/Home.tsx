@@ -161,7 +161,7 @@ export const Home: FC<HomeProps> = () => {
           {
             tasks?.map(task => (
               <div key={task.id} className="col-span-full !px-8">
-                <TaskCard className="col-span-full" task={task} isDragging={false} />
+                <TaskCard className="col-span-full" task={task} isDragging={false} isEditable={false} />
               </div>
             ))
           }

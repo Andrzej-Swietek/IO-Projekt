@@ -134,7 +134,7 @@ export const MyBoards: FC = () => {
                           {project.boards?.map(board => (
                             <div
                               key={board.id}
-                              onClick={() => navigate(`/board/${board.id}`)}
+                              onClick={() => navigate(`/board/${board.id}/${team.id}`)}
                               className="ml-6 mt-6 py-6 px-10 cursor-pointer text-[var(--primary-black)]
                                bg-[var(--primary-red)] hover:bg-[var(--primary-yellow)]  retro-shadow transition-all
                                 duration-200 hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000]"
@@ -166,7 +166,7 @@ export const MyBoards: FC = () => {
           {isTasksLoading && <div>{t('myBoards.loadingTasks')}</div>}
           {tasks?.map(task => (
             <div key={task.id} className="col-span-full px-8">
-              <TaskCard task={task} isDragging={false} />
+              <TaskCard task={task} isDragging={false} isEditable={false} />
             </div>
           ))}
         </aside>

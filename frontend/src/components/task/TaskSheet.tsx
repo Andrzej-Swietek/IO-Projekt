@@ -14,7 +14,7 @@ import { Link } from 'react-router';
 import { useUsersByIds } from '@hooks/useUsersByIds.ts';
 import { TaskHistoryTimeline } from '@components/task/TaskHistoryTimeline.tsx';
 import { cn } from '@/lib/utils.ts';
-import { AlertCircle, Flame, Zap } from 'lucide-react';
+import { AlertCircle, Flame, Zap, Repeat } from 'lucide-react';
 import { RetroButton } from '@components/common/RetroButton.tsx';
 import { UpdateStatusModal } from './UpdateStatusModal';
 import { toast } from 'sonner';
@@ -149,7 +149,7 @@ export const TaskDetailsSheet: FC<{
             <RetroButton
               size="sm"
               onClick={() => setShowStatusModal(true)}
-              icon={<Zap className="w-4 h-4" />}
+              icon={<Repeat className="w-4 h-4" />}
               className="ml-auto"
             >
               {t('taskDetails.updateStatus')}

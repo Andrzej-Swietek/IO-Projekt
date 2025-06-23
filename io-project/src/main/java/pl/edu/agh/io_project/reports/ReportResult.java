@@ -32,6 +32,9 @@ public class ReportResult {
 
     private Boolean success;
 
+    @Column(name = "file_path")
+    private String filePath;
+
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdDate;
 

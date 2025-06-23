@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { RetroModal } from '@components/common/RetroModal.tsx';
 import { CancelButton } from '@components/common/CancelButton.tsx';
 import { RetroButton } from '@components/common/RetroButton.tsx';
-import { X } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
 export const ConfirmModal: FC<{
   open: boolean;
@@ -24,7 +24,7 @@ export const ConfirmModal: FC<{
               onClick={onClose}
             />
             <RetroButton
-              icon={<X className="w-4 h-4" />}
+              icon={<Trash2 className="h-4 w-4" />}
               variant="danger"
               onClick={onConfirm}
             >
