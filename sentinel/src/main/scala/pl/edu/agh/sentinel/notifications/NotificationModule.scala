@@ -15,7 +15,7 @@ object NotificationModule {
     } yield scope
   }
 
-  val live: ZLayer[Any, Throwable, NotificationEnv] =
+  val live: ZLayer[Any, Throwable, NotificationEnv] = {
     ZLayer
       .make[NotificationEnv](
         NotificationConfig.layer,
@@ -25,5 +25,6 @@ object NotificationModule {
       .mapError { e =>
         new RuntimeException(s"Failed to create Notification layer: ${e.getMessage}", e)
       }
+  }
 
 }

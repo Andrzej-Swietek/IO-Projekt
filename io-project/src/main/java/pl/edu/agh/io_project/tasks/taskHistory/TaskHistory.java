@@ -22,7 +22,7 @@ public class TaskHistory {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "task_id")
+    @JoinColumn(name = "task_id", nullable = false)
     private Task task;
 
     @Column(name = "user_id")

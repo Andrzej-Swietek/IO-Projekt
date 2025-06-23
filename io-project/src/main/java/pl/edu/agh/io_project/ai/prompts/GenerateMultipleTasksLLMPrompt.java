@@ -1,5 +1,6 @@
 package pl.edu.agh.io_project.ai.prompts;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -10,6 +11,7 @@ import org.springframework.core.io.Resource;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public record GenerateMultipleTasksLLMPrompt(
         String tasksDescription,
         Integer count
@@ -34,6 +36,7 @@ public record GenerateMultipleTasksLLMPrompt(
         var userMessage = new PromptTemplate(generateMultipleTasksPromptResource)
                 .create(params)
                 .getContents();
+        log.info("GEN prompt for {} tasks", userMessage);
         return new Prompt(List.of(systemMessage, new UserMessage(userMessage)));
     }
 }

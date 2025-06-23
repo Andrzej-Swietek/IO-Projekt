@@ -1,8 +1,9 @@
 package pl.edu.agh.sentinel.notifications
 
+import zio.{ Task, ZIO, ZLayer }
+
 import pl.edu.agh.sentinel.configs.NotificationConfig
 import pl.edu.agh.sentinel.events.AlertEvent
-import zio.{Task, ZIO, ZLayer}
 
 trait Notifier {
   def send(message: AlertEvent): Task[Unit]
@@ -20,7 +21,7 @@ final case class SentinelNotifier(
   }
 }
 
-object SentinelNotifier {  
+object SentinelNotifier {
   val live: ZLayer[NotificationConfig, Throwable, SentinelNotifier] = ZLayer.fromZIO {
     for {
       config <- ZIO.service[NotificationConfig]
@@ -36,7 +37,7 @@ object SentinelNotifier {
         val slackNotifier = for {
           token <- config.slack.token
           if config.slack.enabled
-        } yield SlackNotifier(token) 
+        } yield SlackNotifier(token)
 
         val discordNotifier = for {
           webhook <- config.discord.webhookUrl

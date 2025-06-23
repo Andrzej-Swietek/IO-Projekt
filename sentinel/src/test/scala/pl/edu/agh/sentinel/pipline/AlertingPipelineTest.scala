@@ -1,24 +1,24 @@
 package pl.edu.agh.sentinel.pipline
 
-import zio.*
+import zio._
 import zio.kafka.serde.*
 import zio.stream.ZStream
 import zio.test.*
 
-import pl.edu.agh.sentinel.configs.{DiscordConfig, EmailConfig, NotificationConfig, SlackConfig}
-import pl.edu.agh.sentinel.events.{AlertEvent, TaskEvent}
+import java.time.Instant
+
+import pl.edu.agh.sentinel.SentinelApp.runAlertingPipeline
+import pl.edu.agh.sentinel.configs.{ DiscordConfig, EmailConfig, NotificationConfig, SlackConfig }
+import pl.edu.agh.sentinel.events.{ AlertEvent, TaskEvent }
 import pl.edu.agh.sentinel.kafka.*
 import pl.edu.agh.sentinel.kafka.config.KafkaConfig
+import pl.edu.agh.sentinel.kafka.consumers.{ ConsumingStrategy, KafkaConsumer, TaskEventConsumer }
 import pl.edu.agh.sentinel.kafka.consumers.ConsumingStrategy.Earliest
-import pl.edu.agh.sentinel.kafka.consumers.{ConsumingStrategy, KafkaConsumer, TaskEventConsumer}
 import pl.edu.agh.sentinel.kafka.producers.KafkaProducer
 import pl.edu.agh.sentinel.kafka.serdes.ZioJsonSerde
-import pl.edu.agh.sentinel.kafka.topics.{KafkaTopic, TopicManager}
-import pl.edu.agh.sentinel.notifications.{Notifier, SentinelNotifier}
+import pl.edu.agh.sentinel.kafka.topics.{ KafkaTopic, TopicManager }
+import pl.edu.agh.sentinel.notifications.{ NotificationEnv, Notifier, SentinelNotifier }
 import pl.edu.agh.sentinel.processing.AlertingEngine
-
-
-import java.time.Instant
 
 object AlertingPipelineFunctionTest extends ZIOSpecDefault {
   given Serializer[Any, String] = Serde.string
@@ -74,64 +74,108 @@ object AlertingPipelineFunctionTest extends ZIOSpecDefault {
     alertRef <- Ref.make(List.empty[AlertEvent])
     notifier = makeTestNotifier(alertRef)
     engine = TestEngine()
-    // Simulate the consumer stream
     taskEventStream = ZStream.fromQueue(queue)
-    // Simulate the alerting pipeline
-    fiber <- engine.process(taskEventStream)
+    fiber <- engine
+      .process(taskEventStream)
       .tap(alert => notifier.send(alert))
       .runDrain
       .fork
-    // Simulate producing an event
-    event = TaskEvent.TaskCreated("task-123", "Important", "col-1", "user-1", Instant.now().nn)
+    event = TaskEvent.TaskCreated("task-123", "Important", "team-1", "col-1", "user-1", Instant.now().nn)
     _ <- queue.offer(event)
     _ <- TestClock.adjust(2.seconds)
     alerts <- alertRef.get
     _ <- fiber.interrupt
   } yield assertTrue(alerts.exists(_.message.contains("task-123")))
 
-  def runTestAlertingPipeline(consumer: KafkaConsumer, engine: AlertingEngine)
-    : ZIO[SentinelNotifier, Nothing, Fiber.Runtime[Throwable, Unit]] = for {
-    notifier <- ZIO.service[SentinelNotifier]
+  def runTestAlertingPipeline(
+    taskEventStream: ZStream[Any, Throwable, TaskEvent],
+    producer: KafkaProducer,
+    engine: AlertingEngine,
+  ): ZIO[KafkaEnv & AlertingEngine & NotificationEnv, Throwable, Fiber.Runtime[Throwable, Unit]] = {
+    runAlertingPipeline(taskEventStream, producer, engine).fork
+  }
 
-    taskEventStream <- ZIO.succeed(TaskEventConsumer(consumer).run)
+  // Provide both NotificationConfig and SentinelNotifier
+  def testSentinelNotifierLayer(alertRef: Ref[List[AlertEvent]], testNotifier: Notifier)
+    : ZLayer[Any, Nothing, NotificationConfig & SentinelNotifier] =
+    notificationConfigLayer ++ ZLayer.succeed(new SentinelNotifier(List(testNotifier)))
 
-    alertEventStream = engine.process(taskEventStream)
-    fiber <- alertEventStream
-      .tap(alert => notifier.send(alert))
-      .runDrain
-      .retry(Schedule.exponential(1.second))
-      .forkDaemon
-  } yield fiber
+  val test = for {
+    queue <- Queue.unbounded[TaskEvent]
+    alertRef <- Ref.make(List.empty[AlertEvent])
+    testNotifier = new Notifier {
+      override def send(message: AlertEvent): Task[Unit] = alertRef.update(_ :+ message)
+    }
+    engine = TestEngine()
+    producer <- ZIO.service[KafkaProducer]
+    taskEventStream = ZStream.fromQueue(queue)
+    fiber <- runTestAlertingPipeline(taskEventStream, producer, engine)
+      .provideSomeLayer[KafkaEnv & AlertingEngine](testSentinelNotifierLayer(alertRef, testNotifier))
+    event = TaskEvent.TaskCreated("task-123", "Important", "team-1", "col-1", "user-1", Instant.now().nn)
+    _ <- queue.offer(event)
+    _ <- TestClock.adjust(2.seconds)
+    alerts <- alertRef.get
+    _ <- fiber.interrupt
+  } yield assertTrue(alerts.exists(_.message.contains("task-123")))
+
+  val noAlertOnEmptyInput: ZIO[Any, Nothing, TestResult] = for {
+    queue <- Queue.unbounded[TaskEvent]
+    alertRef <- Ref.make(List.empty[AlertEvent])
+    notifier = makeTestNotifier(alertRef)
+    engine = TestEngine()
+    fiber <- engine.process(ZStream.fromQueue(queue)).tap(alert => notifier.send(alert)).runDrain.fork
+    _ <- TestClock.adjust(2.seconds)
+    alerts <- alertRef.get
+    _ <- fiber.interrupt
+  } yield assertTrue(alerts.isEmpty)
+
+  val multipleAlerts: ZIO[Any, Nothing, TestResult] = for {
+    queue <- Queue.unbounded[TaskEvent]
+    alertRef <- Ref.make(List.empty[AlertEvent])
+    notifier = makeTestNotifier(alertRef)
+    engine = TestEngine()
+    fiber <- engine.process(ZStream.fromQueue(queue)).tap(alert => notifier.send(alert)).runDrain.fork
+    _ <- queue.offer(TaskEvent.TaskCreated("task-1", "A", "team", "col", "user", Instant.now().nn))
+    _ <- queue.offer(TaskEvent.TaskCreated("task-2", "B", "team", "col", "user", Instant.now().nn))
+    _ <- TestClock.adjust(2.seconds)
+    alerts <- alertRef.get
+    _ <- fiber.interrupt
+  } yield assertTrue(alerts.size == 2)
+
+  val duplicateEvents: ZIO[Any, Nothing, TestResult] = for {
+    queue <- Queue.unbounded[TaskEvent]
+    alertRef <- Ref.make(List.empty[AlertEvent])
+    notifier = makeTestNotifier(alertRef)
+    engine = TestEngine()
+    fiber <- engine.process(ZStream.fromQueue(queue)).tap(alert => notifier.send(alert)).runDrain.fork
+    event = TaskEvent.TaskCreated("task-1", "A", "team", "col", "user", Instant.now().nn)
+    _ <- queue.offer(event)
+    _ <- queue.offer(event)
+    _ <- TestClock.adjust(2.seconds)
+    alerts <- alertRef.get
+    _ <- fiber.interrupt
+  } yield assertTrue(alerts.size == 2)
+
+  val alertContentTest: ZIO[Any, Nothing, TestResult] = for {
+    queue <- Queue.unbounded[TaskEvent]
+    alertRef <- Ref.make(List.empty[AlertEvent])
+    notifier = makeTestNotifier(alertRef)
+    engine = TestEngine()
+    fiber <- engine.process(ZStream.fromQueue(queue)).tap(alert => notifier.send(alert)).runDrain.fork
+    event = TaskEvent.TaskCreated("task-xyz", "Critical", "team-x", "col-x", "user-x", Instant.now().nn)
+    _ <- queue.offer(event)
+    _ <- TestClock.adjust(2.seconds)
+    alerts <- alertRef.get
+    _ <- fiber.interrupt
+  } yield assertTrue(alerts.exists(_.message.contains("task-xyz")))
 
   override def spec: Spec[TestEnvironment & Scope, Any] = suite("runAlertingPipeline function")(
-//    test("runAlertingPipeline should emit AlertEvent based on TaskEvent") {
-//      for {
-//        env <- ZIO.service[KafkaTestEnv]
-//        topicManager <- ZIO.service[TopicManager]
-//        producer <- env.getProducer
-//        consumer <- env.getConsumer(ConsumingStrategy.Earliest)
-//
-//        _ <- topicManager.createTopic(topic)
-//
-//        alertRef <- Ref.make(List.empty[AlertEvent])
-//        testNotifier = makeTestNotifier(alertRef)
-//
-//        fiber <- runTestAlertingPipeline(consumer, engine = TestEngine())
-//
-//        event = TaskEvent.TaskCreated("task-123", "Important", "col-1", "user-1", Instant.now().nn)
-//        _ <- producer.produce(topic.name, "key-1", event)
-//
-//        _ <- TestClock.adjust(2.seconds)
-//        _ <- ZIO.sleep(1.second)
-//
-//        alerts <- alertRef.get
-//        result <- TestUtils.eventually(alertRef.get.map(_.exists(_.message.contains("task-123"))))
-//        _ <- fiber.interrupt
-//      } yield assertTrue(alerts.exists(_.message.contains("task-123")))
-//    } @@ TestAspect.diagnose(3.seconds),
-
-    test("should emit AlertEvent based on TaskEvent")(inMemoryTest)
-
+    test("should emit AlertEvent based on TaskEvent")(inMemoryTest),
+    test("should emit AlertEvent using runAlertingPipeline")(test),
+    test("should not emit alert for empty input")(noAlertOnEmptyInput),
+    test("should emit multiple alerts for multiple events")(multipleAlerts),
+    test("should emit alerts for duplicate events")(duplicateEvents),
+    test("should contain correct content in alert")(alertContentTest),
   ).provideLayer(
     Scope.default >+>
       testLayers
@@ -151,11 +195,13 @@ object NotifierTestSupport {
 }
 
 object TestUtils {
-  def eventually[R, E, A](effect: ZIO[R, E, Boolean], retries: Int = 20, delay: Duration = 100.millis): ZIO[R, E, Boolean] =
+  def eventually[R, E, A](effect: ZIO[R, E, Boolean], retries: Int = 20, delay: Duration = 100.millis)
+    : ZIO[R, E, Boolean] = {
     effect.flatMap {
-      case true  => ZIO.succeed(true)
+      case true => ZIO.succeed(true)
       case false =>
         if (retries <= 0) ZIO.succeed(false)
         else ZIO.sleep(delay) *> eventually(effect, retries - 1, delay)
     }
+  }
 }

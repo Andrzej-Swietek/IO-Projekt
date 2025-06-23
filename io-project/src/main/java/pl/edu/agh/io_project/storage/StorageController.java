@@ -37,6 +37,7 @@ public class StorageController {
 
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=\"" + resource.getFilename() + "\"")
+                .header("Content-Type", "application/pdf")
                 .body(resource);
     }
 

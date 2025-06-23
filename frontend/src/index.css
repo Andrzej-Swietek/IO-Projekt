@@ -131,7 +131,6 @@
     --sidebar-ring: oklch(0.704 0.04 256.788);
 
     --primary-yellow: #FFD44C;
-
     --primary-black: #000000;
     --primary-white: #FFFFFF;
     --secondary-white: #F8E2E2;
@@ -143,7 +142,7 @@
 
     --navbar-height: 80px;
     --footer-height: 80px;
-    --screen-view-height: 100vh - --footer-height;
+    --screen-view-height: 100vh ---footer-height;
 }
 
 .dark {
@@ -178,22 +177,48 @@
     --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.551 0.027 264.364);
+
+    --primary-yellow: #E6C043; /* Slightly darker, less bright yellow */
+    --primary-black: #FFFFFF; /* Inverted to white for dark theme */
+    --primary-white: #1A1A1A; /* Dark gray instead of pure black */
+    --secondary-white: #2D1F1F; /* Dark reddish-brown equivalent */
+    --primary-blue: #6BA3E6; /* Slightly darker blue */
+    --secondary-blue: rgba(107, 163, 230, 0.2); /* Darker blue with opacity */
+    --primary-red: #C55A5A; /* Slightly darker red */
+    --secondary-yellow: #4A3D1A; /* Dark brownish-yellow */
+    --primary-gray: #A0A0A0; /* Lighter gray for better contrast */
+
+    .text-black {
+        color: #1A1A1A !important; /* or #fff, or any color you want */
+        background: #FFECB0 !important;
+        padding: 0.5rem;
+        @apply shadow-[8px_8px_0px_#000000];
+    }
+
+    h2 {
+        @apply shadow-[8px_8px_0px_#000000];
+        color: black !important;
+        padding: 0.5rem;
+    }
+
+    input {
+        color: black !important; /* or #fff, or any color you want */
+    }
 }
 
 /*@layer base {*/
-    * {
-        /* margin: 0; */
-        /* padding: 0; */
-        box-sizing: border-box;
-        @apply border-border outline-ring/50;
-    }
+* {
+    /* margin: 0; */
+    /* padding: 0; */
+    box-sizing: border-box;
+    @apply border-border outline-ring/50;
+}
 
-    body {
-        @apply bg-background text-foreground;
-        font-family: var(--font-sans), sans-serif;
-    }
-/*}*/
+body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans), sans-serif;
+}
 
 .retro-shadow {
-  @apply shadow-[8px_8px_0px_#000000];
+    @apply shadow-[8px_8px_0px_#000000];
 }

@@ -10,6 +10,12 @@ import { Register } from '@routes/auth/Register.tsx';
 import { OtherUserProfile } from '@routes/user/OtherUserProfile.tsx';
 import { BoardPage } from '@routes/Board.tsx';
 import { UserProfileTab } from '@routes/user/UserProfile.tsx';
+import { MyBoards } from '@routes/user/MyBoards.tsx';
+import { Reports } from '@routes/user/Reports.tsx';
+import { Settings } from '@routes/settings/Settings.tsx';
+import { LabelsManagement } from '@routes/settings/labels/LabelsManagement.tsx';
+import { Alerts } from '@routes/alerts/Alerts.tsx';
+import { Teams } from './routes/teams/Teams';
 
 interface Props {
 }
@@ -32,6 +38,14 @@ const router = createBrowserRouter([
         element: <About />,
       },
       {
+        path: 'alerts',
+        element: <Alerts />,
+      },
+      {
+        path: 'teams',
+        element: <Teams />,
+      },
+      {
         path: 'auth',
         element: <Outlet />,
         children: [
@@ -44,9 +58,13 @@ const router = createBrowserRouter([
         element: <Outlet />,
         children: [
           { path: 'my-profile', element: <UserProfileTab /> },
+          { path: 'my-boards', element: <MyBoards /> },
+          { path: 'reports', element: <Reports /> },
+          { path: 'settings', element: <Settings /> },
           { path: ':id', element: <OtherUserProfile /> },
         ],
       },
+      { path: 'management/labels', element: <LabelsManagement /> },
       {
         path: 'board/:id',
         element: <BoardPage />,

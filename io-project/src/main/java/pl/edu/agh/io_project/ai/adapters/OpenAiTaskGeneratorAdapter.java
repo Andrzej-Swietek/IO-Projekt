@@ -52,7 +52,11 @@ public class OpenAiTaskGeneratorAdapter implements AiTaskGeneratorPort {
                         .call()
                         .entity(TaskGenerationResponse.class)
         ).orElseThrow(() -> new AIFailureException(List.of("AI result Parsing ")));
-        log.info("Raw response: {}", response);
+        log.info("Raw response: {}", response.getTitle());
+        log.info("Raw response: {}", response.getDescription());
+        log.info("Raw response: {}", response.getEstimatedHours());
+        String rawResponse = chatClient.prompt(prompt).call().content();
+        log.info("AI raw response: {}", rawResponse);
 
         try {
             Task task = Task.builder()
@@ -87,7 +91,7 @@ public class OpenAiTaskGeneratorAdapter implements AiTaskGeneratorPort {
         BoardColumn boardColumn = boardColumnRepository.findById(columnId)
                 .orElseThrow(() -> new EntityNotFoundException("Column with Id " + columnId + "not found"));
         int firstPosition = getNextPosition(columnId);
-        
+
         Prompt prompt = new GenerateMultipleTasksLLMPrompt(projectDescription, count).getPrompt();
         log.info(prompt.toString());
 

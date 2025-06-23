@@ -1,8 +1,10 @@
 package pl.edu.agh.io_project.tasks.label;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.edu.agh.io_project.tasks.Task;
 import pl.edu.agh.io_project.tasks.TaskRepository;
 
 import java.util.List;
@@ -29,22 +31,22 @@ public class LabelServiceImpl implements LabelService {
     @Transactional
     public Label getLabelById(Integer labelId) {
         return this.labelRepository.findById(labelId.longValue())
-                .orElseThrow(() -> new IllegalStateException("Label not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Label not found"));
     }
 
     @Override
     @Transactional
     public List<Label> getLabelsByTask(Integer taskId) {
-        return this.labelRepository.findByTaskId(taskId.longValue());
+        return taskRepository.findById(taskId.longValue())
+                .orElseThrow(() -> new EntityNotFoundException("Task not found"))
+                .getLabels()
+                .stream()
+                .toList();
     }
 
     @Override
     public Label addLabel(LabelRequest request) {
-        var task = this.taskRepository.findById(request.taskId())
-                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
-
         Label label = Label.builder()
-                .task(task)
                 .name(request.name())
                 .color(request.color())
                 .build();
@@ -52,8 +54,18 @@ public class LabelServiceImpl implements LabelService {
         return this.labelRepository.save(label);
     }
 
+    @Transactional
     @Override
     public void deleteLabel(Integer labelId) {
+        Label label = labelRepository.findById(labelId.longValue())
+                .orElseThrow(() -> new EntityNotFoundException("Label not found"));
+
+        List<Task> tasksWithLabel = taskRepository.findByLabelsId(labelId.longValue());
+        for (Task task : tasksWithLabel) {
+            task.getLabels().remove(label);
+        }
+        taskRepository.saveAll(tasksWithLabel);
+
         this.labelRepository.deleteById(labelId.longValue());
     }
 
@@ -63,12 +75,8 @@ public class LabelServiceImpl implements LabelService {
         Label label = this.labelRepository.findById(labelId.longValue())
                 .orElseThrow(() -> new IllegalArgumentException("Label not found"));
 
-        var task = taskRepository.findById(request.taskId())
-                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
-
         label.setName(request.name());
         label.setColor(request.color());
-        label.setTask(task);
 
         return labelRepository.save(label);
     }
