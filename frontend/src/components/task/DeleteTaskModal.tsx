@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { RetroModal } from '@components/common/RetroModal';
 import { RetroButton } from '@components/common/RetroButton';
-import {Trash2} from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 interface DeleteTaskModalProps {
   onClose: () => void;

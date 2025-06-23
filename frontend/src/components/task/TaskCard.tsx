@@ -166,7 +166,7 @@ export const TaskCard: FC<TaskCardProps> = ({ task, isDragging = false, classNam
                 if (!user) return null;
                 return (
                   <Link
-                    to={`/user/userId}`}
+                    to={`/user/${userId}`}
                     key={userId}
                     title={`${user.firstName} ${user.lastName}`}
                   >

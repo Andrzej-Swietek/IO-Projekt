@@ -1,9 +1,6 @@
 import {FC, useState, useEffect} from 'react';
 import {useMutation, useQuery} from '@tanstack/react-query';
-import {
-    ReportControllerApiFactory
-} from '@/api';
-
+import { ReportControllerApiFactory } from '@/api';
 import {RetroButton} from '@components/common/RetroButton';
 import {CreateReportModal} from '@components/report/CreateReportModal';
 import {useUserProfile} from '@context/UserProfileProvider';
@@ -63,7 +60,6 @@ export const Reports: FC = () => {
 
     const downloadReportMutation = useMutation({
         mutationFn: async (filePath: string) => {
-            // const res = await StorageControllerApiFactory().downloadFile(filePath);
             const res = await storageApi.downloadFile(filePath);
             const blob = new Blob([res.data], {type: 'application/pdf'});
             const url = window.URL.createObjectURL(blob);

@@ -116,10 +116,9 @@ public class TaskChangeListener {
                 if (!after.getAssignees().contains(removed)) {
                     historyEntries.add(history(after, userId, TaskHistoryAction.DELETED_ASSIGNEE,
                             "Deleted assignee: " + removed));
-                    // No event for unassignment in your model
                 }
             }
-            // Labels added/removed (no events for these in your model)
+            // Labels added/removed
             for (var label : after.getLabels()) {
                 if (!before.getLabels().contains(label)) {
                     historyEntries.add(history(after, userId, TaskHistoryAction.ADDED_LABEL,

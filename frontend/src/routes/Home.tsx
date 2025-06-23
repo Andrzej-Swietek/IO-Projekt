@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {TaskControllerApiFactory, Team, TeamControllerApiFactory} from '@/api';
+import { TaskControllerApiFactory, Team, TeamControllerApiFactory } from '@/api';
 import { useUserProfile } from '@context/UserProfileProvider.tsx';
 import { ColumnTitle } from '@components/board';
 import { RetroContainer } from '@components/common/RetroContainer.tsx';
