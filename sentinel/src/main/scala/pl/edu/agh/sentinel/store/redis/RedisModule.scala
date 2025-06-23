@@ -1,6 +1,6 @@
 package pl.edu.agh.sentinel.store.redis
 
-import zio.*
+import zio._
 import zio.{ Scope, ZLayer }
 import zio.redis.{ AsyncRedis, CodecSupplier, Redis, RedisConfig => RRedisConfig }
 import zio.schema.Schema

@@ -5,6 +5,7 @@ import { useUserProfile } from '@context/UserProfileProvider';
 import { RetroModal } from '@components/common/RetroModal';
 import { RetroInput } from '@components/common/RetroInput';
 import { RetroButton } from '@components/common/RetroButton';
+import { X } from 'lucide-react';
 
 interface CreateTeamModalProps {
   onClose: () => void;
@@ -41,18 +42,20 @@ export const CreateTeamModal: FC<CreateTeamModalProps> = ({ onClose }) => {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <RetroInput
           label="Team Name"
+          inputColor="bg-yellow-50"
           value={teamName}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setTeamName(e.target.value)}
           required
         />
         <RetroInput
           label="Description"
+          inputColor="bg-yellow-50"
           value={description}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
           required
         />
         <div className="flex justify-end gap-4 mt-4">
-          <RetroButton size="sm" type="button" onClick={onClose}>
+          <RetroButton icon={<X className="w-4 h-4" />} size="sm" type="button" onClick={onClose}>
             Cancel
           </RetroButton>
           <RetroButton size="sm" type="submit" disabled={createTeamMutation.isPending}>

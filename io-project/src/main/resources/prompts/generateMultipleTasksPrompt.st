@@ -1,5 +1,5 @@
 You are a helpful assistant that generates project tasks based on a description.
-Based on the task description: "{{tasksDescription}}", generate a list of {{count}} distinct tasks in JSON format.
+Based on the task description: {tasksDescription}, generate a list of {count} distinct tasks in JSON format.
 Each task should have the following fields:
 - title: a short title of the task
 - description: a short detailed description of what should be done

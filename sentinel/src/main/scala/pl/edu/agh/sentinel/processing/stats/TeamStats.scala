@@ -1,6 +1,9 @@
 package pl.edu.agh.sentinel.processing
 package stats
 
+import zio._
+import zio.json.JsonCodec
+
 import java.time.Instant
 
 case class TeamStats(
@@ -17,4 +20,4 @@ case class TeamStats(
   movedCount: Int = 0,
   statusCounts: Map[String, Int] = Map.empty, // e.g. "TODO" -> 5, "IN_PROGRESS" -> 3, "DONE" -> 2
   avgCloseTimeSeconds: Double = 0.0,
-)
+) derives JsonCodec

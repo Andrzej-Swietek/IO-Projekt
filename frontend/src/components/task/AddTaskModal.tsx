@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Label,
   LabelControllerApiFactory,
+  LabelRequest,
   Task,
   TaskControllerApiFactory,
   TaskRequest,
@@ -15,6 +16,7 @@ import { RetroButton } from '@components/common/RetroButton';
 import { useUserProfile } from '@context/UserProfileProvider';
 import { useUsersByIds } from '@/common/hooks/useUsersByIds';
 import { RetroMultiSelect } from '@components/common/RetroMultiSelect';
+import { RetroColorPicker } from '@components/common/RetroColorPicker';
 
 interface AddTaskModalProps {
   onClose: () => void;
@@ -34,6 +36,10 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
   const [priority, setPriority] = useState(1);
   const [labelIds, setLabelIds] = useState<number[]>(task?.labels ? Array.from(task.labels).map(l => l.id!) : []);
   const [assignees, setAssignees] = useState<string[]>(task?.assignees || []);
+
+  const [showAddLabel, setShowAddLabel] = useState(false);
+  const [newLabelName, setNewLabelName] = useState('');
+  const [newLabelColor, setNewLabelColor] = useState('#000000');
 
   useEffect(() => {
     if (isEdit && task) {
@@ -116,6 +122,31 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
     },
   });
 
+  const addLabelMutation = useMutation({
+    mutationFn: async () => {
+      const api = LabelControllerApiFactory();
+      const req: LabelRequest = {
+        name: newLabelName,
+        color: newLabelColor,
+        // TaskId: task?.id
+      };
+      const response = await api.createLabel(req);
+      return response.data;
+    },
+    onSuccess: createdLabel => {
+      setShowAddLabel(false);
+      setNewLabelName('');
+      setNewLabelColor('#000000');
+
+      if (createdLabel?.id) {
+        setLabelIds(prev => [...prev, createdLabel.id!]);
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['project-labels', boardId] });
+    },
+  });
+
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     console.log('Form submitted with assignees:', assignees);
@@ -139,48 +170,85 @@ export const AddTaskModal: FC<AddTaskModalProps> = ({ onClose, columnId, boardId
         <RetroInput
           label="Title"
           value={title}
+          inputColor="bg-yellow-50"
           onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
           required
         />
         <RetroInput
           label="Description"
           value={description}
+          inputColor="bg-yellow-50"
           onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
           required
         />
         <RetroInput
           label="Priority"
           type="number"
+          inputColor="bg-yellow-50"
           value={priority}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setPriority(Number(e.target.value))}
         />
-        {/* Labels (placeholder) */}
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">Labels</label>
-          <select
-            multiple
-            value={labelIds.map(String)}
-            onChange={e => setLabelIds(Array.from(e.target.selectedOptions, o => Number(o.value)))}
-            className="w-full rounded-md border border-gray-300 px-3 py-2"
-          >
-            {(labels || []).map(label => (
-              <option key={label.id} value={label.id}>{label.name}</option>
-            ))}
-          </select>
 
-          <RetroMultiSelect
-            label="Labels"
-            className="min-w-[50%] w-auto"
-            options={[
-              ...labels?.map(label => ({
+        <div className="flex items-start gap-4">
+          <div className="flex-1">
+            <RetroMultiSelect
+              label="Labels"
+              className="min-w-[50%] w-auto"
+              options={labels?.map(label => ({
                 label: label.name,
                 value: label.id,
-              })) || [],
-            ]}
-            value={labelIds}
-            onChange={selected => setLabelIds(selected.map(Number))}
-          />
+              })) || []}
+              value={labelIds}
+              onChange={selected => setLabelIds(selected.map(Number))}
+            />
+          </div>
+          <div className="self-end">
+            <RetroButton
+              variant="secondary"
+              className="retro-shadow"
+              type="button"
+              size="md"
+              onClick={() => setShowAddLabel(!showAddLabel)}
+            >
+              New
+            </RetroButton>
+          </div>
         </div>
+
+        {showAddLabel && (
+          <div className="border border-black bg-white/90 p-4 space-y-4 retro-shadow">
+            <RetroInput
+              label="New Label Name"
+              inputColor="bg-yellow-50"
+              value={newLabelName}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setNewLabelName(e.target.value)}
+            />
+            <RetroColorPicker
+              label="Color"
+              value={newLabelColor}
+              onChange={e => setNewLabelColor(e.target.value)}
+            />
+            <div className="flex gap-2">
+              <RetroButton
+                variant="secondary"
+                size="sm"
+                type="button"
+                onClick={() => addLabelMutation.mutate()}
+              >
+                Save
+              </RetroButton>
+              <RetroButton
+                variant="secondary"
+                size="sm"
+                type="button"
+                icon={null}
+                onClick={() => setShowAddLabel(false)}
+              >
+                Cancel
+              </RetroButton>
+            </div>
+          </div>
+        )}
         {/* Assignees */}
         <div>
           <RetroMultiSelect

@@ -7,4 +7,6 @@ import java.util.List;
 public interface TaskHistoryRepository extends JpaRepository<TaskHistory, Long> {
 
     List<TaskHistory> findByTaskIdOrderByTimestampDesc(Long taskId);
+
+    void deleteByTaskId(Long taskId);
 }

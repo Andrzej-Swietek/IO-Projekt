@@ -22,9 +22,7 @@ val zioSchemaProtobufVersion = "1.6.1"
 lazy val root = (project in file("."))
   .settings(
     name := "pl/edu/agh/sentinel",
-    Test / testOptions += Tests.Filter(testName =>
-      !testName.toLowerCase.contains("benchmark")
-    ),
+    Test / testOptions += Tests.Filter(testName => !testName.toLowerCase.contains("benchmark")),
     libraryDependencies ++= Seq(
       "dev.zio" %% "zio" % zioVersion,
       "dev.zio" %% "zio-http" % zioHttpVersion,
@@ -61,6 +59,14 @@ lazy val root = (project in file("."))
       "com.dimafeng" %% "testcontainers-scala-kafka" % "0.40.2",
     ),
     testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework")),
+
+    // Fat JAR
+    assembly / mainClass := Some("pl.edu.agh.sentinel.SentinelApp"),
+    assembly / assemblyJarName := s"sentinel-assembly-${version.value}.jar",
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+      case x => MergeStrategy.first
+    },
     scalacOptions ++= Seq(
       "-Xmax-inlines:128",
       "-Yexplicit-nulls",
@@ -74,7 +80,7 @@ lazy val root = (project in file("."))
     ),
     Compile / doc / sources := Seq.empty,
   )
-  .enablePlugins(JavaAppPackaging, UniversalPlugin)
-
+  .enablePlugins(JavaAppPackaging, UniversalPlugin, AssemblyPlugin)
 
 addCommandAlias("fmt", "all scalafmtSbt scalafmtAll")
+addCommandAlias("build-jar", ";clean;compile;assembly")

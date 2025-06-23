@@ -43,7 +43,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -57,8 +57,7 @@ springdoc:
 
 storage:
   local:
-    base-path: classpath:storage/
-
+    base-path: store/
 server:
   port: 8080
   compression:
@@ -69,8 +68,9 @@ server:
 
 logging:
   level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+    #    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.boot.actuate: DEBUG
     io.micrometer: DEBUG
 
@@ -115,7 +115,7 @@ kafka:
     key-serializer: org.apache.kafka.common.serialization.StringSerializer
     value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     properties:
-      spring.json.add.type.headers: false
+      spring.json.add.type.headers: true
   consumer:
     group-id: alert-consumer-group
     auto-offset-reset: earliest
