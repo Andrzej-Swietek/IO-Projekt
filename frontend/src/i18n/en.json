@@ -1,0 +1,133 @@
+{
+  "generate": {
+    "mode": {
+      "single": "Single",
+      "multiple": "Multiple"
+    },
+    "noColumns": "No columns available.",
+    "selectColumn": "Column",
+    "selectMode": "Mode",
+    "howMany": "How many?",
+    "generating": "Generating...",
+    "generate": "Generate",
+    "description": "Description"
+  },
+  "kanban": {
+    "deleteColumn": "Delete Column",
+    "dragColumn": "Drag column",
+    "addTask": "Add Task",
+    "dropTasks": "Drop tasks here",
+    "deleteConfirm": "Are you sure you want to delete the column \"{{column}}\"? This action cannot be undone."
+  },
+  "common": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "drag": "Drag to reorder"
+  },
+  "navbar": {
+    "logoLeft": "retro",
+    "logoRight": "Board",
+    "myBoards": "My Boards",
+    "settings": "Settings",
+    "help": "Help",
+    "signOut": "Sign out",
+    "signIn": "Sign in"
+  },
+  "taskDetails": {
+    "statusValues": {
+      "TODO": "To Do",
+      "IN_PROGRESS": "In Progress",
+      "DONE": "Done",
+      "BLOCKED": "Blocked"
+    },
+    "noAssignees": "No assignees",
+    "created": "Created",
+    "lastModified": "Last Modified",
+    "status": "Status",
+    "updateStatus": "Update Status",
+    "estimate": "Estimate",
+    "labels": "Labels",
+    "assignees": "Assignees",
+    "description": "Description",
+    "noDescription": "No description",
+    "comments": "Comments",
+    "noComments": "No comments yet.",
+    "noEstimates": "No estimates",
+    "estimated": "Estimated",
+    "na": "N/A",
+    "actual": "Actual"
+  },
+  "taskHistory": {
+    "title": "Task History",
+    "system": "System",
+    "actions": {
+      "FALLBACK": "Action",
+      "CREATED": "Task created",
+      "UPDATED_TITLE": "Title updated",
+      "UPDATED_DESCRIPTION": "Description updated",
+      "UPDATED_STATUS": "Status changed",
+      "UPDATED_POSITION": "Position changed",
+      "UPDATED_COLUMN": "Moved to another column",
+      "ADDED_ASSIGNEE": "Assignee added",
+      "DELETED_ASSIGNEE": "Assignee removed",
+      "ADDED_LABEL": "Label added",
+      "DELETED_LABEL": "Label removed",
+      "ADDED_COMMENT": "Comment added",
+      "EDITED_COMMENT": "Comment edited",
+      "DELETED_COMMENT": "Comment deleted",
+      "CLOSED": "Task closed",
+      "TASK_DELETED": "Task deleted"
+    }
+  },
+  "alerts": {
+    "title": "Alerts"
+  },
+  "board": {
+    "loading": "Loading...",
+    "untitled": "Board",
+    "noDescription": "No description available",
+    "teamSectionTitle": "Team",
+    "addColumn": "Add Column",
+    "addMember": "Add Member"
+  },
+  "home": {
+    "greeting": "Hello {{firstName}} {{lastName}}",
+    "myTeams": "My Teams",
+    "loadingTeams": "Loading Teams...",
+    "projects": "Projects",
+    "confirmDeleteTeam": "Are you sure you want to delete team '{{name}}'?",
+    "addTeam": "Add a new team",
+    "myTasks": "My Tasks",
+    "loadingTasks": "Loading Tasks..."
+  },
+  "labels": {
+    "management": "Label Management",
+    "filterLabel": "Filter Labels",
+    "searchPlaceholder": "Search labels...",
+    "add": "Add Label",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Are you sure you want to delete label: "
+  },
+  "settings": {
+    "hello": "Hello",
+    "title": "Settings",
+    "keycloak": "Keycloak Account:",
+    "manageAccount": "Manage Account",
+    "labels": "Labels Management:",
+    "manageLabels": "Manage Labels",
+    "theme": "Theme:",
+    "light": "Light",
+    "dark": "Dark",
+    "primaryColor": "Primary Color:",
+    "language": "Language:"
+  },
+  "myBoards": {
+    "hello": "Hello",
+    "myTeamsBoards": "MY TEAMS & BOARDS",
+    "loadingTeams": "Loading teams...",
+    "myTasks": "My Tasks",
+    "loadingTasks": "Loading Tasks..."
+  }
+}

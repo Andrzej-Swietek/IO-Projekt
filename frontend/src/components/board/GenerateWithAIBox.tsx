@@ -6,6 +6,7 @@ import { RetroButton } from '@components/common/RetroButton';
 import { RetroSelect } from '@components/common/RetroSelect';
 import { RetroTextArea } from '@components/common/RetroTextArea';
 import { Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface GenerateWithAIBoxProps {
   board: Board;
@@ -16,13 +17,13 @@ export const GenerateWithAIBox: FC<GenerateWithAIBoxProps> = ({
   board,
   onNew,
 }) => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [columnId, setColumnId] = useState<number>(board?.columns?.[0]?.id ?? 0);
   const [description, setDescription] = useState('');
   const [mode, setMode] = useState<'single' | 'multiple'>('single');
   const [count, setCount] = useState(2);
 
-  // Prepare options for RetroSelect
   const columnOptions = useMemo(
     () =>
       (board?.columns || []).map(col => ({
@@ -33,8 +34,8 @@ export const GenerateWithAIBox: FC<GenerateWithAIBoxProps> = ({
   );
 
   const modeOptions = [
-    { value: 'single', label: 'Single' },
-    { value: 'multiple', label: 'Multiple' },
+    { value: 'single', label: t('generate.mode.single') },
+    { value: 'multiple', label: t('generate.mode.multiple') },
   ];
 
   const generateTaskMutation = useMutation({
@@ -79,13 +80,14 @@ export const GenerateWithAIBox: FC<GenerateWithAIBoxProps> = ({
     }
   };
 
-  // Handle empty columns edge case
   if (!board?.columns?.length) {
     return (
       <section
         className="w-full min-h-[15vh] bg-yellow-50 border-4 p-8 mb-8 retro-shadow font-mono flex items-center justify-center"
       >
-        <span className="text-black font-mono">No columns available.</span>
+        <span className="text-black font-mono">
+          {t('generate.noColumns')}
+        </span>
       </section>
     );
   }
@@ -97,14 +99,14 @@ export const GenerateWithAIBox: FC<GenerateWithAIBoxProps> = ({
         className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end"
       >
         <RetroSelect
-          label="Column"
+          label={t('generate.selectColumn')}
           value={columnId.toString()}
           onChange={e => setColumnId(Number(e.target.value))}
           options={columnOptions}
           required
         />
         <RetroSelect
-          label="Mode"
+          label={t('generate.selectMode')}
           value={mode}
           onChange={e => setMode(e.target.value as 'single' | 'multiple')}
           options={modeOptions}
@@ -112,7 +114,7 @@ export const GenerateWithAIBox: FC<GenerateWithAIBoxProps> = ({
         />
         {mode === 'multiple' && (
           <RetroInput
-            label="How many?"
+            label={t('generate.howMany')}
             type="number"
             min={2}
             value={count}
@@ -128,13 +130,13 @@ export const GenerateWithAIBox: FC<GenerateWithAIBoxProps> = ({
             disabled={generateTaskMutation.isPending || generateMultipleTasksMutation.isPending}
           >
             {(generateTaskMutation.isPending || generateMultipleTasksMutation.isPending)
-              ? 'Generating...'
-              : 'Generate'}
+              ? t('generate.generating')
+              : t('generate.generate')}
           </RetroButton>
         </div>
         <div className="w-full col-span-3 mt-8">
           <RetroTextArea
-            label="Description"
+            label={t('generate.description')}
             value={description}
             onChange={e => setDescription(e.target.value)}
             required
