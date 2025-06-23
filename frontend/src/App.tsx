@@ -15,6 +15,7 @@ import { Reports } from '@routes/user/Reports.tsx';
 import { Settings } from '@routes/settings/Settings.tsx';
 import { LabelsManagement } from '@routes/settings/labels/LabelsManagement.tsx';
 import { Alerts } from '@routes/alerts/Alerts.tsx';
+import { Teams } from './routes/teams/Teams';
 
 interface Props {
 }
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: 'alerts',
         element: <Alerts />,
+      },
+      {
+        path: 'teams',
+        element: <Teams />,
       },
       {
         path: 'auth',
