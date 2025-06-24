@@ -27,7 +27,7 @@ jobs:
         run: docker info
 
       - name: Run ZIO + Testcontainers tests in Sentinel
-        working-directory: project/sentinel
+        working-directory: sentinel
         run: sbt test
 
       - name: Upload dependency graph
