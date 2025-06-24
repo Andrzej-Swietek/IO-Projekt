@@ -5,7 +5,8 @@
   "scripts": {
     "e2e:test": "npx playwright test",
     "e2e:report": "npx playwright show-report",
-    "e2e:test-ui": "npx playwright test --ui"
+    "e2e:test-ui": "npx playwright test --ui",
+    "e2e:debug": "npx playwright test --debug"
   },
   "keywords": [],
   "author": "",
